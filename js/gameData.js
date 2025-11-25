@@ -1409,10 +1409,22 @@ const GameData = {
     },
 
     formatNumber(num) {
-        if (num < 1000) return Math.floor(num).toString();
-        if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
-        if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
-        return (num / 1000000000).toFixed(1) + 'B';
+        if (num < 1000) {
+            if (num < 10) return parseFloat(num.toFixed(2)).toString();
+            if (num < 100) return parseFloat(num.toFixed(1)).toString();
+            return Math.floor(num).toString();
+        }
+        
+        const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+        const tier = Math.floor(Math.log10(Math.abs(num)) / 3);
+        
+        if (tier >= suffixes.length) {
+            return num.toExponential(2);
+        }
+        
+        const scaled = num / Math.pow(1000, tier);
+        const decimals = scaled >= 100 ? 0 : scaled >= 10 ? 1 : 2;
+        return scaled.toFixed(decimals) + suffixes[tier];
     },
 
     // Get all node connections for rendering
