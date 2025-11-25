@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     
     <!-- Game Modules -->
-    <script src="js/gameData.js"></script>
+    <script type="module" src="js/gameData.js"></script>
     <script src="js/prestigeData.js"></script>
     <script src="js/LayoutEngine.js"></script>
     <script src="js/components/ResourceBar.js"></script>
@@ -26,6 +26,15 @@
     <script src="js/components/SkillTree.js"></script>
     <script src="js/components/InfoPanel.js"></script>
     <script src="js/components/NotificationToast.js"></script>
-    <script src="js/App.js"></script>
+    
+    <!-- Composables (ES6 modules) -->
+    <script type="module" src="js/composables/useGameState.js"></script>
+    <script type="module" src="js/composables/usePrestigeState.js"></script>
+    <script type="module" src="js/composables/useNodeManagement.js"></script>
+    <script type="module" src="js/composables/useSaveLoad.js"></script>
+    <script type="module" src="js/composables/useGameLoop.js"></script>
+    
+    <!-- Main App (ES6 module) -->
+    <script type="module" src="js/App.js"></script>
 </body>
 </html>

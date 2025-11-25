@@ -320,7 +320,5 @@ const LayoutEngine = {
     }
 };
 
-// Apply layout to GameData on load
-if (typeof GameData !== 'undefined') {
-    LayoutEngine.applyLayout(GameData);
-}
+// Note: Layout is now initialized explicitly from gameData.js after module loading
+// This ensures nodes are fully imported before layout calculation

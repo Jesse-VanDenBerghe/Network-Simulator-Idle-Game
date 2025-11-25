@@ -1,5 +1,8 @@
 // Game Data Module - Node definitions and game constants
 // ======================================================
+// Note: Nodes are now imported from separate tier files in js/data/nodes/
+
+import { allNodes } from './data/nodes/index.js';
 
 const GameData = {
     // =============================================
@@ -49,8 +52,11 @@ const GameData = {
         }
     },
 
-    // Node definitions
-    nodes: {
+    // Node definitions (imported from tier files)
+    nodes: allNodes,
+
+    // Legacy inline nodes preserved below for reference (can be removed after testing)
+    _legacyNodes: {
         // =============================================
         // TIER 0 - Core (Starting node)
         // =============================================
@@ -1357,7 +1363,7 @@ const GameData = {
                 description: 'You have become a god.'
             }
         }
-    },
+    }, // End of _legacyNodes - can be removed after testing
 
     // =============================================
     // HELPER FUNCTIONS
@@ -1476,3 +1482,8 @@ const GameData = {
         }
     }
 };
+
+// Export GameData globally for use by other scripts
+window.GameData = GameData;
+
+export default GameData;
