@@ -2,7 +2,7 @@
 // ===================================
 // Uses composables for clean separation of concerns
 
-const { createApp, computed } = Vue;
+const { createApp, computed, onMounted, onUnmounted } = Vue;
 
 // Import composables
 import { useGameState } from './composables/useGameState.js';
@@ -40,6 +40,27 @@ const App = {
                 gameState.unlockedNodes.value
             )
         );
+
+        // ==========================================
+        // KEYBOARD SHORTCUTS
+        // ==========================================
+        function handleKeydown(event) {
+            // 'u' to unlock selected node
+            if (event.key === 'u' || event.key === 'U') {
+                const nodeId = gameState.selectedNodeId.value;
+                if (nodeId) {
+                    gameLoop.handleUnlockNode(nodeId);
+                }
+            }
+        }
+
+        onMounted(() => {
+            window.addEventListener('keydown', handleKeydown);
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('keydown', handleKeydown);
+        });
 
         // ==========================================
         // RETURN (expose to template)
