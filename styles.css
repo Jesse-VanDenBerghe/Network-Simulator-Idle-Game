@@ -554,3 +554,400 @@ body {
 .notification-move {
     transition: transform 0.3s ease;
 }
+
+/* ==================================================== */
+/* PRESTIGE / ASCENSION STYLES */
+/* ==================================================== */
+
+/* Prestige Header Button */
+.prestige-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.prestige-button {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border: 2px solid #00ffff;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.prestige-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+}
+
+.prestige-icon {
+    font-size: 1.5rem;
+}
+
+.prestige-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #00ffff;
+}
+
+.prestige-label {
+    font-size: 0.8rem;
+    color: #aaaacc;
+}
+
+.prestige-ascension {
+    font-size: 0.7rem;
+    color: #8888aa;
+    margin-left: 0.5rem;
+}
+
+/* Ascension Button in Sidebar */
+#ascension-section {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 2px solid #6a11cb;
+    margin-top: 1rem;
+}
+
+#ascension-section h2 {
+    color: #00ffff;
+    margin-bottom: 0.8rem;
+}
+
+#ascension-button {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+#ascension-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+}
+
+#ascension-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#ascension-button .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#ascension-button .button-icon {
+    font-size: 1.5rem;
+}
+
+#ascension-button .button-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+#ascension-button .button-value {
+    font-size: 0.9rem;
+    color: #00ffff;
+}
+
+.ascension-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #8888aa;
+    margin-top: 0.5rem;
+}
+
+/* Ascension Panel */
+#ascension-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 26, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+#ascension-panel .panel-content {
+    background: var(--bg-medium);
+    border: 2px solid #6a11cb;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(106, 17, 203, 0.5);
+}
+
+#ascension-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 2px solid #6a11cb;
+}
+
+#ascension-panel .panel-header h2 {
+    font-size: 1.8rem;
+    color: #00ffff;
+    margin: 0;
+}
+
+#ascension-panel .close-button {
+    background: none;
+    border: none;
+    color: #aaaacc;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#ascension-panel .close-button:hover {
+    color: #ff00aa;
+    transform: rotate(90deg);
+}
+
+/* Prestige Summary */
+.prestige-summary {
+    display: flex;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-bottom: 1px solid #6a11cb;
+}
+
+.prestige-stat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.prestige-stat .stat-icon {
+    font-size: 2rem;
+}
+
+.prestige-stat .stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.prestige-stat .stat-label {
+    font-size: 0.8rem;
+    color: #8888aa;
+}
+
+.prestige-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00ffff;
+}
+
+/* Panel Body */
+#ascension-panel .panel-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Tier Tabs */
+.tier-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.tier-tab {
+    flex: 1;
+    padding: 0.8rem;
+    background: var(--bg-light);
+    border: 1px solid #444466;
+    border-radius: 8px;
+    color: #aaaacc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tier-tab:hover {
+    border-color: #00ffff;
+}
+
+.tier-tab.active {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border-color: #00ffff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Upgrades Grid */
+.upgrades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.upgrade-card {
+    background: var(--bg-light);
+    border: 2px solid #444466;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.upgrade-card.purchased {
+    border-color: #00ffaa;
+    background: linear-gradient(135deg, rgba(0, 255, 170, 0.1) 0%, rgba(0, 255, 170, 0.05) 100%);
+}
+
+.upgrade-card.available {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.upgrade-card.locked {
+    opacity: 0.6;
+}
+
+.upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.upgrade-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #00ffff;
+    margin: 0;
+}
+
+.upgrade-cost {
+    font-size: 0.9rem;
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+}
+
+.upgrade-description {
+    font-size: 0.9rem;
+    color: #aaaacc;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+}
+
+.upgrade-requirements {
+    font-size: 0.75rem;
+    color: #8888aa;
+    margin-bottom: 0.8rem;
+    padding: 0.4rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.req-label {
+    font-weight: bold;
+}
+
+.req-list {
+    color: #aaaacc;
+}
+
+.purchase-button {
+    width: 100%;
+    padding: 0.6rem;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border: 1px solid #00ffff;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.purchase-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+
+.purchase-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #444466;
+}
+
+.upgrade-card.purchased .purchase-button {
+    background: #00ffaa;
+    border-color: #00ffaa;
+    color: var(--bg-dark);
+}
+
+/* Statistics Section */
+.statistics-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #444466;
+}
+
+.statistics-section h3 {
+    color: #00ffff;
+    margin-bottom: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.stat-item {
+    background: var(--bg-dark);
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #444466;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-name {
+    color: #aaaacc;
+    font-size: 0.9rem;
+}
+
+.stat-val {
+    color: #00ffff;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Prestige notification */
+.notification.prestige {
+    border-color: #6a11cb;
+    background: linear-gradient(135deg, rgba(106, 17, 203, 0.3) 0%, rgba(37, 117, 252, 0.3) 100%);
+    box-shadow: 0 0 30px rgba(106, 17, 203, 0.5);
+}

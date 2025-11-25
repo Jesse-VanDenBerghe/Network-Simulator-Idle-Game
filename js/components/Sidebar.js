@@ -3,7 +3,8 @@ const Sidebar = {
     name: 'Sidebar',
     components: {
         ActionButton,
-        AutomationItem
+        AutomationItem,
+        AscensionButton
     },
     props: {
         energyPerClick: { type: Number, required: true },
@@ -12,9 +13,11 @@ const Sidebar = {
         canProcessData: { type: Boolean, default: false },
         automations: { type: Object, required: true },
         effectiveRates: { type: Object, required: true },
-        stats: { type: Object, required: true }
+        stats: { type: Object, required: true },
+        coresEarned: { type: Number, default: 0 },
+        highestTierReached: { type: Number, default: 0 }
     },
-    emits: ['generate-energy', 'process-data'],
+    emits: ['generate-energy', 'process-data', 'ascend'],
     computed: {
         hasAutomations() {
             return Object.values(this.automations).some(rate => rate > 0);
@@ -72,6 +75,12 @@ const Sidebar = {
                     <span>{{ formatNumber(stats.totalData) }}</span>
                 </div>
             </div>
+
+            <AscensionButton
+                :cores-earned="coresEarned"
+                :min-tier-reached="highestTierReached"
+                @ascend="$emit('ascend')"
+            />
         </aside>
     `,
     methods: {

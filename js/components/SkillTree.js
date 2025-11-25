@@ -8,7 +8,9 @@ const SkillTree = {
         nodes: { type: Object, required: true },
         unlockedNodes: { type: Set, required: true },
         selectedNodeId: { type: String, default: null },
-        resources: { type: Object, required: true }
+        resources: { type: Object, required: true },
+        ascensionCount: { type: Number, default: 0 },
+        prestigeBonuses: { type: Object, default: null }
     },
     emits: ['select-node'],
     computed: {
@@ -33,7 +35,7 @@ const SkillTree = {
         },
         canAfford(node) {
             if (!node || !this.isAvailable(node)) return false;
-            const scaledCost = GameData.getScaledNodeCost(node);
+            const scaledCost = GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
             for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (this.resources[resource] < amount) return false;
             }
