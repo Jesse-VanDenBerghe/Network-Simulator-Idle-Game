@@ -123,9 +123,9 @@ formatNumber(num) {
 ```
 
 ## 2.2 Deliverable Checklist
-- [ ] Numbers display with appropriate suffixes
-- [ ] Scientific notation fallback for extreme values
-- [ ] All resource displays use formatNumber()
+- [x] Numbers display with appropriate suffixes
+- [x] Scientific notation fallback for extreme values
+- [x] All resource displays use formatNumber()
 
 ---
 

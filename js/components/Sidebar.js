@@ -32,13 +32,13 @@ const Sidebar = {
                 <ActionButton
                     icon="⚡"
                     text="Generate Energy"
-                    :value="'+' + energyPerClick"
+                    :value="'+' + formatNumber(energyPerClick)"
                     @click="$emit('generate-energy')"
                 />
                 <ActionButton
                     icon="📊"
                     text="Process Data"
-                    :value="'+' + dataPerClick + ' (costs 5⚡)'"
+                    :value="'+' + formatNumber(dataPerClick) + ' (costs 5⚡)'"
                     :locked="!dataUnlocked"
                     :disabled="!canProcessData"
                     @click="$emit('process-data')"
