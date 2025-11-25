@@ -2,6 +2,31 @@
 // ======================================================
 
 const GameData = {
+    // =============================================
+    // CONFIGURATION & CONSTANTS
+    // =============================================
+    
+    // Cost multipliers per tier (Exponential scaling)
+    TIER_COST_MULTIPLIERS: {
+        0: 1,      // Core
+        1: 1,      // 10-25 energy
+        2: 10,     // 100-300 energy
+        3: 50,     // 500-2,000 energy
+        4: 500,    // 5K-20K energy
+        5: 5000,   // 50K-200K energy
+        6: 50000,  // 500K-2M energy
+        7: 500000  // 10M-50M energy
+    },
+
+    // Gate requirements for unlocking new tiers
+    TIER_GATES: {
+        3: { requiredTier: 2, requiredCount: 3 },
+        4: { requiredTier: 3, requiredCount: 6 },
+        5: { requiredTier: 4, requiredCount: 10 },
+        6: { requiredTier: 5, requiredCount: 15 },
+        7: { requiredTier: 6, requiredCount: 20 }
+    },
+
     // Resource definitions
     resources: {
         energy: {
@@ -1334,26 +1359,16 @@ const GameData = {
         }
     },
 
-    // Helper functions
-    TIER_COST_MULTIPLIERS: {
-        0: 1,      // Core
-        1: 1,      // 10-25 energy
-        2: 10,     // 100-300 energy
-        3: 50,     // 500-2,000 energy
-        4: 500,    // 5K-20K energy
-        5: 5000,   // 50K-200K energy
-        6: 50000,  // 500K-2M energy
-        7: 500000  // 10M-50M energy
-    },
+    // =============================================
+    // HELPER FUNCTIONS
+    // =============================================
 
-    TIER_GATES: {
-        3: { requiredTier: 2, requiredCount: 3 },
-        4: { requiredTier: 3, requiredCount: 6 },
-        5: { requiredTier: 4, requiredCount: 10 },
-        6: { requiredTier: 5, requiredCount: 15 },
-        7: { requiredTier: 6, requiredCount: 20 }
-    },
-
+    /**
+     * Count how many nodes of a specific tier are unlocked
+     * @param {number} tier - The tier to count
+     * @param {Set<string>} unlockedNodeIds - Set of unlocked node IDs
+     * @returns {number} The count of unlocked nodes in that tier
+     */
     countUnlockedInTier(tier, unlockedNodeIds) {
         let count = 0;
         unlockedNodeIds.forEach(id => {
@@ -1365,6 +1380,12 @@ const GameData = {
         return count;
     },
 
+    /**
+     * Check if a tier is unlocked based on gate requirements
+     * @param {number} tier - The tier to check
+     * @param {Set<string>} unlockedNodeIds - Set of unlocked node IDs
+     * @returns {boolean} True if the tier is unlocked
+     */
     isTierUnlocked(tier, unlockedNodeIds) {
         const gate = this.TIER_GATES[tier];
         if (!gate) return true;
@@ -1373,6 +1394,11 @@ const GameData = {
         return count >= gate.requiredCount;
     },
 
+    /**
+     * Get the cost of a node scaled by its tier multiplier
+     * @param {Object} node - The node object
+     * @returns {Object} The scaled cost object { resource: amount }
+     */
     getScaledNodeCost(node) {
         const multiplier = this.TIER_COST_MULTIPLIERS[node.tier] || 1;
         const scaled = {};

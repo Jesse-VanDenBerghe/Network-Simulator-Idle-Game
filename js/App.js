@@ -116,12 +116,7 @@ const App = {
         });
 
         const canAffordSelectedNode = computed(() => {
-            if (!selectedNode.value) return false;
-            const scaledCost = GameData.getScaledNodeCost(selectedNode.value);
-            for (const [resource, amount] of Object.entries(scaledCost)) {
-                if (resources[resource] < amount) return false;
-            }
-            return true;
+            return checkAffordability(selectedNode.value);
         });
 
         const isTierLocked = computed(() => {
@@ -151,6 +146,18 @@ const App = {
         const dataPerClickDisplay = computed(() => {
             return Math.floor(computedValues.value.dataPerClick * computedValues.value.dataMultiplier);
         });
+
+        // ==========================================
+        // HELPER METHODS
+        // ==========================================
+        function checkAffordability(node) {
+            if (!node) return false;
+            const scaledCost = GameData.getScaledNodeCost(node);
+            for (const [resource, amount] of Object.entries(scaledCost)) {
+                if (resources[resource] < amount) return false;
+            }
+            return true;
+        }
 
         // ==========================================
         // METHODS
@@ -184,12 +191,10 @@ const App = {
             // Check tier gate
             if (!GameData.isTierUnlocked(node.tier, unlockedNodes.value)) return;
 
-            const scaledCost = GameData.getScaledNodeCost(node);
-
             // Check cost
-            for (const [resource, amount] of Object.entries(scaledCost)) {
-                if (resources[resource] < amount) return;
-            }
+            if (!checkAffordability(node)) return;
+
+            const scaledCost = GameData.getScaledNodeCost(node);
 
             // Deduct costs
             for (const [resource, amount] of Object.entries(scaledCost)) {
