@@ -6,13 +6,10 @@ Ideas to make Network Simulator more satisfying and engaging through visual feed
 
 ### 1. Click Effects & Particles
 - **Floating numbers** that pop out when clicking (+5 ⚡, +2 📊) with satisfying bounce animations
-- **Particle burst** on each click (energy sparks radiating outward)
 - **Screen shake** (subtle) on big milestones or powerful clicks
 - **Combo counter** - clicks within 0.5s stack a multiplier with escalating visual intensity
 
 ### 2. Node Unlock Celebrations
-- **Shockwave animation** emanating from unlocked node
-- **Connection lines animate** (pulse of light traveling from parent to child node)
 - **Confetti burst** for tier-1 unlocks, more elaborate effects for higher tiers
 - **"UNLOCKED!"** text with typewriter/glitch effect
 - **Camera auto-pan** to the newly unlocked node

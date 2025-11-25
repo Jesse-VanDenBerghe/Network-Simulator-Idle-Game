@@ -244,11 +244,11 @@ function savePrestige() {
 | `index.html` | Include new component |
 
 ## 3.6 Deliverable Checklist
-- [ ] Prestige state persists across game resets
-- [ ] Quantum Cores calculated based on progress
-- [ ] Ascend button appears after reaching Tier 3
-- [ ] Game resets but cores are retained
-- [ ] Ascension count displayed in UI
+- [X] Prestige state persists across game resets
+- [X] Quantum Cores calculated based on progress
+- [X] Ascend button appears after reaching Tier 3
+- [X] Game resets but cores are retained
+- [X] Ascension count displayed in UI
 
 ---
 
@@ -419,11 +419,11 @@ function getAccumulatedBonuses() {
 | `index.html` | Include new scripts |
 
 ## 4.4 Deliverable Checklist
-- [ ] 16 prestige upgrades across 4 tiers
-- [ ] Upgrades purchasable with Quantum Cores
-- [ ] Bonuses apply on game start/ascend
-- [ ] Upgrade tree UI shows requirements and costs
-- [ ] Visual indication of purchased upgrades
+- [X] 16 prestige upgrades across 4 tiers
+- [X] Upgrades purchasable with Quantum Cores
+- [X] Bonuses apply on game start/ascend
+- [X] Upgrade tree UI shows requirements and costs
+- [X] Visual indication of purchased upgrades
 
 ---
 
