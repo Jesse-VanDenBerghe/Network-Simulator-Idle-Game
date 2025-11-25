@@ -44,8 +44,8 @@ Ideas to make Network Simulator more satisfying and engaging through visual feed
 ## ✨ Visual Polish
 
 ### 7. Skill Tree Enhancements
-- **Parallax background** - subtle star field that moves as you pan
-- **Connection glow propagation** - power flows visually through unlocked connections
+- ✅ **Parallax background** - subtle star field that moves as you pan
+- ✅ **Connection glow propagation** - power flows visually through unlocked connections
 - **Node "breathing"** - unlocked nodes gently pulse with their tier color
 - **Hover preview** - ghost effect showing what connecting nodes would look like unlocked
 

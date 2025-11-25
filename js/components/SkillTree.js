@@ -17,7 +17,8 @@ const SkillTree = {
     data() {
         return {
             justUnlockedNodeId: null,
-            animatingConnections: new Set()
+            animatingConnections: new Set(),
+            glowingConnections: new Map() // tracks glow animation offset for each connection
         };
     },
     watch: {
@@ -104,9 +105,34 @@ const SkillTree = {
         },
         getAnimatingConnections() {
             return this.connections.filter(conn => this.isConnectionAnimating(conn));
+        },
+        startGlowAnimation() {
+            let time = 0;
+            const animate = () => {
+                time += 0.01;
+                // Update glow positions for unlocked connections
+                this.connections.forEach((conn, index) => {
+                    if (this.isConnectionUnlocked(conn)) {
+                        // Stagger the glow based on connection index
+                        const offset = (time + index * 0.3) % 1;
+                        this.glowingConnections.set(`${conn.from}-${conn.to}`, offset);
+                    }
+                });
+                this.glowAnimationFrame = requestAnimationFrame(animate);
+            };
+            animate();
+        },
+        getGlowOffset(conn) {
+            return this.glowingConnections.get(`${conn.from}-${conn.to}`) || 0;
+        },
+        getGlowGradientId(conn) {
+            return `glow-gradient-${conn.from}-${conn.to}`;
         }
     },
     mounted() {
+        // Start connection glow animation loop
+        this.startGlowAnimation();
+        
         // Center on core node
         this.$nextTick(() => {
             const container = this.$refs.container;
@@ -117,11 +143,31 @@ const SkillTree = {
             }
         });
     },
+    beforeUnmount() {
+        if (this.glowAnimationFrame) {
+            cancelAnimationFrame(this.glowAnimationFrame);
+        }
+    },
     template: `
         <section id="skill-tree-container" ref="container">
             <div id="skill-tree">
                 <svg id="connections">
                     <defs>
+                        <!-- Glow gradients for flowing effect -->
+                        <template v-for="conn in connections" :key="'glow-template-' + conn.from + '-' + conn.to">
+                            <linearGradient 
+                                v-if="isConnectionUnlocked(conn)"
+                                :id="getGlowGradientId(conn)"
+                                gradientUnits="userSpaceOnUse"
+                                :x1="conn.x1" :y1="conn.y1" :x2="conn.x2" :y2="conn.y2"
+                            >
+                                <stop :offset="Math.max(0, getGlowOffset(conn) - 0.1)" stop-color="rgba(0, 255, 170, 0)" />
+                                <stop :offset="getGlowOffset(conn)" stop-color="rgba(0, 255, 255, 0.8)" />
+                                <stop :offset="Math.min(1, getGlowOffset(conn) + 0.1)" stop-color="rgba(0, 255, 170, 0)" />
+                            </linearGradient>
+                        </template>
+                        
+                        <!-- Pulse gradients for unlock animation -->
                         <linearGradient 
                             v-for="conn in connections"
                             :key="'grad-' + conn.from + '-' + conn.to"
@@ -158,6 +204,7 @@ const SkillTree = {
                             </stop>
                         </linearGradient>
                     </defs>
+                    <!-- Base connection lines -->
                     <line
                         v-for="(conn, index) in connections"
                         :key="index"
@@ -167,6 +214,19 @@ const SkillTree = {
                         :y2="conn.y2"
                         :class="{ unlocked: isConnectionUnlocked(conn), animating: isConnectionAnimating(conn) }"
                     />
+                    
+                    <!-- Flowing glow overlay for unlocked connections -->
+                    <template v-for="conn in connections" :key="'glow-line-' + conn.from + '-' + conn.to">
+                        <line
+                            v-if="isConnectionUnlocked(conn) && !isConnectionAnimating(conn)"
+                            :x1="conn.x1"
+                            :y1="conn.y1"
+                            :x2="conn.x2"
+                            :y2="conn.y2"
+                            class="connection-glow"
+                            :stroke="'url(#' + getGlowGradientId(conn) + ')'"
+                        />
+                    </template>
                     <line
                         v-for="conn in getAnimatingConnections()"
                         :key="'pulse-' + conn.from + '-' + conn.to"
