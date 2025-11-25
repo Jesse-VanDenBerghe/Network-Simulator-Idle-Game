@@ -9,6 +9,11 @@ const GameData = {
     // CONFIGURATION & CONSTANTS
     // =============================================
     
+    // Feature flags
+    FEATURE_FLAGS: {
+        DOTS_TO_AVAILABLE_NODES: false, // Show gray dots traveling to available (locked) nodes
+    },
+    
     // Cost multipliers per tier (Exponential scaling)
     TIER_COST_MULTIPLIERS: {
         0: 1,      // Core

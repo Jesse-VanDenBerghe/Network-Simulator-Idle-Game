@@ -364,6 +364,16 @@ body {
     animation: dot-pulse 0.6s ease-in-out infinite;
 }
 
+/* Gray dots traveling to locked nodes */
+.traveling-dot.to-locked {
+    background: #888888;
+    box-shadow: none;
+    animation: none;
+    opacity: 0.6;
+    width: 5px;
+    height: 5px;
+}
+
 @keyframes dot-pulse {
     0%, 100% {
         transform: translate(-50%, -50%) scale(1);
@@ -511,6 +521,38 @@ body {
 
 .node.unlocked .node-name {
     color: var(--text-primary);
+}
+
+/* Progress Ring */
+.progress-ring {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 90px;
+    height: 90px;
+    transform: rotate(-90deg); /* Start from top */
+    pointer-events: none;
+    z-index: 3;
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px currentColor);
+    transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
+    animation: progress-glow 2s ease-in-out infinite;
+}
+
+@keyframes progress-glow {
+    0%, 100% {
+        opacity: 0.8;
+        filter: drop-shadow(0 0 4px currentColor);
+    }
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 8px currentColor);
+    }
 }
 
 /* Tier indicators */

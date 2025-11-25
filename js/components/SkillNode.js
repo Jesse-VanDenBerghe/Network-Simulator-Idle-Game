@@ -8,7 +8,8 @@ const SkillNode = {
         isTierLocked: { type: Boolean, default: false },
         canAfford: { type: Boolean, default: false },
         isSelected: { type: Boolean, default: false },
-        justUnlocked: { type: Boolean, default: false }
+        justUnlocked: { type: Boolean, default: false },
+        progressPercent: { type: Number, default: 0 }
     },
     emits: ['select'],
     computed: {

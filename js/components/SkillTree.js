@@ -19,13 +19,16 @@ const SkillTree = {
             justUnlockedNodeId: null,
             animatingConnections: new Set(),
             glowingConnections: new Map(), // tracks glow animation offset for each connection
-            travelingDots: [] // { id, fromNode, toNode, progress, startTime }
+            travelingDots: [], // { id, fromNode, toNode, progress, startTime }
+            nodeProgress: new Map() // tracks unlock progress for each available node
         };
     },
     watch: {
         lastUnlockedNodeId(newId) {
             if (newId) {
                 this.triggerUnlockAnimation(newId);
+                // Clear progress for the unlocked node
+                this.nodeProgress.delete(newId);
             }
         }
     },
@@ -130,10 +133,10 @@ const SkillTree = {
             return `glow-gradient-${conn.from}-${conn.to}`;
         },
         startDotAnimation() {
-            // Every second, spawn dots from the core node
+            // Every 3 seconds, spawn dots from the core node
             this.dotInterval = setInterval(() => {
                 this.spawnDotsFromCore();
-            }, 1000);
+            }, 3000);
             
             // Animation loop to update dot positions
             const animate = () => {
@@ -147,7 +150,22 @@ const SkillTree = {
                     dot.progress = Math.min(elapsed * dotSpeed, 1);
                     
                     if (dot.progress >= 1) {
-                        dotsToSpawn.push(dot.toNode);
+                        const toNode = this.nodes[dot.toNode];
+                        
+                        // If target node is available (not unlocked), increase its progress
+                        if (toNode && this.isAvailable(toNode)) {
+                            const currentProgress = this.nodeProgress.get(dot.toNode) || 0;
+                            const scaledCost = GameData.getScaledNodeCost(toNode, this.ascensionCount, this.prestigeBonuses);
+                            const totalCost = Object.values(scaledCost).reduce((sum, cost) => sum + cost, 0);
+                            // Each dot contributes 1% of the total cost
+                            const progressIncrement = totalCost * 0.01;
+                            this.nodeProgress.set(dot.toNode, currentProgress + progressIncrement);
+                        }
+                        
+                        // Only spawn from unlocked nodes
+                        if (this.isUnlocked(dot.toNode)) {
+                            dotsToSpawn.push(dot.toNode);
+                        }
                     }
                 });
                 
@@ -164,10 +182,13 @@ const SkillTree = {
             animate();
         },
         spawnDotsFromCore() {
-            // Find all unlocked connections starting from core
-            const coreConnections = this.connections.filter(conn => 
-                conn.from === 'core' && this.isConnectionUnlocked(conn)
-            );
+            // Find connections from core to unlocked nodes (and optionally available nodes)
+            const coreConnections = this.connections.filter(conn => {
+                if (conn.from !== 'core') return false;
+                if (this.isUnlocked(conn.to)) return true;
+                // Only include available nodes if feature flag is enabled
+                return GameData.FEATURE_FLAGS.DOTS_TO_AVAILABLE_NODES && this.isAvailable(this.nodes[conn.to]);
+            });
             
             coreConnections.forEach(conn => {
                 this.travelingDots.push({
@@ -175,15 +196,20 @@ const SkillTree = {
                     fromNode: conn.from,
                     toNode: conn.to,
                     progress: 0,
-                    startTime: Date.now()
+                    startTime: Date.now(),
+                    toUnlocked: this.isUnlocked(conn.to)
                 });
             });
         },
         spawnDotsFromNode(nodeId) {
-            // Find all unlocked connections going out from this node
-            const outgoingConnections = this.connections.filter(conn => 
-                conn.from === nodeId && this.isConnectionUnlocked(conn)
-            );
+            // Find connections going out from this unlocked node to unlocked nodes (and optionally available)
+            const outgoingConnections = this.connections.filter(conn => {
+                if (conn.from !== nodeId) return false;
+                if (!this.isUnlocked(conn.from)) return false;
+                if (this.isUnlocked(conn.to)) return true;
+                // Only include available nodes if feature flag is enabled
+                return GameData.FEATURE_FLAGS.DOTS_TO_AVAILABLE_NODES && this.isAvailable(this.nodes[conn.to]);
+            });
             
             console.log(`Spawning dots from node ${nodeId}, found ${outgoingConnections.length} outgoing connections`, outgoingConnections);
             
@@ -194,7 +220,8 @@ const SkillTree = {
                     fromNode: conn.from,
                     toNode: conn.to,
                     progress: 0,
-                    startTime: now
+                    startTime: now,
+                    toUnlocked: this.isUnlocked(conn.to)
                 });
             });
         },
@@ -207,6 +234,16 @@ const SkillTree = {
             const x = fromNode.x + (toNode.x - fromNode.x) * dot.progress + 40; // +40 for node center
             const y = fromNode.y + (toNode.y - fromNode.y) * dot.progress + 40;
             return { x, y };
+        },
+        getNodeProgressPercent(nodeId) {
+            const node = this.nodes[nodeId];
+            if (!node || !this.isAvailable(node)) return 0;
+            
+            const currentProgress = this.nodeProgress.get(nodeId) || 0;
+            const scaledCost = GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
+            const totalCost = Object.values(scaledCost).reduce((sum, cost) => sum + cost, 0);
+            
+            return Math.min((currentProgress / totalCost) * 100, 100);
         }
     },
     mounted() {
@@ -332,7 +369,7 @@ const SkillTree = {
                 <div 
                     v-for="dot in travelingDots" 
                     :key="dot.id"
-                    class="traveling-dot"
+                    :class="['traveling-dot', { 'to-locked': !dot.toUnlocked }]"
                     :style="{
                         left: getDotPosition(dot).x + 'px',
                         top: getDotPosition(dot).y + 'px'
@@ -350,6 +387,7 @@ const SkillTree = {
                         :can-afford="canAfford(node)"
                         :is-selected="selectedNodeId === node.id"
                         :just-unlocked="justUnlockedNodeId === node.id"
+                        :progress-percent="getNodeProgressPercent(node.id)"
                         @select="selectNode"
                     />
                 </div>
