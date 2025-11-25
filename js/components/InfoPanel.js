@@ -9,13 +9,15 @@ const InfoPanel = {
         tierGate: { type: Object, default: null },
         canAfford: { type: Boolean, default: false },
         resources: { type: Object, required: true },
-        unlockedNodes: { type: Set, required: true }
+        unlockedNodes: { type: Set, required: true },
+        ascensionCount: { type: Number, default: 0 },
+        prestigeBonuses: { type: Object, default: null }
     },
     emits: ['unlock'],
     computed: {
         costEntries() {
             if (!this.node || !this.node.cost) return [];
-            const scaledCost = GameData.getScaledNodeCost(this.node);
+            const scaledCost = GameData.getScaledNodeCost(this.node, this.ascensionCount, this.prestigeBonuses);
             return Object.entries(scaledCost).map(([resource, amount]) => ({
                 resource,
                 resourceName: resource.charAt(0).toUpperCase() + resource.slice(1),

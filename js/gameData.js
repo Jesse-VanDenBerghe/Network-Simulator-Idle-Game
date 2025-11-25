@@ -1395,15 +1395,36 @@ const GameData = {
     },
 
     /**
-     * Get the cost of a node scaled by its tier multiplier
+     * Get the cost of a node scaled by its tier multiplier, ascension count, and prestige bonuses
      * @param {Object} node - The node object
+     * @param {number} ascensionCount - Current ascension count (default 0)
+     * @param {Object} prestigeBonuses - Prestige bonuses object (optional)
      * @returns {Object} The scaled cost object { resource: amount }
      */
-    getScaledNodeCost(node) {
-        const multiplier = this.TIER_COST_MULTIPLIERS[node.tier] || 1;
+    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
+        const baseCost = node.cost;
+        const tierMultiplier = this.TIER_COST_MULTIPLIERS[node.tier] || 1;
+        
+        // Ascension scaling: each ascension increases costs by 50%
+        const ascensionMultiplier = Math.pow(1.5, ascensionCount);
+        
+        // Prestige cost reduction
+        let costReduction = 1;
+        if (prestigeBonuses) {
+            // Apply general cost multiplier
+            if (prestigeBonuses.costMultiplier) {
+                costReduction *= prestigeBonuses.costMultiplier;
+            }
+            // Apply tier-specific cost multipliers
+            if (prestigeBonuses.tierCostMultipliers && prestigeBonuses.tierCostMultipliers[node.tier]) {
+                costReduction *= prestigeBonuses.tierCostMultipliers[node.tier];
+            }
+        }
+        
         const scaled = {};
-        for (const [resource, amount] of Object.entries(node.cost)) {
-            scaled[resource] = Math.floor(amount * multiplier);
+        for (const [resource, amount] of Object.entries(baseCost)) {
+            const finalCost = amount * tierMultiplier * ascensionMultiplier * costReduction;
+            scaled[resource] = Math.floor(finalCost);
         }
         return scaled;
     },

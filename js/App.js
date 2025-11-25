@@ -8,7 +8,8 @@ const App = {
         Sidebar,
         SkillTree,
         InfoPanel,
-        NotificationToast
+        NotificationToast,
+        AscensionPanel
     },
     setup() {
         // ==========================================
@@ -41,8 +42,28 @@ const App = {
         let saveInterval = null;
 
         // ==========================================
+        // PRESTIGE STATE
+        // ==========================================
+        const prestigeState = reactive({
+            ascensionCount: 0,
+            quantumCores: 0,
+            totalCoresEarned: 0,
+            upgrades: new Set(),
+            statistics: {
+                fastestClear: null,
+                totalNodesEverUnlocked: 0,
+                totalEnergyEverEarned: 0,
+                runStartTime: Date.now()
+            }
+        });
+        
+        const showAscensionPanel = ref(false);
+
+        // ==========================================
         // COMPUTED VALUES
         // ==========================================
+        const prestigeBonuses = computed(() => getAccumulatedBonuses());
+
         const computedValues = computed(() => {
             let values = {
                 energyPerClick: 1,
@@ -50,6 +71,10 @@ const App = {
                 dataMultiplier: 1,
                 allRatesMultiplier: 1
             };
+
+            // Apply prestige bonuses
+            const bonuses = prestigeBonuses.value;
+            values.energyPerClick += bonuses.bonusEnergyPerClick;
 
             unlockedNodes.value.forEach(nodeId => {
                 const node = GameData.nodes[nodeId];
@@ -72,11 +97,14 @@ const App = {
             return values;
         });
 
-        const resourceRates = computed(() => ({
-            energy: automations.energy * computedValues.value.allRatesMultiplier,
-            data: automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier,
-            bandwidth: automations.bandwidth * computedValues.value.allRatesMultiplier
-        }));
+        const resourceRates = computed(() => {
+            const bonuses = prestigeBonuses.value;
+            return {
+                energy: automations.energy * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier,
+                data: automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier,
+                bandwidth: automations.bandwidth * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier
+            };
+        });
 
         const effectiveRates = computed(() => ({
             energy: resourceRates.value.energy,
@@ -147,12 +175,25 @@ const App = {
             return Math.floor(computedValues.value.dataPerClick * computedValues.value.dataMultiplier);
         });
 
+        const highestTierReached = computed(() => {
+            let maxTier = 0;
+            unlockedNodes.value.forEach(nodeId => {
+                const node = GameData.nodes[nodeId];
+                if (node && node.tier > maxTier) {
+                    maxTier = node.tier;
+                }
+            });
+            return maxTier;
+        });
+
+        const coresEarned = computed(() => calculateQuantumCores());
+
         // ==========================================
         // HELPER METHODS
         // ==========================================
         function checkAffordability(node) {
             if (!node) return false;
-            const scaledCost = GameData.getScaledNodeCost(node);
+            const scaledCost = GameData.getScaledNodeCost(node, prestigeState.ascensionCount, prestigeBonuses.value);
             for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (resources[resource] < amount) return false;
             }
@@ -194,7 +235,7 @@ const App = {
             // Check cost
             if (!checkAffordability(node)) return;
 
-            const scaledCost = GameData.getScaledNodeCost(node);
+            const scaledCost = GameData.getScaledNodeCost(node, prestigeState.ascensionCount, prestigeBonuses.value);
 
             // Deduct costs
             for (const [resource, amount] of Object.entries(scaledCost)) {
@@ -250,6 +291,202 @@ const App = {
         }
 
         // ==========================================
+        // PRESTIGE METHODS
+        // ==========================================
+        function calculateQuantumCores() {
+            const energyLog = Math.max(0, Math.log10(totalResources.energy + 1));
+            const nodeBonus = unlockedNodes.value.size / 10;
+            
+            // Tier bonuses
+            let tierBonus = 0;
+            for (const nodeId of unlockedNodes.value) {
+                const node = GameData.nodes[nodeId];
+                if (node && node.tier >= 6) {
+                    tierBonus += (node.tier - 5) * 5;
+                }
+                if (node && node.id === 'universe_simulation') {
+                    tierBonus += 20;
+                }
+            }
+            
+            // Core multiplier from upgrades
+            const bonuses = prestigeBonuses.value;
+            const multiplier = bonuses.coreMultiplier;
+            
+            return Math.floor((energyLog + nodeBonus + tierBonus) * multiplier);
+        }
+
+        function getAccumulatedBonuses() {
+            const bonuses = {
+                startingEnergy: 0,
+                startingAutomation: { energy: 0, data: 0, bandwidth: 0 },
+                startingNodes: new Set(['core']),
+                costMultiplier: 1,
+                automationMultiplier: 1,
+                bonusEnergyPerClick: 0,
+                coreMultiplier: 1,
+                tierCostMultipliers: {}
+            };
+            
+            for (const upgradeId of prestigeState.upgrades) {
+                const upgrade = PrestigeData.upgrades[upgradeId];
+                if (!upgrade) continue;
+                
+                const e = upgrade.effect;
+                if (e.startingEnergy) bonuses.startingEnergy += e.startingEnergy;
+                if (e.costMultiplier) bonuses.costMultiplier *= e.costMultiplier;
+                if (e.automationMultiplier) bonuses.automationMultiplier *= e.automationMultiplier;
+                if (e.bonusEnergyPerClick) bonuses.bonusEnergyPerClick += e.bonusEnergyPerClick;
+                if (e.coreMultiplier) bonuses.coreMultiplier *= e.coreMultiplier;
+                
+                if (e.startingNodes) {
+                    e.startingNodes.forEach(nodeId => bonuses.startingNodes.add(nodeId));
+                }
+                
+                if (e.startingAutomation) {
+                    Object.entries(e.startingAutomation).forEach(([resource, value]) => {
+                        bonuses.startingAutomation[resource] += value;
+                    });
+                }
+                
+                if (e.tierCostMultipliers) {
+                    Object.entries(e.tierCostMultipliers).forEach(([tier, mult]) => {
+                        const t = parseInt(tier);
+                        bonuses.tierCostMultipliers[t] = (bonuses.tierCostMultipliers[t] || 1) * mult;
+                    });
+                }
+                
+                // Handle special upgrades
+                if (e.startAllTier) {
+                    Object.values(GameData.nodes).forEach(node => {
+                        if (node.tier === e.startAllTier) {
+                            bonuses.startingNodes.add(node.id);
+                        }
+                    });
+                }
+                
+                if (e.randomStartingNodes) {
+                    // We'll apply this in applyStartingBonuses
+                    bonuses.randomStartingNodes = e.randomStartingNodes;
+                }
+            }
+            
+            return bonuses;
+        }
+
+        function applyStartingBonuses() {
+            const bonuses = getAccumulatedBonuses();
+            
+            // Starting resources
+            resources.energy = bonuses.startingEnergy || 0;
+            totalResources.energy = bonuses.startingEnergy || 0;
+            
+            // Starting automation
+            Object.entries(bonuses.startingAutomation).forEach(([resource, rate]) => {
+                automations[resource] = rate;
+            });
+            
+            // Starting nodes
+            const newUnlocked = new Set(bonuses.startingNodes);
+            
+            // Handle random starting nodes
+            if (bonuses.randomStartingNodes) {
+                const { tier, count } = bonuses.randomStartingNodes;
+                const tierNodes = Object.values(GameData.nodes).filter(n => n.tier === tier && !newUnlocked.has(n.id));
+                const shuffled = tierNodes.sort(() => Math.random() - 0.5);
+                shuffled.slice(0, count).forEach(node => newUnlocked.add(node.id));
+            }
+            
+            unlockedNodes.value = newUnlocked;
+            
+            // Apply effects from starting nodes
+            newUnlocked.forEach(nodeId => {
+                const node = GameData.nodes[nodeId];
+                if (node && node.id !== 'core') {
+                    applyNodeEffects(node);
+                }
+            });
+        }
+
+        function ascend() {
+            const cores = calculateQuantumCores();
+            if (cores < 1) {
+                showNotification('Need at least 1 Quantum Core to ascend!', 'error');
+                return;
+            }
+            
+            // Award cores
+            prestigeState.quantumCores += cores;
+            prestigeState.totalCoresEarned += cores;
+            prestigeState.ascensionCount++;
+            
+            // Update statistics
+            prestigeState.statistics.totalNodesEverUnlocked += unlockedNodes.value.size;
+            prestigeState.statistics.totalEnergyEverEarned += totalResources.energy;
+            
+            const runTime = Date.now() - prestigeState.statistics.runStartTime;
+            if (!prestigeState.statistics.fastestClear || runTime < prestigeState.statistics.fastestClear) {
+                prestigeState.statistics.fastestClear = runTime;
+            }
+            
+            // Reset game state
+            resetGameState();
+            
+            // Save prestige
+            savePrestige();
+            
+            showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, 'prestige');
+        }
+
+        function resetGameState() {
+            // Reset resources
+            Object.keys(resources).forEach(k => resources[k] = 0);
+            Object.keys(totalResources).forEach(k => totalResources[k] = 0);
+            Object.keys(automations).forEach(k => automations[k] = 0);
+            
+            // Reset nodes (keep core)
+            unlockedNodes.value = new Set(['core']);
+            
+            // Reset run timer
+            prestigeState.statistics.runStartTime = Date.now();
+            
+            // Apply starting bonuses from upgrades
+            applyStartingBonuses();
+        }
+
+        function purchaseUpgrade(upgradeId) {
+            const upgrade = PrestigeData.upgrades[upgradeId];
+            if (!upgrade) return;
+            
+            // Check if already purchased
+            if (prestigeState.upgrades.has(upgradeId)) return;
+            
+            // Check requirements
+            const requirementsMet = upgrade.requires.every(reqId => prestigeState.upgrades.has(reqId));
+            if (!requirementsMet) return;
+            
+            // Check cost
+            if (prestigeState.quantumCores < upgrade.cost) return;
+            
+            // Deduct cost
+            prestigeState.quantumCores -= upgrade.cost;
+            
+            // Add upgrade
+            const newUpgrades = new Set(prestigeState.upgrades);
+            newUpgrades.add(upgradeId);
+            prestigeState.upgrades = newUpgrades;
+            
+            // Save prestige
+            savePrestige();
+            
+            showNotification(`✨ ${upgrade.name} purchased!`, 'success');
+        }
+
+        function toggleAscensionPanel() {
+            showAscensionPanel.value = !showAscensionPanel.value;
+        }
+
+        // ==========================================
         // GAME LOOP
         // ==========================================
         function gameLoop() {
@@ -283,7 +520,11 @@ const App = {
 
         function loadGame() {
             const saveData = localStorage.getItem('networkSimulatorSave');
-            if (!saveData) return;
+            if (!saveData) {
+                // No game save, but apply prestige bonuses if any
+                applyStartingBonuses();
+                return;
+            }
 
             try {
                 const data = JSON.parse(saveData);
@@ -320,6 +561,39 @@ const App = {
             }
         }
 
+        function savePrestige() {
+            const prestigeData = {
+                ascensionCount: prestigeState.ascensionCount,
+                quantumCores: prestigeState.quantumCores,
+                totalCoresEarned: prestigeState.totalCoresEarned,
+                upgrades: Array.from(prestigeState.upgrades),
+                statistics: { ...prestigeState.statistics }
+            };
+            localStorage.setItem('networkSimulatorPrestige', JSON.stringify(prestigeData));
+        }
+
+        function loadPrestige() {
+            const prestigeData = localStorage.getItem('networkSimulatorPrestige');
+            if (!prestigeData) return;
+
+            try {
+                const data = JSON.parse(prestigeData);
+                
+                prestigeState.ascensionCount = data.ascensionCount || 0;
+                prestigeState.quantumCores = data.quantumCores || 0;
+                prestigeState.totalCoresEarned = data.totalCoresEarned || 0;
+                prestigeState.upgrades = new Set(data.upgrades || []);
+                
+                if (data.statistics) {
+                    Object.assign(prestigeState.statistics, data.statistics);
+                    // Reset run start time
+                    prestigeState.statistics.runStartTime = Date.now();
+                }
+            } catch (e) {
+                console.error('Failed to load prestige:', e);
+            }
+        }
+
         function resetGame() {
             if (confirm('Are you sure you want to reset all progress?')) {
                 localStorage.removeItem('networkSimulatorSave');
@@ -331,9 +605,11 @@ const App = {
         // LIFECYCLE
         // ==========================================
         onMounted(() => {
+            loadPrestige();
             loadGame();
             gameLoopInterval = setInterval(gameLoop, 100);
             saveInterval = setInterval(saveGame, 30000);
+            setInterval(savePrestige, 30000);
         });
 
         onUnmounted(() => {
@@ -351,6 +627,8 @@ const App = {
             unlockedNodes,
             selectedNodeId,
             notifications,
+            prestigeState,
+            showAscensionPanel,
 
             // Computed
             computedValues,
@@ -367,6 +645,8 @@ const App = {
             tierGateRequirement,
             stats,
             dataPerClickDisplay,
+            highestTierReached,
+            coresEarned,
 
             // Methods
             generateEnergy,
@@ -374,6 +654,9 @@ const App = {
             selectNode,
             unlockNode,
             resetGame,
+            ascend,
+            purchaseUpgrade,
+            toggleAscensionPanel,
 
             // Data
             nodes: GameData.nodes
@@ -383,6 +666,14 @@ const App = {
         <div id="game-container">
             <header id="header">
                 <h1>Network Simulator</h1>
+                <div class="prestige-header" v-if="prestigeState.ascensionCount > 0 || prestigeState.quantumCores > 0">
+                    <button class="prestige-button" @click="toggleAscensionPanel" title="View Ascension Upgrades">
+                        <span class="prestige-icon">💎</span>
+                        <span class="prestige-value">{{ prestigeState.quantumCores }}</span>
+                        <span class="prestige-label">Quantum Cores</span>
+                        <span class="prestige-ascension">Ascension {{ prestigeState.ascensionCount }}</span>
+                    </button>
+                </div>
                 <div id="resources">
                     <ResourceBar
                         icon="⚡"
@@ -415,8 +706,11 @@ const App = {
                     :automations="automations"
                     :effective-rates="effectiveRates"
                     :stats="stats"
+                    :cores-earned="coresEarned"
+                    :highest-tier-reached="highestTierReached"
                     @generate-energy="generateEnergy"
                     @process-data="processData"
+                    @ascend="ascend"
                 />
 
                 <SkillTree
@@ -424,6 +718,8 @@ const App = {
                     :unlocked-nodes="unlockedNodes"
                     :selected-node-id="selectedNodeId"
                     :resources="resources"
+                    :ascension-count="prestigeState.ascensionCount"
+                    :prestige-bonuses="prestigeBonuses"
                     @select-node="selectNode"
                 />
 
@@ -436,11 +732,24 @@ const App = {
                     :can-afford="canAffordSelectedNode"
                     :resources="resources"
                     :unlocked-nodes="unlockedNodes"
+                    :ascension-count="prestigeState.ascensionCount"
+                    :prestige-bonuses="prestigeBonuses"
                     @unlock="unlockNode"
                 />
             </main>
 
             <NotificationToast :notifications="notifications" />
+            
+            <AscensionPanel
+                :visible="showAscensionPanel"
+                :quantum-cores="prestigeState.quantumCores"
+                :ascension-count="prestigeState.ascensionCount"
+                :purchased-upgrades="prestigeState.upgrades"
+                :statistics="prestigeState.statistics"
+                :total-cores-earned="prestigeState.totalCoresEarned"
+                @purchase-upgrade="purchaseUpgrade"
+                @close="toggleAscensionPanel"
+            />
         </div>
     `
 };
