@@ -259,6 +259,19 @@ body {
     stroke-width: 3;
 }
 
+#connections line.animating {
+    stroke: var(--connection-unlocked);
+    stroke-width: 3;
+}
+
+/* Connection pulse animation */
+.connection-pulse {
+    stroke-width: 6;
+    fill: none;
+    pointer-events: none;
+    filter: blur(2px);
+}
+
 /* Nodes */
 .node {
     position: absolute;
@@ -324,6 +337,58 @@ body {
     50% {
         box-shadow: 0 0 35px rgba(255, 215, 0, 0.9);
         border-color: #ffed4e;
+    }
+}
+
+/* Shockwave animation for node unlocks */
+.shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #00ffaa;
+    transform: translate(-50%, -50%) scale(1);
+    animation: shockwave-expand 0.8s ease-out forwards;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.shockwave-2 {
+    animation-delay: 0.15s;
+}
+
+@keyframes shockwave-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        border-width: 3px;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+/* Node just-unlocked state */
+.node.just-unlocked {
+    animation: node-unlock-flash 0.5s ease-out;
+}
+
+@keyframes node-unlock-flash {
+    0% {
+        transform: scale(1.3);
+        filter: brightness(2);
+    }
+    50% {
+        transform: scale(1.1);
+        filter: brightness(1.5);
+    }
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
     }
 }
 

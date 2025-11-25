@@ -50,6 +50,7 @@ const App = {
             automations: gameState.automations,
             unlockedNodes: gameState.unlockedNodes,
             selectedNodeId: gameState.selectedNodeId,
+            lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             notifications: gameLoop.notifications,
             
             // Prestige State
@@ -148,6 +149,7 @@ const App = {
                     :resources="resources"
                     :ascension-count="prestigeState.ascensionCount"
                     :prestige-bonuses="prestigeBonuses"
+                    :last-unlocked-node-id="lastUnlockedNodeId"
                     @select-node="selectNode"
                 />
 

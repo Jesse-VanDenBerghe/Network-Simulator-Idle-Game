@@ -10,9 +10,23 @@ const SkillTree = {
         selectedNodeId: { type: String, default: null },
         resources: { type: Object, required: true },
         ascensionCount: { type: Number, default: 0 },
-        prestigeBonuses: { type: Object, default: null }
+        prestigeBonuses: { type: Object, default: null },
+        lastUnlockedNodeId: { type: String, default: null }
     },
     emits: ['select-node'],
+    data() {
+        return {
+            justUnlockedNodeId: null,
+            animatingConnections: new Set()
+        };
+    },
+    watch: {
+        lastUnlockedNodeId(newId) {
+            if (newId) {
+                this.triggerUnlockAnimation(newId);
+            }
+        }
+    },
     computed: {
         connections() {
             // Only show connections where both nodes are visible
@@ -55,6 +69,41 @@ const SkillTree = {
         },
         selectNode(nodeId) {
             this.$emit('select-node', nodeId);
+        },
+        triggerUnlockAnimation(nodeId) {
+            // Trigger shockwave on node
+            this.justUnlockedNodeId = nodeId;
+            
+            // Find connections to this node and animate them
+            const node = this.nodes[nodeId];
+            if (node && node.requires) {
+                node.requires.forEach(parentId => {
+                    const connKey = `${parentId}-${nodeId}`;
+                    this.animatingConnections.add(connKey);
+                    
+                    // Remove animation after it completes
+                    setTimeout(() => {
+                        this.animatingConnections.delete(connKey);
+                    }, 800);
+                });
+            }
+            
+            // Clear shockwave after animation
+            setTimeout(() => {
+                this.justUnlockedNodeId = null;
+            }, 1000);
+        },
+        isConnectionAnimating(conn) {
+            if (!conn || !conn.from || !conn.to) return false;
+            const key = `${conn.from}-${conn.to}`;
+            return this.animatingConnections.has(key);
+        },
+        getConnectionGradientId(conn) {
+            if (!conn) return '';
+            return `pulse-gradient-${conn.from}-${conn.to}`;
+        },
+        getAnimatingConnections() {
+            return this.connections.filter(conn => this.isConnectionAnimating(conn));
         }
     },
     mounted() {
@@ -72,6 +121,43 @@ const SkillTree = {
         <section id="skill-tree-container" ref="container">
             <div id="skill-tree">
                 <svg id="connections">
+                    <defs>
+                        <linearGradient 
+                            v-for="conn in connections"
+                            :key="'grad-' + conn.from + '-' + conn.to"
+                            :id="getConnectionGradientId(conn)"
+                            gradientUnits="userSpaceOnUse"
+                            :x1="conn.x1" :y1="conn.y1" :x2="conn.x2" :y2="conn.y2"
+                        >
+                            <stop offset="0%" stop-color="#00ffaa" stop-opacity="0">
+                                <animate 
+                                    v-if="isConnectionAnimating(conn)"
+                                    attributeName="offset" 
+                                    values="0;1" 
+                                    dur="0.6s" 
+                                    fill="freeze"
+                                />
+                            </stop>
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="1">
+                                <animate 
+                                    v-if="isConnectionAnimating(conn)"
+                                    attributeName="offset" 
+                                    values="0;1" 
+                                    dur="0.6s" 
+                                    fill="freeze"
+                                />
+                            </stop>
+                            <stop offset="10%" stop-color="#00ffaa" stop-opacity="0">
+                                <animate 
+                                    v-if="isConnectionAnimating(conn)"
+                                    attributeName="offset" 
+                                    values="0.1;1.1" 
+                                    dur="0.6s" 
+                                    fill="freeze"
+                                />
+                            </stop>
+                        </linearGradient>
+                    </defs>
                     <line
                         v-for="(conn, index) in connections"
                         :key="index"
@@ -79,7 +165,17 @@ const SkillTree = {
                         :y1="conn.y1"
                         :x2="conn.x2"
                         :y2="conn.y2"
-                        :class="{ unlocked: isConnectionUnlocked(conn) }"
+                        :class="{ unlocked: isConnectionUnlocked(conn), animating: isConnectionAnimating(conn) }"
+                    />
+                    <line
+                        v-for="conn in getAnimatingConnections()"
+                        :key="'pulse-' + conn.from + '-' + conn.to"
+                        :x1="conn.x1"
+                        :y1="conn.y1"
+                        :x2="conn.x2"
+                        :y2="conn.y2"
+                        class="connection-pulse"
+                        :stroke="'url(#' + getConnectionGradientId(conn) + ')'"
                     />
                 </svg>
                 <div id="nodes">
@@ -92,6 +188,7 @@ const SkillTree = {
                         :is-tier-locked="isTierLocked(node)"
                         :can-afford="canAfford(node)"
                         :is-selected="selectedNodeId === node.id"
+                        :just-unlocked="justUnlockedNodeId === node.id"
                         @select="selectNode"
                     />
                 </div>

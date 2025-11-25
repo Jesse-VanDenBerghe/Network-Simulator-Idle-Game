@@ -125,6 +125,8 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         if (success) {
             const node = GameData.nodes[nodeId];
             showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+            // Trigger unlock animation
+            gameState.setLastUnlockedNode(nodeId);
             saveLoad.saveGame();
             return true;
         }

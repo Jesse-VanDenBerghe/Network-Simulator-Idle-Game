@@ -28,6 +28,7 @@ export function useGameState() {
 
     const unlockedNodes = ref(new Set(['core']));
     const selectedNodeId = ref(null);
+    const lastUnlockedNodeId = ref(null);
 
     // ==========================================
     // COMPUTED
@@ -78,6 +79,16 @@ export function useGameState() {
         unlockedNodes.value = new Set(['core']);
     }
 
+    function setLastUnlockedNode(nodeId) {
+        lastUnlockedNodeId.value = nodeId;
+        // Clear after animation completes
+        setTimeout(() => {
+            if (lastUnlockedNodeId.value === nodeId) {
+                lastUnlockedNodeId.value = null;
+            }
+        }, 1200);
+    }
+
     // ==========================================
     // RETURN
     // ==========================================
@@ -88,6 +99,7 @@ export function useGameState() {
         automations,
         unlockedNodes,
         selectedNodeId,
+        lastUnlockedNodeId,
         
         // Computed
         dataUnlocked,
@@ -99,6 +111,7 @@ export function useGameState() {
         // Methods
         selectNode,
         resetResources,
-        resetNodes
+        resetNodes,
+        setLastUnlockedNode
     };
 }
