@@ -33,7 +33,8 @@ const SkillTree = {
         },
         canAfford(node) {
             if (!node || !this.isAvailable(node)) return false;
-            for (const [resource, amount] of Object.entries(node.cost)) {
+            const scaledCost = GameData.getScaledNodeCost(node);
+            for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (this.resources[resource] < amount) return false;
             }
             return true;
