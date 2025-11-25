@@ -18,7 +18,8 @@ const SkillTree = {
         return {
             justUnlockedNodeId: null,
             animatingConnections: new Set(),
-            glowingConnections: new Map() // tracks glow animation offset for each connection
+            glowingConnections: new Map(), // tracks glow animation offset for each connection
+            travelingDots: [] // { id, fromNode, toNode, progress, startTime }
         };
     },
     watch: {
@@ -127,11 +128,93 @@ const SkillTree = {
         },
         getGlowGradientId(conn) {
             return `glow-gradient-${conn.from}-${conn.to}`;
+        },
+        startDotAnimation() {
+            // Every second, spawn dots from the core node
+            this.dotInterval = setInterval(() => {
+                this.spawnDotsFromCore();
+            }, 1000);
+            
+            // Animation loop to update dot positions
+            const animate = () => {
+                const now = Date.now();
+                const dotSpeed = 0.5; // dots take 2 seconds to traverse a connection
+                
+                // First, check for dots that have completed and spawn new ones
+                const dotsToSpawn = [];
+                this.travelingDots.forEach(dot => {
+                    const elapsed = (now - dot.startTime) / 1000;
+                    dot.progress = Math.min(elapsed * dotSpeed, 1);
+                    
+                    if (dot.progress >= 1) {
+                        dotsToSpawn.push(dot.toNode);
+                    }
+                });
+                
+                // Spawn new dots from completed nodes
+                dotsToSpawn.forEach(nodeId => {
+                    this.spawnDotsFromNode(nodeId);
+                });
+                
+                // Then filter out completed dots
+                this.travelingDots = this.travelingDots.filter(dot => dot.progress < 1);
+                
+                this.dotAnimationFrame = requestAnimationFrame(animate);
+            };
+            animate();
+        },
+        spawnDotsFromCore() {
+            // Find all unlocked connections starting from core
+            const coreConnections = this.connections.filter(conn => 
+                conn.from === 'core' && this.isConnectionUnlocked(conn)
+            );
+            
+            coreConnections.forEach(conn => {
+                this.travelingDots.push({
+                    id: `${Date.now()}-${Math.random()}`,
+                    fromNode: conn.from,
+                    toNode: conn.to,
+                    progress: 0,
+                    startTime: Date.now()
+                });
+            });
+        },
+        spawnDotsFromNode(nodeId) {
+            // Find all unlocked connections going out from this node
+            const outgoingConnections = this.connections.filter(conn => 
+                conn.from === nodeId && this.isConnectionUnlocked(conn)
+            );
+            
+            console.log(`Spawning dots from node ${nodeId}, found ${outgoingConnections.length} outgoing connections`, outgoingConnections);
+            
+            const now = Date.now();
+            outgoingConnections.forEach((conn, index) => {
+                this.travelingDots.push({
+                    id: `${now}-${Math.random()}-${index}`,
+                    fromNode: conn.from,
+                    toNode: conn.to,
+                    progress: 0,
+                    startTime: now
+                });
+            });
+        },
+        getDotPosition(dot) {
+            const fromNode = this.nodes[dot.fromNode];
+            const toNode = this.nodes[dot.toNode];
+            if (!fromNode || !toNode) return { x: 0, y: 0 };
+            
+            // Interpolate position along the line
+            const x = fromNode.x + (toNode.x - fromNode.x) * dot.progress + 40; // +40 for node center
+            const y = fromNode.y + (toNode.y - fromNode.y) * dot.progress + 40;
+            return { x, y };
         }
     },
     mounted() {
         // Start connection glow animation loop
         this.startGlowAnimation();
+        
+        // Start traveling dot animation
+        this.startDotAnimation();
         
         // Center on core node
         this.$nextTick(() => {
@@ -146,6 +229,12 @@ const SkillTree = {
     beforeUnmount() {
         if (this.glowAnimationFrame) {
             cancelAnimationFrame(this.glowAnimationFrame);
+        }
+        if (this.dotAnimationFrame) {
+            cancelAnimationFrame(this.dotAnimationFrame);
+        }
+        if (this.dotInterval) {
+            clearInterval(this.dotInterval);
         }
     },
     template: `
@@ -238,6 +327,18 @@ const SkillTree = {
                         :stroke="'url(#' + getConnectionGradientId(conn) + ')'"
                     />
                 </svg>
+                
+                <!-- Traveling dots -->
+                <div 
+                    v-for="dot in travelingDots" 
+                    :key="dot.id"
+                    class="traveling-dot"
+                    :style="{
+                        left: getDotPosition(dot).x + 'px',
+                        top: getDotPosition(dot).y + 'px'
+                    }"
+                ></div>
+                
                 <div id="nodes">
                     <SkillNode
                         v-for="node in nodesList"
