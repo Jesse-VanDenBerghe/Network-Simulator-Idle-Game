@@ -13,7 +13,8 @@ const InfoPanel = {
     computed: {
         costEntries() {
             if (!this.node || !this.node.cost) return [];
-            return Object.entries(this.node.cost).map(([resource, amount]) => ({
+            const scaledCost = GameData.getScaledNodeCost(this.node);
+            return Object.entries(scaledCost).map(([resource, amount]) => ({
                 resource,
                 resourceName: resource.charAt(0).toUpperCase() + resource.slice(1),
                 amount,
