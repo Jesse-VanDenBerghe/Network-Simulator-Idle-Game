@@ -106,7 +106,13 @@ const App = {
 
         const isSelectedNodeAvailable = computed(() => {
             if (!selectedNode.value || isSelectedNodeUnlocked.value) return false;
-            return selectedNode.value.requires.every(reqId => unlockedNodes.value.has(reqId));
+            
+            // Check requirements
+            const requirementsMet = selectedNode.value.requires.every(reqId => unlockedNodes.value.has(reqId));
+            if (!requirementsMet) return false;
+
+            // Check tier gate
+            return GameData.isTierUnlocked(selectedNode.value.tier, unlockedNodes.value);
         });
 
         const canAffordSelectedNode = computed(() => {
@@ -116,6 +122,24 @@ const App = {
                 if (resources[resource] < amount) return false;
             }
             return true;
+        });
+
+        const isTierLocked = computed(() => {
+            if (!selectedNode.value) return false;
+            return !GameData.isTierUnlocked(selectedNode.value.tier, unlockedNodes.value);
+        });
+
+        const tierGateRequirement = computed(() => {
+            if (!selectedNode.value) return null;
+            const gate = GameData.TIER_GATES[selectedNode.value.tier];
+            if (!gate) return null;
+            
+            const count = GameData.countUnlockedInTier(gate.requiredTier, unlockedNodes.value);
+            return {
+                ...gate,
+                currentCount: count,
+                remaining: Math.max(0, gate.requiredCount - count)
+            };
         });
 
         const stats = computed(() => ({
@@ -156,6 +180,9 @@ const App = {
             // Check requirements
             const requirementsMet = node.requires.every(reqId => unlockedNodes.value.has(reqId));
             if (!requirementsMet) return;
+
+            // Check tier gate
+            if (!GameData.isTierUnlocked(node.tier, unlockedNodes.value)) return;
 
             const scaledCost = GameData.getScaledNodeCost(node);
 
@@ -331,6 +358,8 @@ const App = {
             isSelectedNodeUnlocked,
             isSelectedNodeAvailable,
             canAffordSelectedNode,
+            isTierLocked,
+            tierGateRequirement,
             stats,
             dataPerClickDisplay,
 
@@ -397,6 +426,8 @@ const App = {
                     :node="selectedNode"
                     :is-unlocked="isSelectedNodeUnlocked"
                     :is-available="isSelectedNodeAvailable"
+                    :is-tier-locked="isTierLocked"
+                    :tier-gate="tierGateRequirement"
                     :can-afford="canAffordSelectedNode"
                     :resources="resources"
                     :unlocked-nodes="unlockedNodes"

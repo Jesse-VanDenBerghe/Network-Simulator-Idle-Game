@@ -1346,6 +1346,33 @@ const GameData = {
         7: 500000  // 10M-50M energy
     },
 
+    TIER_GATES: {
+        3: { requiredTier: 2, requiredCount: 3 },
+        4: { requiredTier: 3, requiredCount: 6 },
+        5: { requiredTier: 4, requiredCount: 10 },
+        6: { requiredTier: 5, requiredCount: 15 },
+        7: { requiredTier: 6, requiredCount: 20 }
+    },
+
+    countUnlockedInTier(tier, unlockedNodeIds) {
+        let count = 0;
+        unlockedNodeIds.forEach(id => {
+            const node = this.nodes[id];
+            if (node && node.tier === tier) {
+                count++;
+            }
+        });
+        return count;
+    },
+
+    isTierUnlocked(tier, unlockedNodeIds) {
+        const gate = this.TIER_GATES[tier];
+        if (!gate) return true;
+        
+        const count = this.countUnlockedInTier(gate.requiredTier, unlockedNodeIds);
+        return count >= gate.requiredCount;
+    },
+
     getScaledNodeCost(node) {
         const multiplier = this.TIER_COST_MULTIPLIERS[node.tier] || 1;
         const scaled = {};

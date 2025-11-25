@@ -5,6 +5,7 @@ const SkillNode = {
         node: { type: Object, required: true },
         isUnlocked: { type: Boolean, default: false },
         isAvailable: { type: Boolean, default: false },
+        isTierLocked: { type: Boolean, default: false },
         canAfford: { type: Boolean, default: false },
         isSelected: { type: Boolean, default: false }
     },
@@ -15,9 +16,10 @@ const SkillNode = {
                 node: true,
                 [`tier-${this.node.tier}`]: true,
                 unlocked: this.isUnlocked,
-                available: this.isAvailable && !this.isUnlocked,
-                affordable: this.canAfford && !this.isUnlocked,
-                locked: !this.isUnlocked && !this.isAvailable,
+                available: this.isAvailable && !this.isUnlocked && !this.isTierLocked,
+                affordable: this.canAfford && !this.isUnlocked && !this.isTierLocked,
+                'tier-locked': this.isTierLocked,
+                locked: !this.isUnlocked && (!this.isAvailable || this.isTierLocked),
                 selected: this.isSelected
             };
         },
