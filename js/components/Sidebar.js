@@ -4,7 +4,8 @@ const Sidebar = {
     components: {
         ActionButton,
         AutomationItem,
-        AscensionButton
+        AscensionButton,
+        ParticleBurst
     },
     props: {
         energyPerClick: { type: Number, required: true },
@@ -32,20 +33,24 @@ const Sidebar = {
         <aside id="sidebar">
             <div id="manual-actions">
                 <h2>Manual Actions</h2>
-                <ActionButton
-                    icon="⚡"
-                    text="Generate Energy"
-                    :value="'+' + formatNumber(energyPerClick)"
-                    @click="$emit('generate-energy')"
-                />
-                <ActionButton
-                    icon="📊"
-                    text="Process Data"
-                    :value="'+' + formatNumber(dataPerClick) + ' (costs 5⚡)'"
-                    :locked="!dataUnlocked"
-                    :disabled="!canProcessData"
-                    @click="$emit('process-data')"
-                />
+                <div class="action-wrapper" @click="handleEnergyClick">
+                    <ActionButton
+                        icon="⚡"
+                        text="Generate Energy"
+                        :value="'+' + formatNumber(energyPerClick)"
+                    />
+                    <ParticleBurst ref="energyParticles" />
+                </div>
+                <div class="action-wrapper" @click="handleDataClick">
+                    <ActionButton
+                        icon="📊"
+                        text="Process Data"
+                        :value="'+' + formatNumber(dataPerClick) + ' (costs 5⚡)'"
+                        :locked="!dataUnlocked"
+                        :disabled="!canProcessData"
+                    />
+                    <ParticleBurst ref="dataParticles" />
+                </div>
             </div>
 
             <div id="automations" v-if="hasAutomations">
@@ -86,6 +91,35 @@ const Sidebar = {
     methods: {
         formatNumber(num) {
             return GameData.formatNumber(Math.floor(num));
+        },
+        handleEnergyClick(event) {
+            this.$emit('generate-energy');
+            // Trigger particle burst at click position
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            this.$refs.energyParticles.burst(x, y, {
+                count: 10,
+                color: '#00ffaa',
+                secondaryColor: '#ffff00',
+                spread: 50,
+                size: 5
+            });
+        },
+        handleDataClick(event) {
+            if (!this.dataUnlocked || !this.canProcessData) return;
+            this.$emit('process-data');
+            // Trigger particle burst at click position
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            this.$refs.dataParticles.burst(x, y, {
+                count: 10,
+                color: '#00aaff',
+                secondaryColor: '#aa00ff',
+                spread: 50,
+                size: 5
+            });
         }
     }
 };
