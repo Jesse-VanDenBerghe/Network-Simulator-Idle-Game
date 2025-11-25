@@ -1335,6 +1335,26 @@ const GameData = {
     },
 
     // Helper functions
+    TIER_COST_MULTIPLIERS: {
+        0: 1,      // Core
+        1: 1,      // 10-25 energy
+        2: 10,     // 100-300 energy  
+        3: 50,     // 500-2,000 energy
+        4: 500,    // 5K-20K energy
+        5: 5000,   // 50K-200K energy
+        6: 50000,  // 500K-2M energy
+        7: 500000  // 10M-50M energy
+    },
+
+    getScaledNodeCost(node) {
+        const multiplier = this.TIER_COST_MULTIPLIERS[node.tier] || 1;
+        const scaled = {};
+        for (const [resource, amount] of Object.entries(node.cost)) {
+            scaled[resource] = Math.floor(amount * multiplier);
+        }
+        return scaled;
+    },
+
     formatNumber(num) {
         if (num < 1000) return Math.floor(num).toString();
         if (num < 1000000) return (num / 1000).toFixed(1) + 'K';

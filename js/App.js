@@ -111,7 +111,8 @@ const App = {
 
         const canAffordSelectedNode = computed(() => {
             if (!selectedNode.value) return false;
-            for (const [resource, amount] of Object.entries(selectedNode.value.cost)) {
+            const scaledCost = GameData.getScaledNodeCost(selectedNode.value);
+            for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (resources[resource] < amount) return false;
             }
             return true;
@@ -156,13 +157,15 @@ const App = {
             const requirementsMet = node.requires.every(reqId => unlockedNodes.value.has(reqId));
             if (!requirementsMet) return;
 
+            const scaledCost = GameData.getScaledNodeCost(node);
+
             // Check cost
-            for (const [resource, amount] of Object.entries(node.cost)) {
+            for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (resources[resource] < amount) return;
             }
 
             // Deduct costs
-            for (const [resource, amount] of Object.entries(node.cost)) {
+            for (const [resource, amount] of Object.entries(scaledCost)) {
                 resources[resource] -= amount;
             }
 
