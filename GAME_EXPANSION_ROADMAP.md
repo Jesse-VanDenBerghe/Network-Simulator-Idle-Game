@@ -91,10 +91,10 @@ function isTierUnlocked(tier, unlockedNodes) {
 | `js/components/SkillNode.js` | Show tier-locked state |
 
 ## 1.4 Deliverable Checklist
-- [ ] Costs scale exponentially by tier
-- [ ] Tier 3+ nodes hidden until gate requirements met
-- [ ] UI shows "Unlock X more Tier N nodes" for locked tiers
-- [ ] Single run takes 30-45 minutes
+- [x] Costs scale exponentially by tier
+- [x] Tier 3+ nodes hidden until gate requirements met
+- [x] UI shows "Unlock X more Tier N nodes" for locked tiers
+- [x] Single run takes 30-45 minutes
 
 ---
 

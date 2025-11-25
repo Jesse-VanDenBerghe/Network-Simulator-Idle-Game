@@ -5,6 +5,8 @@ const InfoPanel = {
         node: { type: Object, default: null },
         isUnlocked: { type: Boolean, default: false },
         isAvailable: { type: Boolean, default: false },
+        isTierLocked: { type: Boolean, default: false },
+        tierGate: { type: Object, default: null },
         canAfford: { type: Boolean, default: false },
         resources: { type: Object, required: true },
         unlockedNodes: { type: Set, required: true }
@@ -99,10 +101,13 @@ const InfoPanel = {
                     </div>
 
                     <!-- Action button -->
-                    <div v-if="isUnlocked" class="unlocked-badge">✓ Unlocked</div>
+                    <div v-if=\"isUnlocked\" class=\"unlocked-badge\">✓ Unlocked</div>
+                    <div v-else-if=\"isTierLocked\" class=\"locked-badge\">
+                        🔒 Locked: Unlock {{ tierGate.remaining }} more Tier {{ tierGate.requiredTier }} nodes
+                    </div>
                     <button 
-                        v-else-if="isAvailable"
-                        class="unlock-btn"
+                        v-else-if=\"isAvailable\"
+                        class=\"unlock-btn\"
                         :disabled="!canAfford"
                         @click="unlock"
                     >

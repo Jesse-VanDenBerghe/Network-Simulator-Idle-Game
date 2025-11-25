@@ -33,14 +33,19 @@ const SkillTree = {
         },
         canAfford(node) {
             if (!node || !this.isAvailable(node)) return false;
-            for (const [resource, amount] of Object.entries(node.cost)) {
+            const scaledCost = GameData.getScaledNodeCost(node);
+            for (const [resource, amount] of Object.entries(scaledCost)) {
                 if (this.resources[resource] < amount) return false;
             }
             return true;
         },
+        isTierLocked(node) {
+             return !GameData.isTierUnlocked(node.tier, this.unlockedNodes);
+        },
         isNodeVisible(node) {
             if (!node) return false;
             // Show if unlocked OR available
+            // Note: We SHOW tier-locked nodes if they are otherwise available (parents unlocked)
             return this.unlockedNodes.has(node.id) || this.isAvailable(node);
         },
         isConnectionUnlocked(connection) {
@@ -82,6 +87,7 @@ const SkillTree = {
                         :node="node"
                         :is-unlocked="isUnlocked(node.id)"
                         :is-available="isAvailable(node)"
+                        :is-tier-locked="isTierLocked(node)"
                         :can-afford="canAfford(node)"
                         :is-selected="selectedNodeId === node.id"
                         @select="selectNode"

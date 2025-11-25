@@ -145,7 +145,7 @@ const GameData = {
             y: 950,
             description: 'Basic energy generator. Produces energy automatically.',
             requires: ['energy_boost'],
-            cost: { energy: 50, data: 5 },
+            cost: { energy: 15, data: 2 },
             effects: {
                 automation: { resource: 'energy', rate: 1 },
                 description: '+1 Energy/second (passive)'
@@ -161,7 +161,7 @@ const GameData = {
             y: 850,
             description: 'Improves energy generation efficiency.',
             requires: ['energy_boost'],
-            cost: { energy: 75 },
+            cost: { energy: 20 },
             effects: {
                 energyPerClick: 2,
                 description: '+2 Energy per click'
@@ -177,7 +177,7 @@ const GameData = {
             y: 800,
             description: 'Store excess energy for later use.',
             requires: ['energy_boost'],
-            cost: { energy: 60 },
+            cost: { energy: 18 },
             effects: {
                 energyPerClick: 1,
                 description: '+1 Energy per click'
@@ -193,7 +193,7 @@ const GameData = {
             y: 1100,
             description: 'Harness the power of the sun.',
             requires: ['energy_boost'],
-            cost: { energy: 80, data: 10 },
+            cost: { energy: 25, data: 5 },
             effects: {
                 automation: { resource: 'energy', rate: 0.5 },
                 description: '+0.5 Energy/second (passive)'
@@ -210,7 +210,7 @@ const GameData = {
             y: 850,
             description: 'Store and accumulate more data.',
             requires: ['data_processing'],
-            cost: { energy: 40, data: 10 },
+            cost: { energy: 12, data: 5 },
             effects: {
                 dataPerClick: 1,
                 description: '+1 Data per process'
@@ -226,7 +226,7 @@ const GameData = {
             y: 950,
             description: 'Automatically mines data from the network.',
             requires: ['data_processing'],
-            cost: { energy: 100, data: 15 },
+            cost: { energy: 30, data: 5 },
             effects: {
                 automation: { resource: 'data', rate: 0.5 },
                 description: '+0.5 Data/second (passive)'
@@ -242,7 +242,7 @@ const GameData = {
             y: 1150,
             description: 'Quick access to frequently used data.',
             requires: ['data_processing'],
-            cost: { energy: 55, data: 12 },
+            cost: { energy: 15, data: 4 },
             effects: {
                 dataPerClick: 1,
                 description: '+1 Data per process'
@@ -258,7 +258,7 @@ const GameData = {
             y: 850,
             description: 'Compress data for efficient storage.',
             requires: ['data_processing'],
-            cost: { energy: 65, data: 8 },
+            cost: { energy: 20, data: 3 },
             effects: {
                 dataMultiplier: 1.2,
                 description: '1.2x Data gains'
@@ -275,7 +275,7 @@ const GameData = {
             y: 1650,
             description: 'Routes data more efficiently through your network.',
             requires: ['network_basics'],
-            cost: { energy: 60, data: 20 },
+            cost: { energy: 18, data: 6 },
             effects: {
                 dataMultiplier: 1.5,
                 description: '1.5x Data processing'
@@ -291,7 +291,7 @@ const GameData = {
             y: 1650,
             description: 'Protects your network and improves stability.',
             requires: ['network_basics'],
-            cost: { energy: 80, data: 25 },
+            cost: { energy: 25, data: 8 },
             effects: {
                 description: 'Required for security branch'
             }
@@ -306,7 +306,7 @@ const GameData = {
             y: 1700,
             description: 'Connect multiple devices efficiently.',
             requires: ['network_basics'],
-            cost: { energy: 70, data: 18 },
+            cost: { energy: 22, data: 5 },
             effects: {
                 automation: { resource: 'data', rate: 0.3 },
                 description: '+0.3 Data/second (passive)'
@@ -323,7 +323,7 @@ const GameData = {
             y: 750,
             description: 'Develop efficient algorithms.',
             requires: ['research_basics'],
-            cost: { energy: 45, data: 15 },
+            cost: { energy: 15, data: 5 },
             effects: {
                 dataPerClick: 1,
                 description: '+1 Data per process'
@@ -339,7 +339,7 @@ const GameData = {
             y: 750,
             description: 'Optimize all system processes.',
             requires: ['research_basics'],
-            cost: { energy: 55, data: 20 },
+            cost: { energy: 18, data: 6 },
             effects: {
                 allRatesMultiplier: 1.1,
                 description: '1.1x all passive rates'
@@ -355,7 +355,7 @@ const GameData = {
             y: 700,
             description: 'Run simulations to predict outcomes.',
             requires: ['research_basics'],
-            cost: { energy: 50, data: 18 },
+            cost: { energy: 16, data: 5 },
             effects: {
                 description: 'Required for advanced simulations'
             }
@@ -371,7 +371,7 @@ const GameData = {
             y: 750,
             description: 'Better cooling for improved performance.',
             requires: ['power_management'],
-            cost: { energy: 40, data: 5 },
+            cost: { energy: 12, data: 2 },
             effects: {
                 energyPerClick: 1,
                 description: '+1 Energy per click'
@@ -387,7 +387,7 @@ const GameData = {
             y: 700,
             description: 'Stabilize power output.',
             requires: ['power_management'],
-            cost: { energy: 55 },
+            cost: { energy: 18 },
             effects: {
                 automation: { resource: 'energy', rate: 0.3 },
                 description: '+0.3 Energy/second (passive)'
@@ -408,7 +408,7 @@ const GameData = {
             y: 850,
             description: 'Advanced generator with improved output.',
             requires: ['generator_mk1'],
-            cost: { energy: 200, data: 30 },
+            cost: { energy: 15, data: 5 },
             effects: {
                 automation: { resource: 'energy', rate: 3 },
                 description: '+3 Energy/second (passive)'
@@ -424,7 +424,7 @@ const GameData = {
             y: 700,
             description: 'Push your systems beyond their limits.',
             requires: ['efficiency_1', 'generator_mk1'],
-            cost: { energy: 300, data: 50 },
+            cost: { energy: 20, data: 8 },
             effects: {
                 energyPerClick: 5,
                 description: '+5 Energy per click'
@@ -440,7 +440,7 @@ const GameData = {
             y: 1150,
             description: 'Generate energy from wind.',
             requires: ['solar_panel'],
-            cost: { energy: 150, data: 25 },
+            cost: { energy: 12, data: 4 },
             effects: {
                 automation: { resource: 'energy', rate: 2 },
                 description: '+2 Energy/second (passive)'
@@ -456,7 +456,7 @@ const GameData = {
             y: 600,
             description: 'Massive energy storage system.',
             requires: ['capacitor'],
-            cost: { energy: 180, data: 35 },
+            cost: { energy: 14, data: 5 },
             effects: {
                 energyPerClick: 3,
                 automation: { resource: 'energy', rate: 1 },
@@ -473,7 +473,7 @@ const GameData = {
             y: 550,
             description: 'Zero-resistance energy transfer.',
             requires: ['voltage_regulator', 'heat_sink'],
-            cost: { energy: 250, data: 40 },
+            cost: { energy: 18, data: 6 },
             effects: {
                 automation: { resource: 'energy', rate: 2 },
                 energyPerClick: 2,
@@ -491,7 +491,7 @@ const GameData = {
             y: 750,
             description: 'Process multiple data streams simultaneously.',
             requires: ['data_storage', 'data_miner'],
-            cost: { energy: 250, data: 75 },
+            cost: { energy: 18, data: 10 },
             effects: {
                 dataPerClick: 3,
                 dataMultiplier: 2,
@@ -508,7 +508,7 @@ const GameData = {
             y: 850,
             description: 'Structured data storage system.',
             requires: ['data_miner'],
-            cost: { energy: 180, data: 60 },
+            cost: { energy: 14, data: 8 },
             effects: {
                 automation: { resource: 'data', rate: 1.5 },
                 description: '+1.5 Data/second (passive)'
@@ -524,7 +524,7 @@ const GameData = {
             y: 1100,
             description: 'Massive data storage facility.',
             requires: ['data_cache'],
-            cost: { energy: 200, data: 80 },
+            cost: { energy: 16, data: 10 },
             effects: {
                 dataPerClick: 2,
                 automation: { resource: 'data', rate: 1 },
@@ -541,7 +541,7 @@ const GameData = {
             y: 700,
             description: 'Remove duplicate data efficiently.',
             requires: ['compression'],
-            cost: { energy: 150, data: 50 },
+            cost: { energy: 12, data: 6 },
             effects: {
                 dataMultiplier: 1.3,
                 description: '1.3x Data gains'
@@ -557,7 +557,7 @@ const GameData = {
             y: 700,
             description: 'Fast data retrieval with indexes.',
             requires: ['compression', 'data_storage'],
-            cost: { energy: 170, data: 55 },
+            cost: { energy: 14, data: 7 },
             effects: {
                 dataPerClick: 2,
                 description: '+2 Data per process'
@@ -574,7 +574,7 @@ const GameData = {
             y: 1900,
             description: 'Unlocks bandwidth as a new resource with passive generation.',
             requires: ['router', 'firewall'],
-            cost: { energy: 500, data: 100 },
+            cost: { energy: 30, data: 10 },
             effects: {
                 unlockBandwidth: true,
                 automation: { resource: 'bandwidth', rate: 0.5 },
@@ -591,7 +591,7 @@ const GameData = {
             y: 1750,
             description: 'Secure data transmission protocols.',
             requires: ['firewall'],
-            cost: { energy: 400, data: 80 },
+            cost: { energy: 25, data: 8 },
             effects: {
                 description: 'Required for advanced security'
             }
@@ -606,7 +606,7 @@ const GameData = {
             y: 1750,
             description: 'Distribute network load evenly.',
             requires: ['router'],
-            cost: { energy: 350, data: 70 },
+            cost: { energy: 22, data: 7 },
             effects: {
                 allRatesMultiplier: 1.15,
                 description: '1.15x all passive rates'
@@ -622,7 +622,7 @@ const GameData = {
             y: 1850,
             description: 'Connect to external networks.',
             requires: ['switch', 'router'],
-            cost: { energy: 300, data: 65 },
+            cost: { energy: 20, data: 6 },
             effects: {
                 automation: { resource: 'data', rate: 1 },
                 description: '+1 Data/second (passive)'
@@ -638,7 +638,7 @@ const GameData = {
             y: 1850,
             description: 'Hide your network traffic.',
             requires: ['switch', 'firewall'],
-            cost: { energy: 280, data: 60 },
+            cost: { energy: 18, data: 5 },
             effects: {
                 dataMultiplier: 1.25,
                 description: '1.25x Data gains'
@@ -655,7 +655,7 @@ const GameData = {
             y: 600,
             description: 'Teach machines to learn patterns.',
             requires: ['algorithms'],
-            cost: { energy: 300, data: 100 },
+            cost: { energy: 20, data: 10 },
             effects: {
                 dataMultiplier: 1.4,
                 description: '1.4x Data gains'
@@ -671,7 +671,7 @@ const GameData = {
             y: 600,
             description: 'Multi-layer neural processing.',
             requires: ['optimization'],
-            cost: { energy: 350, data: 120 },
+            cost: { energy: 25, data: 12 },
             effects: {
                 allRatesMultiplier: 1.2,
                 description: '1.2x all passive rates'
@@ -687,7 +687,7 @@ const GameData = {
             y: 550,
             description: 'Probabilistic simulations.',
             requires: ['simulation'],
-            cost: { energy: 280, data: 90 },
+            cost: { energy: 18, data: 8 },
             effects: {
                 dataPerClick: 2,
                 energyPerClick: 2,
@@ -704,7 +704,7 @@ const GameData = {
             y: 500,
             description: 'Evolution-based optimization.',
             requires: ['algorithms', 'simulation'],
-            cost: { energy: 320, data: 95 },
+            cost: { energy: 22, data: 9 },
             effects: {
                 allRatesMultiplier: 1.15,
                 description: '1.15x all passive rates'
@@ -725,7 +725,7 @@ const GameData = {
             y: 800,
             description: 'Massive energy production facility.',
             requires: ['generator_mk2'],
-            cost: { energy: 1000, data: 200, bandwidth: 50 },
+            cost: { energy: 20, data: 4, bandwidth: 1 },
             effects: {
                 automation: { resource: 'energy', rate: 10 },
                 description: '+10 Energy/second (passive)'
@@ -741,7 +741,7 @@ const GameData = {
             y: 600,
             description: 'Harness matter-antimatter annihilation.',
             requires: ['generator_mk2', 'superconductor'],
-            cost: { energy: 1500, data: 300, bandwidth: 80 },
+            cost: { energy: 30, data: 6, bandwidth: 2 },
             effects: {
                 automation: { resource: 'energy', rate: 15 },
                 description: '+15 Energy/second (passive)'
@@ -757,7 +757,7 @@ const GameData = {
             y: 1200,
             description: 'Capture a star\'s entire energy output.',
             requires: ['wind_turbine'],
-            cost: { energy: 5000, data: 1000, bandwidth: 200 },
+            cost: { energy: 100, data: 20, bandwidth: 4 },
             effects: {
                 automation: { resource: 'energy', rate: 50 },
                 description: '+50 Energy/second (passive)'
@@ -773,7 +773,7 @@ const GameData = {
             y: 500,
             description: 'Super-heated plasma energy transfer.',
             requires: ['overclocking'],
-            cost: { energy: 800, data: 180 },
+            cost: { energy: 16, data: 4 },
             effects: {
                 energyPerClick: 10,
                 description: '+10 Energy per click'
@@ -789,7 +789,7 @@ const GameData = {
             y: 450,
             description: 'Extract energy from quantum vacuum.',
             requires: ['battery_array', 'overclocking'],
-            cost: { energy: 2000, data: 400, bandwidth: 100 },
+            cost: { energy: 40, data: 8, bandwidth: 2 },
             effects: {
                 automation: { resource: 'energy', rate: 8 },
                 energyPerClick: 5,
@@ -807,7 +807,7 @@ const GameData = {
             y: 600,
             description: 'Quantum computing capabilities.',
             requires: ['parallel_processing'],
-            cost: { energy: 800, data: 300, bandwidth: 75 },
+            cost: { energy: 16, data: 6, bandwidth: 2 },
             effects: {
                 automation: { resource: 'data', rate: 5 },
                 dataMultiplier: 3,
@@ -824,7 +824,7 @@ const GameData = {
             y: 750,
             description: 'Vast unstructured data storage.',
             requires: ['database'],
-            cost: { energy: 600, data: 400, bandwidth: 60 },
+            cost: { energy: 12, data: 8, bandwidth: 1 },
             effects: {
                 automation: { resource: 'data', rate: 4 },
                 description: '+4 Data/second (passive)'
@@ -840,7 +840,7 @@ const GameData = {
             y: 1000,
             description: 'Process massive datasets.',
             requires: ['data_warehouse'],
-            cost: { energy: 700, data: 500, bandwidth: 70 },
+            cost: { energy: 14, data: 10, bandwidth: 2 },
             effects: {
                 dataPerClick: 5,
                 dataMultiplier: 2.5,
@@ -857,7 +857,7 @@ const GameData = {
             y: 550,
             description: 'Harness distributed processing power.',
             requires: ['parallel_processing', 'indexing'],
-            cost: { energy: 900, data: 350, bandwidth: 90 },
+            cost: { energy: 18, data: 7, bandwidth: 2 },
             effects: {
                 automation: { resource: 'data', rate: 3 },
                 allRatesMultiplier: 1.25,
@@ -874,7 +874,7 @@ const GameData = {
             y: 550,
             description: '3D data storage technology.',
             requires: ['deduplication', 'indexing'],
-            cost: { energy: 550, data: 280 },
+            cost: { energy: 11, data: 6 },
             effects: {
                 dataPerClick: 4,
                 description: '+4 Data per process'
@@ -891,7 +891,7 @@ const GameData = {
             y: 2100,
             description: 'AI-powered automation system.',
             requires: ['bandwidth_unlock'],
-            cost: { energy: 1500, data: 500, bandwidth: 100 },
+            cost: { energy: 30, data: 10, bandwidth: 2 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 1 },
                 allRatesMultiplier: 1.5,
@@ -908,7 +908,7 @@ const GameData = {
             y: 1850,
             description: 'Exploit unknown vulnerabilities.',
             requires: ['encryption'],
-            cost: { energy: 2000, data: 400, bandwidth: 150 },
+            cost: { energy: 40, data: 8, bandwidth: 3 },
             effects: {
                 instantUnlock: true,
                 description: 'Instantly unlock one random locked node'
@@ -924,7 +924,7 @@ const GameData = {
             y: 1700,
             description: 'Secure encrypted tunnels.',
             requires: ['encryption'],
-            cost: { energy: 600, data: 250, bandwidth: 40 },
+            cost: { energy: 12, data: 5, bandwidth: 1 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 0.5 },
                 description: '+0.5 Bandwidth/second (passive)'
@@ -940,7 +940,7 @@ const GameData = {
             y: 1850,
             description: 'Content Delivery Network.',
             requires: ['load_balancer'],
-            cost: { energy: 700, data: 300, bandwidth: 50 },
+            cost: { energy: 14, data: 6, bandwidth: 1 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 0.3 },
                 description: '+0.3 Bandwidth/s'
@@ -956,7 +956,7 @@ const GameData = {
             y: 2000,
             description: 'Decentralized network topology.',
             requires: ['gateway', 'bandwidth_unlock'],
-            cost: { energy: 800, data: 350, bandwidth: 60 },
+            cost: { energy: 16, data: 7, bandwidth: 1 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 0.8 },
                 allRatesMultiplier: 1.2,
@@ -973,7 +973,7 @@ const GameData = {
             y: 2000,
             description: 'Access the hidden network.',
             requires: ['proxy', 'bandwidth_unlock'],
-            cost: { energy: 1000, data: 400, bandwidth: 80 },
+            cost: { energy: 20, data: 8, bandwidth: 2 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 0.5 },
                 description: '+0.5 Bandwidth/s'
@@ -990,7 +990,7 @@ const GameData = {
             y: 450,
             description: 'Artificial General Intelligence.',
             requires: ['machine_learning'],
-            cost: { energy: 1200, data: 600, bandwidth: 100 },
+            cost: { energy: 24, data: 12, bandwidth: 2 },
             effects: {
                 allRatesMultiplier: 1.5,
                 description: '1.5x all passive rates'
@@ -1006,7 +1006,7 @@ const GameData = {
             y: 450,
             description: 'Brain-inspired computing.',
             requires: ['deep_learning'],
-            cost: { energy: 1100, data: 550, bandwidth: 90 },
+            cost: { energy: 22, data: 11, bandwidth: 2 },
             effects: {
                 automation: { resource: 'data', rate: 4 },
                 dataMultiplier: 2,
@@ -1023,7 +1023,7 @@ const GameData = {
             y: 400,
             description: 'Simulate quantum systems.',
             requires: ['monte_carlo', 'genetic_algorithm'],
-            cost: { energy: 1300, data: 500, bandwidth: 110 },
+            cost: { energy: 26, data: 10, bandwidth: 2 },
             effects: {
                 dataPerClick: 5,
                 energyPerClick: 5,
@@ -1045,7 +1045,7 @@ const GameData = {
             y: 700,
             description: 'Forge new stars for energy.',
             requires: ['fusion_core', 'antimatter_reactor'],
-            cost: { energy: 10000, data: 2000, bandwidth: 500 },
+            cost: { energy: 20, data: 4, bandwidth: 1 },
             effects: {
                 automation: { resource: 'energy', rate: 100 },
                 description: '+100 Energy/second (passive)'
@@ -1061,7 +1061,7 @@ const GameData = {
             y: 1050,
             description: 'Extract energy from black holes.',
             requires: ['dyson_sphere'],
-            cost: { energy: 25000, data: 5000, bandwidth: 1000 },
+            cost: { energy: 50, data: 10, bandwidth: 2 },
             effects: {
                 automation: { resource: 'energy', rate: 200 },
                 description: '+200 Energy/second (passive)'
@@ -1077,7 +1077,7 @@ const GameData = {
             y: 350,
             description: 'Store universe-scale energy.',
             requires: ['zero_point', 'plasma_conduit'],
-            cost: { energy: 8000, data: 1500, bandwidth: 400 },
+            cost: { energy: 16, data: 3, bandwidth: 1 },
             effects: {
                 energyPerClick: 25,
                 automation: { resource: 'energy', rate: 20 },
@@ -1095,7 +1095,7 @@ const GameData = {
             y: 450,
             description: 'Store data in quantum states.',
             requires: ['quantum_processor'],
-            cost: { energy: 5000, data: 2500, bandwidth: 300 },
+            cost: { energy: 10, data: 5, bandwidth: 1 },
             effects: {
                 automation: { resource: 'data', rate: 20 },
                 dataMultiplier: 5,
@@ -1112,7 +1112,7 @@ const GameData = {
             y: 850,
             description: 'Contains all possible data.',
             requires: ['data_lake', 'big_data'],
-            cost: { energy: 8000, data: 4000, bandwidth: 500 },
+            cost: { energy: 16, data: 8, bandwidth: 1 },
             effects: {
                 automation: { resource: 'data', rate: 30 },
                 description: '+30 Data/second (passive)'
@@ -1128,7 +1128,7 @@ const GameData = {
             y: 400,
             description: 'Compile data into reality.',
             requires: ['distributed_computing', 'holographic_storage'],
-            cost: { energy: 6000, data: 3000, bandwidth: 400 },
+            cost: { energy: 12, data: 6, bandwidth: 1 },
             effects: {
                 dataPerClick: 15,
                 allRatesMultiplier: 2,
@@ -1146,7 +1146,7 @@ const GameData = {
             y: 2300,
             description: 'Network spanning galaxies.',
             requires: ['neural_network'],
-            cost: { energy: 15000, data: 5000, bandwidth: 800 },
+            cost: { energy: 30, data: 10, bandwidth: 2 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 5 },
                 allRatesMultiplier: 2,
@@ -1163,7 +1163,7 @@ const GameData = {
             y: 2150,
             description: 'Instant communication via entanglement.',
             requires: ['mesh_network'],
-            cost: { energy: 10000, data: 3500, bandwidth: 600 },
+            cost: { energy: 20, data: 7, bandwidth: 1 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 3 },
                 description: '+3 Bandwidth/s'
@@ -1179,7 +1179,7 @@ const GameData = {
             y: 2050,
             description: 'Invisible network infrastructure.',
             requires: ['darknet', 'zero_day'],
-            cost: { energy: 12000, data: 4000, bandwidth: 700 },
+            cost: { energy: 24, data: 8, bandwidth: 1 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 4 },
                 dataMultiplier: 3,
@@ -1197,7 +1197,7 @@ const GameData = {
             y: 300,
             description: 'Beyond human intelligence.',
             requires: ['ai_core'],
-            cost: { energy: 20000, data: 8000, bandwidth: 1000 },
+            cost: { energy: 40, data: 16, bandwidth: 2 },
             effects: {
                 allRatesMultiplier: 3,
                 description: '3x all passive rates'
@@ -1213,7 +1213,7 @@ const GameData = {
             y: 300,
             description: 'Transfer consciousness to the network.',
             requires: ['neural_processor'],
-            cost: { energy: 18000, data: 7000, bandwidth: 900 },
+            cost: { energy: 36, data: 14, bandwidth: 2 },
             effects: {
                 automation: { resource: 'data', rate: 25 },
                 description: '+25 Data/s'
@@ -1229,7 +1229,7 @@ const GameData = {
             y: 250,
             description: 'Access parallel universes.',
             requires: ['quantum_simulation'],
-            cost: { energy: 30000, data: 10000, bandwidth: 1500 },
+            cost: { energy: 60, data: 20, bandwidth: 3 },
             effects: {
                 energyPerClick: 50,
                 dataPerClick: 30,
@@ -1251,7 +1251,7 @@ const GameData = {
             y: 900,
             description: 'Tap into the energy of the universe itself.',
             requires: ['stellar_forge', 'singularity_tap'],
-            cost: { energy: 100000, data: 25000, bandwidth: 5000 },
+            cost: { energy: 20, data: 5, bandwidth: 1 },
             effects: {
                 automation: { resource: 'energy', rate: 500 },
                 description: '+500 Energy/second (passive)'
@@ -1267,7 +1267,7 @@ const GameData = {
             y: 650,
             description: 'Access the universal database of all knowledge.',
             requires: ['quantum_memory', 'omniscient_database'],
-            cost: { energy: 80000, data: 50000, bandwidth: 4000 },
+            cost: { energy: 16, data: 10, bandwidth: 1 },
             effects: {
                 automation: { resource: 'data', rate: 100 },
                 dataMultiplier: 10,
@@ -1284,7 +1284,7 @@ const GameData = {
             y: 2500,
             description: 'Collective consciousness of all networks.',
             requires: ['galactic_network', 'quantum_entanglement', 'shadow_network'],
-            cost: { energy: 120000, data: 40000, bandwidth: 8000 },
+            cost: { energy: 24, data: 8, bandwidth: 2 },
             effects: {
                 automation: { resource: 'bandwidth', rate: 20 },
                 allRatesMultiplier: 5,
@@ -1301,7 +1301,7 @@ const GameData = {
             y: 150,
             description: 'The ultimate convergence of all intelligence.',
             requires: ['superintelligence', 'consciousness_upload', 'multiverse_access'],
-            cost: { energy: 150000, data: 75000, bandwidth: 10000 },
+            cost: { energy: 30, data: 15, bandwidth: 2 },
             effects: {
                 allRatesMultiplier: 10,
                 energyPerClick: 100,
@@ -1323,7 +1323,7 @@ const GameData = {
             y: 2700,
             description: 'Simulate entire universes at will.',
             requires: ['omega_point', 'universal_energy', 'akashic_records', 'hivemind'],
-            cost: { energy: 1000000, data: 500000, bandwidth: 100000 },
+            cost: { energy: 20, data: 10, bandwidth: 2 },
             effects: {
                 automation: { resource: 'energy', rate: 1000 },
                 automation: { resource: 'data', rate: 500 },
@@ -1338,12 +1338,39 @@ const GameData = {
     TIER_COST_MULTIPLIERS: {
         0: 1,      // Core
         1: 1,      // 10-25 energy
-        2: 10,     // 100-300 energy  
+        2: 10,     // 100-300 energy
         3: 50,     // 500-2,000 energy
         4: 500,    // 5K-20K energy
         5: 5000,   // 50K-200K energy
         6: 50000,  // 500K-2M energy
         7: 500000  // 10M-50M energy
+    },
+
+    TIER_GATES: {
+        3: { requiredTier: 2, requiredCount: 3 },
+        4: { requiredTier: 3, requiredCount: 6 },
+        5: { requiredTier: 4, requiredCount: 10 },
+        6: { requiredTier: 5, requiredCount: 15 },
+        7: { requiredTier: 6, requiredCount: 20 }
+    },
+
+    countUnlockedInTier(tier, unlockedNodeIds) {
+        let count = 0;
+        unlockedNodeIds.forEach(id => {
+            const node = this.nodes[id];
+            if (node && node.tier === tier) {
+                count++;
+            }
+        });
+        return count;
+    },
+
+    isTierUnlocked(tier, unlockedNodeIds) {
+        const gate = this.TIER_GATES[tier];
+        if (!gate) return true;
+        
+        const count = this.countUnlockedInTier(gate.requiredTier, unlockedNodeIds);
+        return count >= gate.requiredCount;
     },
 
     getScaledNodeCost(node) {
