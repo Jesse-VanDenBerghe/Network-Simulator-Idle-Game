@@ -55,14 +55,15 @@ Benefits: Testable handlers, easy to add new effects, DRY (no duplicate code).
 All 95 tests still passing.
 ```
 
-**C4: Refactor LayoutEngine into 3 Classes**
+**C4: Refactor LayoutEngine into 3 Classes** ✅ **FIXED**
 ```
-In LayoutEngine.js, split 250+ line god object into:
-- TreeBuilder: buildTree(), buildChildren() - pure functions
-- PositionCalculator: calculatePositions(), assignBranches() - spatial logic
-- CollisionResolver: resolveCollisions(), detectOverlap() - physics
-- Compose in LayoutEngine.calculateLayout() = builder.build() → calc.positions() → resolver.collisions()
-Time: 4 hours. Benefit: Testable independently, modify without side effects.
+✅ COMPLETED - Split 250+ line god object into:
+- TreeBuilder: buildTree(), countDescendants(), assignBranches(), averageAngle()
+- PositionCalculator: calculateDepth(), calculateRadius(), calculatePositions(), groupByParent(), groupByAngle(), angleDiff()
+- CollisionResolver: resolveCollisions(), buildSpatialGrid(), getGridCellKey()
+- LayoutEngine: Thin orchestrator that composes the 3 classes
+Benefits: Each class testable independently, single responsibility, modify without side effects.
+All 95 tests still passing.
 ```
 
 ### 🟡 Minor Issues (Should Fix)

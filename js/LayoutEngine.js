@@ -1,4 +1,5 @@
 // LayoutEngine - Dynamic node positioning for the skill tree
+// Refactored into 3 focused classes: TreeBuilder, PositionCalculator, CollisionResolver
 // ==========================================================
 
 /**
@@ -8,66 +9,30 @@ function getReqId(req) {
     return typeof req === 'string' ? req : req.id;
 }
 
-const LayoutEngine = {
-    // Configuration
-    config: {
-        centerX: 1400,           // Center of the skill tree
-        centerY: 1400,           // Center of the skill tree
-        tierSpacing: 180,        // Radial spacing between tiers
-        sameTierOffset: 60,      // Extra radius offset for same-tier children (smaller = closer)
-        nodeSpacing: 100,        // Minimum spacing between nodes
-        nodeSize: 80,            // Size of each node for collision detection
-    },
-
-    /**
-     * Calculate positions for all nodes dynamically
-     * @param {Object} nodes - The nodes object from GameData
-     * @returns {Object} - Nodes with updated x, y positions
-     */
-    calculateLayout(nodes) {
-        const nodesCopy = structuredClone(nodes);
-        
-        // Step 1: Build the tree structure
-        const tree = this.buildTree(nodesCopy);
-        
-        // Step 2: Assign branches and sub-positions to all nodes
-        this.assignBranches(nodesCopy, tree);
-        
-        // Step 3: Calculate positions using a force-directed-like approach per tier
-        this.calculatePositions(nodesCopy, tree);
-        
-        // Step 4: Apply collision resolution
-        this.resolveCollisions(nodesCopy);
-        
-        return nodesCopy;
-    },
-
-    /**
-     * Build tree structure from node dependencies
-     */
+// ==========================================================
+// TreeBuilder: Constructs dependency tree structure from nodes
+// Single Responsibility: Build tree structure and assign branches
+// ==========================================================
+class TreeBuilder {
     buildTree(nodes) {
         const tree = {
             nodesByTier: {},
             children: {},      
             parents: {},       
             maxTier: 0,
-            descendants: {}    // Track all descendants for subtree sizing
+            descendants: {}
         };
 
         Object.values(nodes).forEach(node => {
-            // Group by tier
             if (!tree.nodesByTier[node.tier]) {
                 tree.nodesByTier[node.tier] = [];
             }
             tree.nodesByTier[node.tier].push(node.id);
             tree.maxTier = Math.max(tree.maxTier, node.tier);
-
-            // Build parent-child relationships
             tree.parents[node.id] = (node.requires || []).map(getReqId);
             tree.children[node.id] = [];
         });
 
-        // Build children list
         Object.values(nodes).forEach(node => {
             node.requires.forEach(req => {
                 const parentId = getReqId(req);
@@ -77,38 +42,31 @@ const LayoutEngine = {
             });
         });
 
-        // Calculate descendant counts for spacing
         Object.keys(nodes).forEach(nodeId => {
             tree.descendants[nodeId] = this.countDescendants(nodeId, tree, nodes);
         });
 
         return tree;
-    },
+    }
 
-    /**
-     * Count all descendants of a node (for proportional spacing)
-     */
-    countDescendants(nodeId, tree, nodes) {
+    countDescendants(nodeId, tree, nodes, visited = new Set()) {
+        if (visited.has(nodeId)) return 0;
+        visited.add(nodeId);
+        
         const children = tree.children[nodeId] || [];
         let count = children.length;
         children.forEach(childId => {
-            count += this.countDescendants(childId, tree, nodes);
+            count += this.countDescendants(childId, tree, nodes, visited);
         });
         return count;
-    },
+    }
 
-    /**
-     * Assign each node to a branch based on its ancestry
-     * Tier 1 nodes are spread evenly around the circle
-     */
     assignBranches(nodes, tree) {
-        // Old shed is special
         if (nodes.old_shed) {
             nodes.old_shed.branch = 'old_shed';
             nodes.old_shed.branchAngle = 0;
         }
 
-        // Tier 1 nodes: spread evenly around the circle
         const tier1Nodes = tree.nodesByTier[1] || [];
         const tier1Count = tier1Nodes.length;
         
@@ -118,7 +76,6 @@ const LayoutEngine = {
             nodes[nodeId].branchAngle = angle;
         });
 
-        // Propagate branches to descendants
         for (let tier = 2; tier <= tree.maxTier; tier++) {
             const tierNodes = tree.nodesByTier[tier] || [];
             
@@ -136,7 +93,30 @@ const LayoutEngine = {
                 }
             });
         }
-    },
+    }
+
+    averageAngle(angles) {
+        if (angles.length === 0) return 0;
+        if (angles.length === 1) return angles[0];
+        
+        let sumSin = 0, sumCos = 0;
+        angles.forEach(a => {
+            sumSin += Math.sin(a);
+            sumCos += Math.cos(a);
+        });
+        
+        return Math.atan2(sumSin / angles.length, sumCos / angles.length);
+    }
+}
+
+// ==========================================================
+// PositionCalculator: Calculates node positions based on tree structure
+// Single Responsibility: Physics-based positioning and depth calculations
+// ==========================================================
+class PositionCalculator {
+    constructor(config) {
+        this.config = config;
+    }
 
     /**
      * Calculate the depth of a node from tier 1 (how many parent hops)
@@ -170,20 +150,14 @@ const LayoutEngine = {
             sameTierHops: parentDepthInfo.sameTierHops + (isSameTierHop ? 1 : 0)
         };
         return cache[nodeId];
-    },
+    }
 
-    /**
-     * Calculate radius for a node based on depth and same-tier hops
-     */
     calculateRadius(depthInfo) {
         const { tierSpacing, sameTierOffset } = this.config;
         const effectiveDepth = depthInfo.depth - depthInfo.sameTierHops;
         return effectiveDepth * tierSpacing + depthInfo.sameTierHops * sameTierOffset;
-    },
+    }
 
-    /**
-     * Calculate average of angles (handling wraparound)
-     */
     averageAngle(angles) {
         if (angles.length === 0) return 0;
         if (angles.length === 1) return angles[0];
@@ -195,7 +169,7 @@ const LayoutEngine = {
         });
         
         return Math.atan2(sumSin / angles.length, sumCos / angles.length);
-    },
+    }
 
     /**
      * Calculate positions for all nodes
@@ -286,17 +260,13 @@ const LayoutEngine = {
             node.x = Math.round(node.x - halfNode);
             node.y = Math.round(node.y - halfNode);
         });
-    },
+    }
 
-    /**
-     * Group tier nodes by their primary parent for symmetrical layout
-     */
     groupByParent(nodeIds, nodes, tree) {
         const groups = {};
         
         nodeIds.forEach(nodeId => {
             const node = nodes[nodeId];
-            // Use first parent as the grouping key
             const parentId = node.requires && node.requires.length > 0 ? getReqId(node.requires[0]) : 'old_shed';
             
             if (!groups[parentId]) {
@@ -306,11 +276,8 @@ const LayoutEngine = {
         });
         
         return Object.values(groups);
-    },
+    }
 
-    /**
-     * Group nodes by similar angles (within tolerance)
-     */
     groupByAngle(nodeIds, nodes, tolerance = 0.3) {
         const groups = [];
         
@@ -337,26 +304,30 @@ const LayoutEngine = {
         });
         
         return groups;
-    },
+    }
 
-    /**
-     * Calculate difference between two angles
-     */
     angleDiff(a, b) {
         let diff = b - a;
         while (diff > Math.PI) diff -= 2 * Math.PI;
         while (diff < -Math.PI) diff += 2 * Math.PI;
         return diff;
-    },
+    }
+}
 
-    /**
-     * Resolve collisions between nodes using spatial partitioning (grid-based)
-     * Reduces complexity from O(n²) to O(n·k) where k = avg nodes per cell
-     */
+// ==========================================================
+// CollisionResolver: Resolves node collisions using spatial partitioning
+// Single Responsibility: Collision detection and resolution only
+// Complexity: O(n*k) where k = avg nodes per grid cell (instead of O(n²))
+// ==========================================================
+class CollisionResolver {
+    constructor(config) {
+        this.config = config;
+    }
+
     resolveCollisions(nodes) {
         const nodeList = Object.values(nodes);
         const minDistance = this.config.nodeSpacing;
-        const cellSize = minDistance * 2; // Size of grid cells for spatial partitioning
+        const cellSize = minDistance * 2;
         const iterations = 15;
 
         for (let iter = 0; iter < iterations; iter++) {
@@ -416,14 +387,8 @@ const LayoutEngine = {
             node.x = Math.round(node.x);
             node.y = Math.round(node.y);
         });
-    },
+    }
 
-    /**
-     * Build spatial grid for collision detection
-     * @param {Array} nodeList - List of nodes
-     * @param {number} cellSize - Size of each grid cell
-     * @returns {Map} - Map of cellKey -> Array of nodes in that cell
-     */
     buildSpatialGrid(nodeList, cellSize) {
         const grid = new Map();
         
@@ -436,25 +401,54 @@ const LayoutEngine = {
         });
         
         return grid;
-    },
+    }
 
-    /**
-     * Get grid cell key for a position
-     * @param {number} x - X coordinate
-     * @param {number} y - Y coordinate
-     * @param {number} cellSize - Size of each grid cell
-     * @returns {string} - Cell key in format "cellX,cellY"
-     */
     getGridCellKey(x, y, cellSize) {
         const cellX = Math.floor(x / cellSize);
         const cellY = Math.floor(y / cellSize);
         return `${cellX},${cellY}`;
+    }
+}
+
+// ==========================================================
+// LayoutEngine: Main orchestrator that composes the three specialized classes
+// Maintains original API while using composition internally
+// ==========================================================
+const LayoutEngine = {
+    config: {
+        centerX: 1400,
+        centerY: 1400,
+        tierSpacing: 180,
+        sameTierOffset: 60,
+        nodeSpacing: 100,
+        nodeSize: 80,
     },
 
-    /**
-     * Apply layout to GameData nodes
-     * Call this once to update all node positions
-     */
+    _treeBuilder: new TreeBuilder(),
+    _positionCalculator: null,
+    _collisionResolver: null,
+
+    _ensureComponents() {
+        if (!this._positionCalculator) {
+            this._positionCalculator = new PositionCalculator(this.config);
+        }
+        if (!this._collisionResolver) {
+            this._collisionResolver = new CollisionResolver(this.config);
+        }
+    },
+
+    calculateLayout(nodes) {
+        this._ensureComponents();
+        const nodesCopy = structuredClone(nodes);
+        
+        const tree = this._treeBuilder.buildTree(nodesCopy);
+        this._treeBuilder.assignBranches(nodesCopy, tree);
+        this._positionCalculator.calculatePositions(nodesCopy, tree);
+        this._collisionResolver.resolveCollisions(nodesCopy);
+        
+        return nodesCopy;
+    },
+
     applyLayout(gameData) {
         const layoutNodes = this.calculateLayout(gameData.nodes);
         
@@ -468,13 +462,8 @@ const LayoutEngine = {
         return gameData;
     },
 
-    /**
-     * Initialize layout - call once on load after GameData is ready
-     * @param {Object} gameData - The GameData object
-     */
     initializeLayout(gameData) {
         if (gameData && gameData.nodes) {
-            console.log('Initializing layout for', Object.keys(gameData.nodes).length, 'nodes');
             this.applyLayout(gameData);
         }
     }
@@ -484,6 +473,3 @@ const LayoutEngine = {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = LayoutEngine;
 }
-
-// Note: Layout is initialized explicitly from App.js after all modules are loaded
-// This ensures nodes are fully imported before layout calculation
