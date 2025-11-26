@@ -2,7 +2,7 @@
 // ===================================
 // Uses composables for clean separation of concerns
 
-const { createApp, computed, onMounted, onUnmounted } = Vue;
+const { createApp, computed, ref, onMounted, onUnmounted } = Vue;
 
 // Import composables
 import { useGameState } from './composables/useGameState.js';
@@ -19,7 +19,8 @@ const App = {
         SkillTree,
         InfoPanel,
         NotificationToast,
-        AscensionPanel
+        AscensionPanel,
+        ChangelogModal
     },
     setup() {
         // ==========================================
@@ -42,9 +43,29 @@ const App = {
         );
 
         // ==========================================
+        // CHANGELOG MODAL
+        // ==========================================
+        const showChangelogModal = ref(false);
+        const toggleChangelogModal = () => {
+            showChangelogModal.value = !showChangelogModal.value;
+        };
+
+        // ==========================================
         // KEYBOARD SHORTCUTS
         // ==========================================
         function handleKeydown(event) {
+            // Close modals with Escape
+            if (event.key === 'Escape') {
+                if (showChangelogModal.value) {
+                    showChangelogModal.value = false;
+                    return;
+                }
+                if (prestigeState.showAscensionPanel.value) {
+                    prestigeState.toggleAscensionPanel();
+                    return;
+                }
+            }
+            
             // 'u' to unlock selected node
             if (event.key === 'u' || event.key === 'U') {
                 const nodeId = gameState.selectedNodeId.value;
@@ -106,6 +127,8 @@ const App = {
             ascend: gameLoop.ascend,
             purchaseUpgrade: gameLoop.handlePurchaseUpgrade,
             toggleAscensionPanel: prestigeState.toggleAscensionPanel,
+            toggleChangelogModal,
+            showChangelogModal,
             resetGame: saveLoad.resetGame,
             
             // Data
@@ -115,7 +138,10 @@ const App = {
     template: `
         <div id="game-container">
             <header id="header">
-                <h1>Network Simulator</h1>
+                <div class="header-left">
+                    <h1>Network Simulator</h1>
+                    <button class="icon-button" @click="toggleChangelogModal" title="View Changelog">📜</button>
+                </div>
                 <div class="prestige-header" v-if="prestigeState.ascensionCount > 0 || prestigeState.quantumCores > 0">
                     <button class="prestige-button" @click="toggleAscensionPanel" title="View Ascension Upgrades">
                         <span class="prestige-icon">💎</span>
@@ -200,6 +226,11 @@ const App = {
                 :total-cores-earned="prestigeState.totalCoresEarned"
                 @purchase-upgrade="purchaseUpgrade"
                 @close="toggleAscensionPanel"
+            />
+            
+            <ChangelogModal
+                :visible="showChangelogModal"
+                @close="toggleChangelogModal"
             />
         </div>
     `

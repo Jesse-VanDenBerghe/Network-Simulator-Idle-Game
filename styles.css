@@ -46,10 +46,37 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 170, 0.2);
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 #header h1 {
     font-size: 1.5rem;
     color: var(--accent-primary);
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+}
+
+.icon-button {
+    background: var(--bg-light);
+    border: 1px solid var(--accent-primary);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+    background: var(--accent-primary);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+}
+
+.icon-button:active {
+    transform: scale(0.95);
 }
 
 #resources {
@@ -1186,4 +1213,145 @@ body {
     border-color: #6a11cb;
     background: linear-gradient(135deg, rgba(106, 17, 203, 0.3) 0%, rgba(37, 117, 252, 0.3) 100%);
     box-shadow: 0 0 30px rgba(106, 17, 203, 0.5);
+}
+
+/* ============================================= */
+/* CHANGELOG PANEL */
+/* ============================================= */
+
+#changelog-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 26, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+#changelog-panel .panel-content {
+    background: var(--bg-medium);
+    border: 2px solid var(--accent-primary);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0, 255, 170, 0.3);
+}
+
+#changelog-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--accent-primary);
+}
+
+#changelog-panel .panel-header h2 {
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+    margin: 0;
+}
+
+#changelog-panel .close-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#changelog-panel .close-button:hover {
+    color: var(--accent-tertiary);
+    transform: rotate(90deg);
+}
+
+#changelog-panel .panel-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Changelog releases */
+#changelog-panel .changelog-release {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--text-muted);
+}
+
+#changelog-panel .changelog-release:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+#changelog-panel .release-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--accent-primary);
+}
+
+#changelog-panel .release-version {
+    font-size: 1.3rem;
+    color: var(--accent-secondary);
+    margin: 0;
+}
+
+#changelog-panel .release-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    background: var(--bg-light);
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+}
+
+/* Changelog sections */
+#changelog-panel .changelog-section {
+    margin-bottom: 1rem;
+}
+
+#changelog-panel .section-title {
+    font-size: 0.9rem;
+    color: var(--accent-primary);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#changelog-panel .section-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#changelog-panel .section-list li {
+    color: var(--text-secondary);
+    padding: 0.4rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+#changelog-panel .section-list li:before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent-primary);
 }
