@@ -32,12 +32,14 @@ function getTierMultiplierForResource(tier, resource) {
 /**
  * Get the cost of a node scaled by its tier multiplier, ascension count, prestige bonuses, and level
  * @param {Object} node - The node object
- * @param {number} ascensionCount - Current ascension count (default 0)
- * @param {Object} prestigeBonuses - Prestige bonuses object (optional)
- * @param {number} currentLevel - Current level of the node (default 0)
+ * @param {Object} [options={}] - Options object
+ * @param {number} [options.ascensionCount=0] - Current ascension count
+ * @param {Object|null} [options.prestigeBonuses=null] - Prestige bonuses object
+ * @param {number} [options.currentLevel=0] - Current level of the node
  * @returns {Object} The scaled cost object { resource: amount }
  */
-export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0) {
+export function getScaledNodeCost(node, options = {}) {
+    const { ascensionCount = 0, prestigeBonuses = null, currentLevel = 0 } = options;
     const baseCost = node.cost;
     
     // Ascension scaling: each ascension increases costs by ASCENSION_COST_MULTIPLIER (compounds)

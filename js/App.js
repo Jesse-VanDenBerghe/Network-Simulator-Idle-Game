@@ -37,7 +37,7 @@ const App = {
         const prestigeState = usePrestigeState();
         
         // These composables communicate via eventBus instead of direct dependencies
-        const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus);
+        const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus, GameData.nodes);
         const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
         const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
 

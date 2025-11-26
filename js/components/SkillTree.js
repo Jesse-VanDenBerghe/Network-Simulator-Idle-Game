@@ -1,4 +1,6 @@
 // SkillTree Component - The main skill tree visualization
+import { checkNodeAvailable, checkCanAffordNode, checkTierLocked, checkNodeVisible } from '../composables/useNodeValidation.js';
+
 const SkillTree = {
     name: 'SkillTree',
     components: {
@@ -56,36 +58,22 @@ const SkillTree = {
             return this.unlockedNodes.has(nodeId);
         },
         isAvailable(node) {
-            if (this.unlockedNodes.has(node.id)) return false;
-            return node.requires.every(req => 
-                GameData.checkRequirementMet(req, this.unlockedNodes, this.nodeLevels)
-            );
+            return checkNodeAvailable(node, this.unlockedNodes, this.nodeLevels);
         },
         canAfford(node) {
-            if (!node || !this.isAvailable(node)) return false;
-            const scaledCost = GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
-            for (const [resource, amount] of Object.entries(scaledCost)) {
-                if (this.resources[resource] < amount) return false;
-            }
-            return true;
+            return checkCanAffordNode(
+                node,
+                this.resources,
+                { ascensionCount: this.ascensionCount, prestigeBonuses: this.prestigeBonuses },
+                this.unlockedNodes,
+                this.nodeLevels
+            );
         },
         isTierLocked(node) {
-             return !GameData.isTierUnlocked(node.tier, this.unlockedNodes);
+            return checkTierLocked(node, this.unlockedNodes);
         },
         isNodeVisible(node) {
-            if (!node) return false;
-            
-            // Tier gate nodes are visible even if their branch isn't unlocked yet
-            // (they are the nodes that unlock their branch)
-            if (!node.isTierGate) {
-                // Check if the node's branch is unlocked
-                if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, this.unlockedBranches)) {
-                    return false;
-                }
-            }
-            
-            // Show if unlocked OR available (parents unlocked)
-            return this.unlockedNodes.has(node.id) || this.isAvailable(node);
+            return checkNodeVisible(node, this.unlockedNodes, this.unlockedBranches, this.nodeLevels);
         },
         isConnectionUnlocked(connection) {
             return this.unlockedNodes.has(connection.from) && this.unlockedNodes.has(connection.to);
@@ -174,7 +162,10 @@ const SkillTree = {
                         // If target node is available (not unlocked), increase its progress
                         if (toNode && this.isAvailable(toNode)) {
                             const currentProgress = this.nodeProgress.get(dot.toNode) || 0;
-                            const scaledCost = GameData.getScaledNodeCost(toNode, this.ascensionCount, this.prestigeBonuses);
+                            const scaledCost = GameData.getScaledNodeCost(toNode, {
+                                ascensionCount: this.ascensionCount,
+                                prestigeBonuses: this.prestigeBonuses
+                            });
                             const totalCost = Object.values(scaledCost).reduce((sum, cost) => sum + cost, 0);
                             // Each dot contributes 1% of the total cost
                             const progressIncrement = totalCost * 0.01;
@@ -257,7 +248,10 @@ const SkillTree = {
             if (!node || !this.isAvailable(node)) return 0;
             
             const currentProgress = this.nodeProgress.get(nodeId) || 0;
-            const scaledCost = GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
+            const scaledCost = GameData.getScaledNodeCost(node, {
+                ascensionCount: this.ascensionCount,
+                prestigeBonuses: this.prestigeBonuses
+            });
             const totalCost = Object.values(scaledCost).reduce((sum, cost) => sum + cost, 0);
             
             return Math.min((currentProgress / totalCost) * 100, 100);
@@ -469,3 +463,6 @@ const SkillTree = {
         </section>
     `
 };
+
+// Expose globally for non-module scripts
+window.SkillTree = SkillTree;

@@ -154,40 +154,42 @@ SkillTree.isAvailable() now uses: node.requires.every(req => GameData.checkRequi
 Replaced nested ternaries with clean, reusable, testable helper function.
 ```
 
-**C7: Use Named Object Parameters Instead of Long Signatures**
+**C7: Use Named Object Parameters Instead of Long Signatures** ✅ **FIXED**
 ```
-In nodeUtils.js getScaledNodeCost(), change from:
+✅ COMPLETED - Refactored getScaledNodeCost() in nodeUtils.js from:
   getScaledNodeCost(node, ascensionCount=0, prestigeBonuses=null, currentLevel=0)
 To: getScaledNodeCost(node, { ascensionCount=0, prestigeBonuses=null, currentLevel=0 })
-All 4+ arg functions should use destructured options object.
-Time: 1 hour. Benefit: Self-documenting, extensible, no parameter order mistakes.
+Updated all 6 call sites in gameData.js, useNodeManagement.js, SkillTree.js, InfoPanel.js.
+Benefits: Self-documenting, extensible, no parameter order mistakes.
 ```
 
 ### 🟡 Clean Code Minor Violations (Nice to Have)
 
-**C8: Move Validation Logic to Composable**
+**C8: Move Validation Logic to Composable** ✅ **FIXED**
 ```
-Create useNodeValidation(gameState, prestigeState) composable.
-Move SkillTree.isAvailable() and canAfford() methods there.
-Have SkillTree.js call computed props from composable instead of duplicating logic.
-Time: 2 hours. Benefit: DRY, testable, reusable in other components.
-```
-
-**C9: Replace Empty Catch Blocks with Proper Error Handling**
-```
-In useGameLoop.js:123,132 and useSaveLoad.js, replace catch(e){/*ignore*/} with:
-  if (e.name === 'QuotaExceededError') { showNotification('Storage full') }
-  else { console.error('Save failed:', e) }
-Time: 30 min. Benefit: Visible errors, better UX, easier debugging.
+✅ COMPLETED - Created useNodeValidation composable with pure functions:
+- checkNodeAvailable(), checkCanAffordNode(), checkTierLocked(), checkNodeVisible()
+- useNodeValidation() composable wrapper for Composition API
+SkillTree.js now imports and uses pure validation functions.
+Benefits: Testable, reusable, DRY - logic no longer duplicated.
 ```
 
-**C10: Pass Global Dependencies as Parameters**
+**C9: Replace Empty Catch Blocks with Proper Error Handling** ✅ **FIXED**
 ```
-In useNodeManagement.js, GameData is used as global. Instead:
-- Add "nodes" parameter to functions that need it
-- Replace Object.values(GameData.nodes).filter(...) with Object.values(nodes).filter(...)
-- Makes functions testable and pure.
-Time: 1 hour. Benefit: Testable, mockable, no hidden dependencies.
+✅ COMPLETED - In useGameLoop.js saveNotificationHistory() and loadNotificationHistory():
+- Added QuotaExceededError check with console.warn
+- Added console.error for other failures
+- loadNotificationHistory clears corrupted data on parse failure
+useSaveLoad.js already had proper error handling.
+```
+
+**C10: Pass Global Dependencies as Parameters** ✅ **FIXED**
+```
+✅ COMPLETED - useNodeManagement now requires nodes parameter:
+  useNodeManagement(gameState, prestigeState, eventBus, nodes)
+- App.js passes GameData.nodes explicitly
+- All internal functions use nodes param directly (no getNodes() helper)
+Benefits: Testable with mock nodes, no hidden dependencies, pure functions.
 ```
 
 **C11: Standardize Naming - Use is*/can*/get* Prefixes Consistently**
@@ -238,9 +240,9 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 
 ```
 🔴 Critical Issues: 0 (blocking bugs)
-🟠 Major Issues: 1 (performance at scale)
+🟠 Major Issues: 0 (was 1, C7 fixed)
 🟡 Minor Issues: 5 remaining (was 9, m1-m4 fixed)
-🔴 Clean Code Violations: 13 remaining (was 15, C2 + C5 fixed)
+🔴 Clean Code Violations: 9 remaining (was 15, C2 + C5 + C7 + C8-C10 fixed)
 ✅ Positive Notes: 8
 ```
 
@@ -248,7 +250,7 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 - Performance (scale): ~~M1~~, M2, M3
 - Robustness: ~~m1-m4~~, m8
 - Code Quality: m5-m7, m9
-- Clean Code/Architecture: ~~C2~~, ~~C5~~, C1, C3-C4, C6-C15
+- Clean Code/Architecture: ~~C2~~, ~~C5~~, ~~C7~~, C1, C3-C4, C6, C8-C15
 
 **Verdict:** ✅ **Can merge with critical fixes for 1000-node scale**  
 ⚠️ **Major refactoring recommended post-merge for maintainability (esp. C1, C3-C4)**
@@ -821,29 +823,20 @@ props: {
 
 ---
 
-#### **C7: Passing Generic Objects Instead of Typed Data**
+#### **~~C7: Passing Generic Objects Instead of Typed Data~~** ✅ **FIXED**
 **Location:** All composables  
 **Category:** Type Safety / Self-Documenting Code  
-**Issue:**
-```javascript
-// ❌ Unclear what properties are needed
-function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0)
 
-// 📥 Called like:
-GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
-// Question: Is 4th param omitted? How many params can be omitted?
+**Status:** ✅ **RESOLVED** - Refactored `getScaledNodeCost()` to use options object pattern. Updated all 6 call sites in `gameData.js`, `useNodeManagement.js`, `SkillTree.js`, `InfoPanel.js`.
+
+**Before:**
+```javascript
+getScaledNodeCost(node, ascensionCount, prestigeBonuses, currentLevel)
 ```
 
-**Fix:** Use destructuring:
+**After:**
 ```javascript
-function getScaledNodeCost(node, options = {}) {
-    const { ascensionCount = 0, prestigeBonuses = null, currentLevel = 0 } = options;
-    // ...
-}
-
-// Called like:
-GameData.getScaledNodeCost(node, { ascensionCount: 2, prestigeBonuses: myBonuses })
-// Clear what you're passing
+getScaledNodeCost(node, { ascensionCount, prestigeBonuses, currentLevel })
 ```
 
 ---

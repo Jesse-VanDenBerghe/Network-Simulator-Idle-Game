@@ -4,7 +4,13 @@
 
 const { computed } = Vue;
 
-export function useNodeManagement(gameState, prestigeState, eventBus) {
+/**
+ * @param {Object} gameState - Game state from useGameState
+ * @param {Object} prestigeState - Prestige state from usePrestigeState
+ * @param {Object} eventBus - Event bus for inter-composable communication
+ * @param {Object} nodes - Node definitions (required)
+ */
+export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
     // ==========================================
     // COMPUTED
     // ==========================================
@@ -21,7 +27,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
         values.energyPerClick += bonuses.bonusEnergyPerClick;
 
         gameState.unlockedNodes.value.forEach(nodeId => {
-            const node = GameData.nodes[nodeId];
+            const node = nodes[nodeId];
             if (!node) return;
 
             // Get node level (default 1 for backward compatibility)
@@ -57,7 +63,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
     });
 
     const selectedNode = computed(() => {
-        return gameState.selectedNodeId.value ? GameData.nodes[gameState.selectedNodeId.value] : null;
+        return gameState.selectedNodeId.value ? nodes[gameState.selectedNodeId.value] : null;
     });
 
     const isSelectedNodeUnlocked = computed(() => {
@@ -146,12 +152,11 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
     function checkAffordability(node, level = null) {
         if (!node) return false;
         const currentLevel = level !== null ? level : getNodeLevel(node.id);
-        const scaledCost = GameData.getScaledNodeCost(
-            node,
-            prestigeState.prestigeState.ascensionCount,
-            prestigeState.prestigeBonuses.value,
+        const scaledCost = GameData.getScaledNodeCost(node, {
+            ascensionCount: prestigeState.prestigeState.ascensionCount,
+            prestigeBonuses: prestigeState.prestigeBonuses.value,
             currentLevel
-        );
+        });
         for (const [resource, amount] of Object.entries(scaledCost)) {
             if (gameState.resources[resource] < amount) return false;
         }
@@ -182,7 +187,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
      * Unlock or upgrade a node
      */
     function unlockNode(nodeId) {
-        const node = GameData.nodes[nodeId];
+        const node = nodes[nodeId];
         if (!node) return false;
 
         const currentLevel = getNodeLevel(nodeId);
@@ -203,12 +208,11 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
         // Check cost
         if (!checkAffordability(node, currentLevel)) return false;
 
-        const scaledCost = GameData.getScaledNodeCost(
-            node,
-            prestigeState.prestigeState.ascensionCount,
-            prestigeState.prestigeBonuses.value,
+        const scaledCost = GameData.getScaledNodeCost(node, {
+            ascensionCount: prestigeState.prestigeState.ascensionCount,
+            prestigeBonuses: prestigeState.prestigeBonuses.value,
             currentLevel
-        );
+        });
 
         // Deduct costs
         for (const [resource, amount] of Object.entries(scaledCost)) {
@@ -283,7 +287,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
 
         instantUnlock: (effects) => {
             if (effects.instantUnlock) {
-                const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
+                const lockedAvailableNodes = Object.values(nodes).filter(n =>
                     !gameState.unlockedNodes.value.has(n.id) &&
                     checkRequirements(n)
                 );
@@ -377,7 +381,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
         // Handle random starting nodes
         if (bonuses.randomStartingNodes) {
             const { tier, count } = bonuses.randomStartingNodes;
-            const tierNodes = Object.values(GameData.nodes).filter(n => 
+            const tierNodes = Object.values(nodes).filter(n => 
                 n.tier === tier && !newUnlocked.has(n.id)
             );
             const shuffled = tierNodes.sort(() => Math.random() - 0.5);
@@ -388,7 +392,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
         
         // Apply effects from starting nodes
         newUnlocked.forEach(nodeId => {
-            const node = GameData.nodes[nodeId];
+            const node = nodes[nodeId];
             if (node && node.id !== 'old_shed') {
                 applyNodeEffects(node);
             }

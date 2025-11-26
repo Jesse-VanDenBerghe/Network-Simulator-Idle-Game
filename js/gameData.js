@@ -59,13 +59,14 @@ const GameData = {
     /**
      * Get the cost of a node scaled by tier, ascension, prestige bonuses, and level
      * @param {Object} node - The node object
-     * @param {number} [ascensionCount=0] - Current ascension count
-     * @param {Object|null} [prestigeBonuses=null] - Prestige bonuses object
-     * @param {number} [currentLevel=0] - Current level of the node
+     * @param {Object} [options={}] - Options object
+     * @param {number} [options.ascensionCount=0] - Current ascension count
+     * @param {Object|null} [options.prestigeBonuses=null] - Prestige bonuses object
+     * @param {number} [options.currentLevel=0] - Current level of the node
      * @returns {Object} The scaled cost object { resource: amount }
      */
-    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0) {
-        return getScaledNodeCostUtil(node, ascensionCount, prestigeBonuses, currentLevel);
+    getScaledNodeCost(node, options = {}) {
+        return getScaledNodeCostUtil(node, options);
     },
     
     /**

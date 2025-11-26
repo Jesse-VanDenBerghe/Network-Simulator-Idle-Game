@@ -131,7 +131,13 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     function saveNotificationHistory() {
         try {
             localStorage.setItem(NOTIFICATION_HISTORY_KEY, JSON.stringify(notificationHistory.value));
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('Storage quota exceeded - notification history not saved');
+            } else {
+                console.error('Failed to save notification history:', e);
+            }
+        }
     }
 
     /**
@@ -143,7 +149,11 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
             if (saved) {
                 notificationHistory.value = JSON.parse(saved);
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            console.error('Failed to load notification history:', e);
+            // Clear corrupted data
+            notificationHistory.value = [];
+        }
     }
 
     /**
