@@ -4,7 +4,7 @@
 // Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
-import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS } from '../data/constants.js';
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType } from '../data/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -121,7 +121,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         narrations.forEach(n => {
             const text = typeof n === 'string' ? n : n.text;
             const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
-            setTimeout(() => showNotification(text, 'narration', duration), 500);
+            setTimeout(() => showNotification(text, NotificationType.NARRATION, duration), 500);
         });
     }
 
@@ -181,7 +181,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         );
         
         if (cores < 1) {
-            showNotification('Need at least 1 Quantum Core to ascend!', 'error');
+            showNotification('Need at least 1 Quantum Core to ascend!', NotificationType.ERROR);
             return;
         }
         
@@ -205,7 +205,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         // Request prestige save via event
         eventBus.emit('requestSavePrestige');
         
-        showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, 'prestige');
+        showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, NotificationType.SUCCESS);
     }
 
     /**
@@ -232,7 +232,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         const success = prestigeState.purchaseUpgrade(upgradeId);
         if (success) {
             const upgrade = PrestigeData.upgrades[upgradeId];
-            showNotification(`✨ ${upgrade.name} purchased!`, 'success');
+            showNotification(`✨ ${upgrade.name} purchased!`, NotificationType.SUCCESS);
             eventBus.emit('requestSavePrestige');
             return true;
         }
@@ -255,9 +255,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         cachedResourceRates = rates;
         
         if (isUpgrade) {
-            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, 'success');
+            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.SUCCESS);
         } else {
-            showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.SUCCESS);
         }
         
         // Show narration from base effects (on initial unlock only)
@@ -308,7 +308,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         });
         eventBus.on('offlineProgressCalculated', (message) => {
             if (message) {
-                showNotification(message, 'info');
+                showNotification(message, NotificationType.INFO);
             }
         });
         eventBus.on('gameLoaded', () => {

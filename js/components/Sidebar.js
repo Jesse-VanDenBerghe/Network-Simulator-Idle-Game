@@ -9,8 +9,8 @@ const Sidebar = {
     },
     props: {
         resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, stats }
-        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, crankDisabled }
-        gameStats: { type: Object, required: true } // { automations, effectiveRates, coresEarned, highestTierReached, dataUnlocked, canProcessData }
+        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankDisabled }
+        gameStats: { type: Object, required: true } // { automations, effectiveRates, coresEarned, highestTierReached, isDataUnlocked, canProcessData }
     },
     emits: ['generate-energy', 'process-data', 'ascend'],
     computed: {
@@ -42,7 +42,7 @@ const Sidebar = {
             return null;
         },
         energyButtonText() {
-            if (this.generationState.crankDisabled) {
+            if (this.generationState.isCrankDisabled) {
                 return 'Broken Crank';
             }
             return 'Turn Crank';
@@ -63,7 +63,7 @@ const Sidebar = {
                         icon="⚡"
                         :text="energyButtonText"
                         :value="energyButtonValue"
-                        :locked="generationState.crankDisabled"
+                        :locked="generationState.isCrankDisabled"
                         :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
@@ -73,7 +73,7 @@ const Sidebar = {
                         icon="📊"
                         text="Generating Data"
                         :value="dataButtonValue"
-                        :locked="!gameStats.dataUnlocked"
+                        :locked="!gameStats.isDataUnlocked"
                         :progress="dataGenerationProgress"
                     />
                 </div>
@@ -119,7 +119,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
-            if (this.generationState.crankDisabled) return;
+            if (this.generationState.isCrankDisabled) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();
@@ -134,7 +134,7 @@ const Sidebar = {
             });
         },
         handleDataClick(event) {
-            if (!this.gameStats.dataUnlocked || !this.gameStats.canProcessData) return;
+            if (!this.gameStats.isDataUnlocked || !this.gameStats.canProcessData) return;
             this.$emit('process-data');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

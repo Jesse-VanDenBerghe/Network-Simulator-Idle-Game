@@ -3,7 +3,7 @@
 // Handles saving and loading game and prestige data
 // Uses event bus for decoupled communication
 
-import { MAX_OFFLINE_TIME_S } from '../data/constants.js';
+import { MAX_OFFLINE_TIME_S, NotificationType } from '../data/constants.js';
 
 export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**
@@ -82,7 +82,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         } catch (e) {
             if (e.name === 'QuotaExceededError') {
                 console.error('Storage quota exceeded - save failed');
-                eventBus.emit('showNotification', { message: 'Storage full! Save failed.', type: 'error' });
+                eventBus.emit('showNotification', { message: 'Storage full! Save failed.', type: NotificationType.ERROR });
             } else {
                 console.error('Save failed:', e);
             }
@@ -166,7 +166,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         } catch (e) {
             if (e.name === 'QuotaExceededError') {
                 console.error('Storage quota exceeded - prestige save failed');
-                eventBus.emit('showNotification', { message: 'Storage full! Prestige save failed.', type: 'error' });
+                eventBus.emit('showNotification', { message: 'Storage full! Prestige save failed.', type: NotificationType.ERROR });
             } else {
                 console.error('Prestige save failed:', e);
             }

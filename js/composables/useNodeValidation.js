@@ -3,6 +3,7 @@
 // Extracted validation logic from SkillTree for reusability and testability
 
 import GameData from '../gameData.js';
+import { isBranchUnlocked } from '../utils/branchUtils.js';
 
 // ==========================================
 // PURE VALIDATION FUNCTIONS (for Options API or direct use)
@@ -69,7 +70,7 @@ export function checkNodeVisible(node, unlockedNodes, unlockedBranches, nodeLeve
     
     // Tier gate nodes are visible even if branch isn't unlocked (they unlock the branch)
     if (!node.isTierGate) {
-        if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, unlockedBranches)) {
+        if (!isBranchUnlocked(node.branch, unlockedBranches)) {
             return false;
         }
     }

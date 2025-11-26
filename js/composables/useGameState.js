@@ -45,17 +45,17 @@ export function useGameState() {
         energyPerTick: 1
     });
 
-    const crankDisabled = ref(false);
+    const isCrankDisabled = ref(false);
 
     // ==========================================
     // COMPUTED
     // ==========================================
-    const dataUnlocked = computed(() => {
+    const isDataUnlocked = computed(() => {
         return unlockedFeatures.value.has('dataProcessing');
     });
 
     const canProcessData = computed(() => {
-        return dataUnlocked.value && resources.energy >= 5;
+        return isDataUnlocked.value && resources.energy >= 5;
     });
 
     const highestTierReached = computed(() => {
@@ -116,7 +116,7 @@ export function useGameState() {
         energyGeneration.progress = 0;
         energyGeneration.interval = 1000;
         energyGeneration.energyPerTick = 1;
-        crankDisabled.value = false;
+        isCrankDisabled.value = false;
     }
 
     /**
@@ -173,10 +173,10 @@ export function useGameState() {
         lastUnlockedNodeId,
         dataGeneration,
         energyGeneration,
-        crankDisabled,
+        isCrankDisabled,
         
         // Computed
-        dataUnlocked,
+        isDataUnlocked,
         canProcessData,
         highestTierReached,
         stats,

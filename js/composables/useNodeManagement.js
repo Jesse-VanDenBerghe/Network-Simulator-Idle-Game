@@ -303,7 +303,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
 
         disableCrank: (effects) => {
             if (effects.disableCrank) {
-                gameState.crankDisabled.value = true;
+                gameState.isCrankDisabled.value = true;
             }
         },
 

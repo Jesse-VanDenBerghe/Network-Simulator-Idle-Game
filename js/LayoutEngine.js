@@ -2,6 +2,16 @@
 // Refactored into 3 focused classes: TreeBuilder, PositionCalculator, CollisionResolver
 // ==========================================================
 
+// Layout config (mirrors LAYOUT_CONFIG from constants.js for non-module scripts)
+const LAYOUT_ENGINE_CONFIG = Object.freeze({
+    CENTER_X: 1400,
+    CENTER_Y: 1400,
+    TIER_SPACING: 180,
+    SAME_TIER_OFFSET: 60,
+    NODE_SPACING: 100,
+    NODE_SIZE: 80
+});
+
 /**
  * Extract node ID from a requirement (supports both 'node_id' and { id: 'node_id', level: n })
  */
@@ -415,13 +425,14 @@ class CollisionResolver {
 // Maintains original API while using composition internally
 // ==========================================================
 const LayoutEngine = {
+    // Use LAYOUT_ENGINE_CONFIG (C14)
     config: {
-        centerX: 1400,
-        centerY: 1400,
-        tierSpacing: 180,
-        sameTierOffset: 60,
-        nodeSpacing: 100,
-        nodeSize: 80,
+        centerX: LAYOUT_ENGINE_CONFIG.CENTER_X,
+        centerY: LAYOUT_ENGINE_CONFIG.CENTER_Y,
+        tierSpacing: LAYOUT_ENGINE_CONFIG.TIER_SPACING,
+        sameTierOffset: LAYOUT_ENGINE_CONFIG.SAME_TIER_OFFSET,
+        nodeSpacing: LAYOUT_ENGINE_CONFIG.NODE_SPACING,
+        nodeSize: LAYOUT_ENGINE_CONFIG.NODE_SIZE,
     },
 
     _treeBuilder: new TreeBuilder(),
