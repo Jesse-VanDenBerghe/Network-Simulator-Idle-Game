@@ -4,8 +4,8 @@
 
 export const energyBranch = {
     // == Tier 1 Nodes ==
-    energy_unlock: {
-        id: 'energy_unlock',
+    hand_crank: {
+        id: 'hand_crank',
         name: 'Hand crank',
         icon: '🔧',
         tier: 1,
@@ -24,14 +24,14 @@ export const energyBranch = {
     },
 
     // == Tier 2 Nodes ==
-    energy_2_1: {
-        id: 'energy_2_1',
+    lubricant: {
+        id: 'lubricant',
         name: 'Lubricant',
         icon: '🧴',
         tier: 2,
         branch: 'energy',
         description: 'The crank is a bit stiff, maybe some oil would help it turn more smoothly?',
-        requires: ['energy_unlock'],
+        requires: ['hand_crank'],
         cost: { energy: 10 },
         effects: {
             energyPerClick: 1,
@@ -39,14 +39,14 @@ export const energyBranch = {
         }
     },
 
-    energy_2_2: {
-        id: 'energy_2_2',
+    lightbulb: {
+        id: 'lightbulb',
         name: 'Lightbulb',
         icon: '💡',
         tier: 2,
         branch: 'energy',
         description: 'Let there be light!',
-        requires: ['energy_2_1', 'energy_2_3'],
+        requires: ['lubricant', 'hamster_wheel'],
         cost: { energy: 50 },
         effects: {
             description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.',
@@ -57,14 +57,14 @@ export const energyBranch = {
         }
     },
 
-    energy_2_3: {
-        id: 'energy_2_3',
+    hamster_wheel: {
+        id: 'hamster_wheel',
         name: 'Hamster Wheel',
         icon: '🐹',
         tier: 2,
         branch: 'energy',
         description: ' My hamster loves running in this thing, and it generates energy too!',
-        requires: ['energy_unlock'],
+        requires: ['hand_crank'],
         cost: { energy: 25},
         effects: {
             automation: { resource: 'energy', rate: 0.5 },
@@ -72,14 +72,14 @@ export const energyBranch = {
         }
     },
     
-    energy_2_4: {
-        id: 'energy_2_4',
+    attic: {
+        id: 'attic',
         name: 'Explore Attic',
         icon: '📦',
         tier: 2,
         branch: 'energy',
         description: 'Since we have light now, why not search grandpa\'s attic for cool stuff?',
-        requires: ['energy_2_2'],
+        requires: ['lightbulb'],
         cost: { energy: 100 },
         effects: {
             unlockBranch: 'computer',
@@ -91,14 +91,14 @@ export const energyBranch = {
     },
 
     // == Tier 3 Nodes ==
-    energy_3_1: {
-        id: 'energy_3_1',
+    crank_harder: {
+        id: 'crank_harder',
         name: 'Turn harder',
         icon: '💪',
         tier: 3,
         branch: 'energy',
         description: 'Why not put some muscle into it? Give that crank a good, hard turn!',
-        requires: ['energy_2_1'],
+        requires: ['lubricant'],
         cost: { energy: 5 },
         effects: {
             energyPerClick: 2,
@@ -106,14 +106,14 @@ export const energyBranch = {
         }
     },
 
-    energy_3_2: {
-        id: 'energy_3_2',
+    catch_rat: {
+        id: 'catch_rat',
         name: 'Catch a rat',
         icon: '🐀',
         tier: 3,
         branch: 'energy',
         description: 'There\'s a rat running around in here, maybe we can train it to run in the wheel?',
-        requires: ['energy_2_3'],
+        requires: ['hamster_wheel'],
         cost: { energy: 10 },
         maxLevel: 5,
         costScaling: 1.5,
@@ -123,32 +123,32 @@ export const energyBranch = {
         }
     },
 
-    energy_3_3: {
-        id: 'energy_3_3',
+    old_generator: {
+        id: 'old_generator',
         name: 'Old Generator',
         icon: '⚙️',
         tier: 3,
         branch: 'energy',
         description: 'In the back of the attic, you find an old generator that looks like it could still work. Maybe we can power it up?',
-        requires: ['energy_2_4'],
-        cost: { energy: 100 },
+        requires: ['attic'],
+        cost: { energy: 100, data: 50 },
         effects: {
-            automation: { resource: 'energy', rate: 10 },
-            description: '+10 Energy/second (passive)'
+            automation: { resource: 'energy', rate: 25 },
+            description: '+25 Energy/second (passive)'
         }
     },
 
-    energy_3_4: {
-        id: 'energy_3_4',
+    rat_king: {
+        id: 'rat_king',
         name: 'Rat king',
         icon: '👑',
         tier: 3,
         branch: 'energy',
         description: 'After catching a few rats, one of them seems to be the leader. Maybe if we catch it, the others will follow?',
-        requires: [{ id: 'energy_3_2', level: 5 }],
-        cost: { energy: 100 },
+        requires: [{ id: 'catch_rat', level: 5 }],
+        cost: { energy: 100 , data: 10},
         effects: {
-            automation: { resource: 'energy', rate: 100 },
+            automation: { resource: 'energy', rate: 10 },
             description: '+100 Energy/second (passive)'
         }
     },

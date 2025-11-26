@@ -26,6 +26,6 @@ export const TIER_COST_MULTIPLIERS = {
 
 export const COST_SHIFT_FOR_RESOURCE = {
     energy: 1,
-    data: -2,
+    data: 2,
     bandwidth: -4
 }

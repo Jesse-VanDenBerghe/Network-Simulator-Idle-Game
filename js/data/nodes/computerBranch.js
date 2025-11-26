@@ -5,8 +5,8 @@
 export const computerBranch = {
 
     // == Tier 1 Nodes ==
-    computer_unlock: {
-        id: 'computer_unlock',
+    gpa_old_pc: {
+        id: 'gpa_old_pc',
         name: 'Grandpa\'s old PC',
         icon: '💻',
         tier: 1,
@@ -24,14 +24,14 @@ export const computerBranch = {
     },
 
     // == Tier 2 Nodes ==
-    computer_2_1: {
-        id: 'computer_2_1',
+    command_help: {
+        id: 'command_help',
         name: '/help',
         icon: 'x',
         tier: 2,
         branch: 'computer',
         description: 'A simple command that provides assistance. Maybe it can help you understand the computer better?',
-        requires: ['computer_unlock'],
+        requires: ['gpa_old_pc'],
         cost: { energy: 30 },
         effects: {
             narrate: {
@@ -41,14 +41,14 @@ export const computerBranch = {
         }
     },
 
-    computer_2_2: {
-        id: 'computer_2_2',
+    command_generate: {
+        id: 'command_generate',
         name: '/generate',
         icon: '📊',
         tier: 2,
         branch: 'computer',
         description: 'A command to process raw data and extract useful information. This could be valuable for your operations.',
-        requires: ['computer_2_1'],
+        requires: ['command_help'],
         cost: { energy: 50 },
         effects: {
             unlockDataGeneration: true,
