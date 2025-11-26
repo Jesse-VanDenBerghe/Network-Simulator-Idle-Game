@@ -14,7 +14,7 @@ export const energyBranch = {
         requires: ['core'],
         cost: { energy: 0 },
         effects: {
-            energyPerClick: 1000,
+            energyPerClick: 1,
             narrate: {
                 text: 'When you turn the crank, you hear a faint humming sound...',
                 duration: 8000
@@ -71,11 +71,9 @@ export const energyBranch = {
             description: '+0.5 Energy/second (passive)'
         }
     },
-
-    // == Tier 3 Nodes ==
     
-    energy_3_1: {
-        id: 'energy_3_1',
+    energy_2_4: {
+        id: 'energy_2_4',
         name: 'Explore Attic',
         icon: '📦',
         tier: 2,
@@ -89,6 +87,52 @@ export const energyBranch = {
                 text: 'You found an old computer up in the attic! Lets see if it still works...',
                 duration: 10000
             }
+        }
+    },
+
+    // == Tier 3 Nodes ==
+    energy_3_1: {
+        id: 'energy_3_1',
+        name: 'Turn harder',
+        icon: '💪',
+        tier: 3,
+        branch: 'energy',
+        description: 'Why not put some muscle into it? Give that crank a good, hard turn!',
+        requires: ['energy_2_1'],
+        cost: { energy: 100 },
+        effects: {
+            energyPerClick: 2,
+            description: '+2 Energy per crank'
+        }
+    },
+
+    energy_3_2: {
+        id: 'energy_3_2',
+        name: 'Catch a rat',
+        icon: '🐀',
+        tier: 3,
+        branch: 'energy',
+        description: 'There\'s a rat running around in here, maybe we can train it to run in the wheel?',
+        requires: ['energy_2_3'],
+        cost: { energy: 10 },
+        effects: {
+            automation: { resource: 'energy', rate: 1 },
+            description: '+1 Energy/second (passive)'
+        }
+    },
+
+    energy_3_3: {
+        id: 'energy_3_3',
+        name: 'Old Generator',
+        icon: '⚙️',
+        tier: 3,
+        branch: 'energy',
+        description: 'In the back of the attic, you find an old generator that looks like it could still work. Maybe we can power it up?',
+        requires: ['energy_2_4'],
+        cost: { energy: 100 },
+        effects: {
+            automation: { resource: 'energy', rate: 10 },
+            description: '+10 Energy/second (passive)'
         }
     },
 };
