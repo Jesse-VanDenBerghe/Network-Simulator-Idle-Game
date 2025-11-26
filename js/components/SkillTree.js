@@ -22,7 +22,12 @@ const SkillTree = {
             animatingConnections: new Set(),
             glowingConnections: new Map(), // tracks glow animation offset for each connection
             travelingDots: [], // { id, fromNode, toNode, progress, startTime }
-            nodeProgress: new Map() // tracks unlock progress for each available node
+            nodeProgress: new Map(), // tracks unlock progress for each available node
+            // Zoom state
+            zoomLevel: 1,
+            minZoom: 0.25,
+            maxZoom: 2,
+            zoomStep: 0.05
         };
     },
     watch: {
@@ -264,6 +269,54 @@ const SkillTree = {
             const totalCost = Object.values(scaledCost).reduce((sum, cost) => sum + cost, 0);
             
             return Math.min((currentProgress / totalCost) * 100, 100);
+        },
+        // Zoom methods
+        handleWheel(event) {
+            // Pinch-to-zoom on trackpad triggers wheel with ctrlKey
+            if (event.ctrlKey) {
+                event.preventDefault();
+                // Use deltaY directly for smoother pinch - scale down for less sensitivity
+                const delta = -event.deltaY * 0.01;
+                this.setZoom(this.zoomLevel + delta, event);
+            }
+        },
+        setZoom(newZoom, event = null) {
+            const oldZoom = this.zoomLevel;
+            this.zoomLevel = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+            
+            // Adjust scroll to zoom toward cursor/center
+            if (event && this.$refs.container) {
+                const container = this.$refs.container;
+                const rect = container.getBoundingClientRect();
+                const cursorX = event.clientX - rect.left;
+                const cursorY = event.clientY - rect.top;
+                
+                const scrollX = container.scrollLeft;
+                const scrollY = container.scrollTop;
+                
+                // Calculate new scroll to keep cursor position stable
+                const scale = this.zoomLevel / oldZoom;
+                container.scrollLeft = (scrollX + cursorX) * scale - cursorX;
+                container.scrollTop = (scrollY + cursorY) * scale - cursorY;
+            }
+        },
+        zoomIn() {
+            this.setZoom(this.zoomLevel + this.zoomStep);
+        },
+        zoomOut() {
+            this.setZoom(this.zoomLevel - this.zoomStep);
+        },
+        resetZoom() {
+            this.zoomLevel = 1;
+            // Re-center on core node
+            this.$nextTick(() => {
+                const container = this.$refs.container;
+                const coreNode = this.nodes.old_shed;
+                if (container && coreNode) {
+                    container.scrollLeft = coreNode.x - container.clientWidth / 2 + 40;
+                    container.scrollTop = coreNode.y - container.clientHeight / 2 + 40;
+                }
+            });
         }
     },
     mounted() {
@@ -295,9 +348,16 @@ const SkillTree = {
         }
     },
     template: `
-        <section id="skill-tree-container" ref="container">
-            <div id="skill-tree">
-                <svg id="connections">
+        <section id="skill-tree-container" @wheel="handleWheel">
+            <div class="zoom-controls">
+                <button @click="zoomIn" title="Zoom In">+</button>
+                <span class="zoom-level">{{ Math.round(zoomLevel * 100) }}%</span>
+                <button @click="zoomOut" title="Zoom Out">−</button>
+                <button @click="resetZoom" title="Reset Zoom">⟲</button>
+            </div>
+            <div id="skill-tree-wrapper" ref="container">
+                <div id="skill-tree" :style="{ transform: 'scale(' + zoomLevel + ')', transformOrigin: '0 0' }">
+                    <svg id="connections">
                     <defs>
                         <!-- Glow gradients for flowing effect -->
                         <template v-for="conn in connections" :key="'glow-template-' + conn.from + '-' + conn.to">
@@ -412,6 +472,7 @@ const SkillTree = {
                         @select="selectNode"
                     />
                 </div>
+            </div>
             </div>
         </section>
     `
