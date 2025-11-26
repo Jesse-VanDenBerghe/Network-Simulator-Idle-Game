@@ -350,45 +350,62 @@ const LayoutEngine = {
     },
 
     /**
-     * Resolve collisions between nodes
+     * Resolve collisions between nodes using spatial partitioning (grid-based)
+     * Reduces complexity from O(n²) to O(n·k) where k = avg nodes per cell
      */
     resolveCollisions(nodes) {
         const nodeList = Object.values(nodes);
         const minDistance = this.config.nodeSpacing;
+        const cellSize = minDistance * 2; // Size of grid cells for spatial partitioning
         const iterations = 15;
 
         for (let iter = 0; iter < iterations; iter++) {
             let maxOverlap = 0;
 
-            for (let a = 0; a < nodeList.length; a++) {
-                for (let b = a + 1; b < nodeList.length; b++) {
-                    const nodeA = nodeList[a];
-                    const nodeB = nodeList[b];
-                    
-                    const dx = nodeB.x - nodeA.x;
-                    const dy = nodeB.y - nodeA.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < minDistance && distance > 0) {
-                        const overlap = minDistance - distance;
-                        maxOverlap = Math.max(maxOverlap, overlap);
+            // Step 1: Partition nodes into grid cells - O(n)
+            const grid = this.buildSpatialGrid(nodeList, cellSize);
+
+            // Step 2: Check collisions only within & adjacent cells - O(n·k)
+            nodeList.forEach(nodeA => {
+                const cellKey = this.getGridCellKey(nodeA.x, nodeA.y, cellSize);
+                const [cx, cy] = cellKey.split(',').map(Number);
+                
+                // Check current cell and 8 adjacent cells
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        const adjKey = `${cx + dx},${cy + dy}`;
+                        const cellNodes = grid.get(adjKey) || [];
                         
-                        // Push nodes apart
-                        const pushX = (dx / distance) * overlap * 0.5;
-                        const pushY = (dy / distance) * overlap * 0.5;
-                        
-                        // Don't move the old_shed node
-                        if (nodeA.id !== 'old_shed') {
-                            nodeA.x -= pushX;
-                            nodeA.y -= pushY;
-                        }
-                        if (nodeB.id !== 'old_shed') {
-                            nodeB.x += pushX;
-                            nodeB.y += pushY;
-                        }
+                        cellNodes.forEach(nodeB => {
+                            // Avoid duplicate checks (only process if nodeB comes after nodeA)
+                            if (nodeA.id >= nodeB.id) return;
+                            
+                            const dx = nodeB.x - nodeA.x;
+                            const dy = nodeB.y - nodeA.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < minDistance && distance > 0) {
+                                const overlap = minDistance - distance;
+                                maxOverlap = Math.max(maxOverlap, overlap);
+                                
+                                // Push nodes apart
+                                const pushX = (dx / distance) * overlap * 0.5;
+                                const pushY = (dy / distance) * overlap * 0.5;
+                                
+                                // Don't move the old_shed node
+                                if (nodeA.id !== 'old_shed') {
+                                    nodeA.x -= pushX;
+                                    nodeA.y -= pushY;
+                                }
+                                if (nodeB.id !== 'old_shed') {
+                                    nodeB.x += pushX;
+                                    nodeB.y += pushY;
+                                }
+                            }
+                        });
                     }
                 }
-            }
+            });
 
             // Stop early if no significant overlaps
             if (maxOverlap < 1) break;
@@ -399,6 +416,39 @@ const LayoutEngine = {
             node.x = Math.round(node.x);
             node.y = Math.round(node.y);
         });
+    },
+
+    /**
+     * Build spatial grid for collision detection
+     * @param {Array} nodeList - List of nodes
+     * @param {number} cellSize - Size of each grid cell
+     * @returns {Map} - Map of cellKey -> Array of nodes in that cell
+     */
+    buildSpatialGrid(nodeList, cellSize) {
+        const grid = new Map();
+        
+        nodeList.forEach(node => {
+            const cellKey = this.getGridCellKey(node.x, node.y, cellSize);
+            if (!grid.has(cellKey)) {
+                grid.set(cellKey, []);
+            }
+            grid.get(cellKey).push(node);
+        });
+        
+        return grid;
+    },
+
+    /**
+     * Get grid cell key for a position
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     * @param {number} cellSize - Size of each grid cell
+     * @returns {string} - Cell key in format "cellX,cellY"
+     */
+    getGridCellKey(x, y, cellSize) {
+        const cellX = Math.floor(x / cellSize);
+        const cellY = Math.floor(y / cellSize);
+        return `${cellX},${cellY}`;
     },
 
     /**
