@@ -7,6 +7,7 @@ export const tier0Nodes = {
         name: 'Core System',
         icon: '🔮',
         tier: 0,
+        branch: null,
         x: 1400,
         y: 1200,
         description: 'The central hub of your network. Everything begins here.',

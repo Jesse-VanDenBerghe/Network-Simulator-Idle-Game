@@ -2,6 +2,29 @@
 // ===============
 
 /**
+ * Branch unlock order and tier mapping
+ */
+export const BRANCH_UNLOCK_ORDER = [
+    'power',
+    'processing', 
+    'network',
+    'research',
+    'security',
+    'cloud',
+    'endgame'
+];
+
+export const BRANCH_UNLOCK_TIER = {
+    power: 1,
+    processing: 2,
+    network: 3,
+    research: 4,
+    security: 5,
+    cloud: 6,
+    endgame: 7
+};
+
+/**
  * Cost multipliers per tier - exponential scaling
  */
 export const TIER_COST_MULTIPLIERS = {

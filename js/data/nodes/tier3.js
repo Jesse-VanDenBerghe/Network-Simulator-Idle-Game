@@ -1,13 +1,14 @@
-// Tier 3 Nodes - Advanced unlocks
-// ================================
+// Tier 3 Nodes - Power (3) + Processing (3) + Network (3 + gate)
+// ================================================================
 
 export const tier3Nodes = {
-    // === ENERGY BRANCH ===
+    // === POWER BRANCH (3 nodes) ===
     generator_mk2: {
         id: 'generator_mk2',
         name: 'Generator Mk2',
         icon: '🔌',
         tier: 3,
+        branch: 'power',
         x: 400,
         y: 850,
         description: 'Advanced generator with improved output.',
@@ -19,27 +20,12 @@ export const tier3Nodes = {
         }
     },
 
-    overclocking: {
-        id: 'overclocking',
-        name: 'Overclocking',
-        icon: '🚀',
-        tier: 3,
-        x: 550,
-        y: 700,
-        description: 'Push your systems beyond their limits.',
-        requires: ['efficiency_1', 'generator_mk1'],
-        cost: { energy: 20, data: 8 },
-        effects: {
-            energyPerClick: 5,
-            description: '+5 Energy per click'
-        }
-    },
-
     wind_turbine: {
         id: 'wind_turbine',
         name: 'Wind Turbine',
         icon: '🌪️',
         tier: 3,
+        branch: 'power',
         x: 300,
         y: 1150,
         description: 'Generate energy from wind.',
@@ -51,50 +37,34 @@ export const tier3Nodes = {
         }
     },
 
-    battery_array: {
-        id: 'battery_array',
-        name: 'Battery Array',
-        icon: '🔋',
+    overclocking: {
+        id: 'overclocking',
+        name: 'Overclocking',
+        icon: '🚀',
         tier: 3,
-        x: 750,
-        y: 600,
-        description: 'Massive energy storage system.',
-        requires: ['capacitor'],
-        cost: { energy: 14, data: 5 },
+        branch: 'power',
+        x: 550,
+        y: 700,
+        description: 'Push your systems beyond their limits.',
+        requires: ['generator_mk1'],
+        cost: { energy: 20, data: 8 },
         effects: {
-            energyPerClick: 3,
-            automation: { resource: 'energy', rate: 1 },
-            description: '+3 per click, +1 Energy/s'
+            energyPerClick: 5,
+            description: '+5 Energy per click'
         }
     },
 
-    superconductor: {
-        id: 'superconductor',
-        name: 'Superconductor',
-        icon: '💫',
-        tier: 3,
-        x: 650,
-        y: 550,
-        description: 'Zero-resistance energy transfer.',
-        requires: ['voltage_regulator', 'heat_sink'],
-        cost: { energy: 18, data: 6 },
-        effects: {
-            automation: { resource: 'energy', rate: 2 },
-            energyPerClick: 2,
-            description: '+2 Energy/s, +2 per click'
-        }
-    },
-
-    // === DATA BRANCH ===
+    // === PROCESSING BRANCH (3 nodes) ===
     parallel_processing: {
         id: 'parallel_processing',
         name: 'Parallel Process',
         icon: '🔀',
         tier: 3,
+        branch: 'processing',
         x: 2250,
         y: 750,
         description: 'Process multiple data streams simultaneously.',
-        requires: ['data_storage', 'data_miner'],
+        requires: ['data_storage'],
         cost: { energy: 18, data: 10 },
         effects: {
             dataPerClick: 3,
@@ -108,10 +78,11 @@ export const tier3Nodes = {
         name: 'Database',
         icon: '🗄️',
         tier: 3,
+        branch: 'processing',
         x: 2400,
         y: 850,
         description: 'Structured data storage system.',
-        requires: ['data_miner'],
+        requires: ['data_processing'],
         cost: { energy: 14, data: 8 },
         effects: {
             automation: { resource: 'data', rate: 1.5 },
@@ -119,85 +90,54 @@ export const tier3Nodes = {
         }
     },
 
-    data_warehouse: {
-        id: 'data_warehouse',
-        name: 'Data Warehouse',
-        icon: '🏭',
+    compression: {
+        id: 'compression',
+        name: 'Compression',
+        icon: '🗜️',
         tier: 3,
-        x: 2400,
-        y: 1100,
-        description: 'Massive data storage facility.',
-        requires: ['data_cache'],
-        cost: { energy: 16, data: 10 },
-        effects: {
-            dataPerClick: 2,
-            automation: { resource: 'data', rate: 1 },
-            description: '+2 per process, +1 Data/s'
-        }
-    },
-
-    deduplication: {
-        id: 'deduplication',
-        name: 'Deduplication',
-        icon: '🔃',
-        tier: 3,
-        x: 1850,
-        y: 700,
-        description: 'Remove duplicate data efficiently.',
-        requires: ['compression'],
-        cost: { energy: 12, data: 6 },
+        branch: 'processing',
+        x: 1900,
+        y: 850,
+        description: 'Compress data for efficient storage.',
+        requires: ['data_storage'],
+        cost: { energy: 20, data: 8 },
         effects: {
             dataMultiplier: 1.3,
             description: '1.3x Data gains'
         }
     },
 
-    indexing: {
-        id: 'indexing',
-        name: 'Indexing',
-        icon: '📑',
+    // === NETWORK BRANCH (3 nodes) ===
+    firewall: {
+        id: 'firewall',
+        name: 'Firewall',
+        icon: '🛡️',
         tier: 3,
-        x: 2000,
-        y: 700,
-        description: 'Fast data retrieval with indexes.',
-        requires: ['compression', 'data_storage'],
-        cost: { energy: 14, data: 7 },
+        branch: 'network',
+        x: 1650,
+        y: 1650,
+        description: 'Protects your network and improves stability.',
+        requires: ['router'],
+        cost: { energy: 25, data: 12 },
         effects: {
-            dataPerClick: 2,
-            description: '+2 Data per process'
+            description: 'Required for security branch'
         }
     },
 
-    // === NETWORK BRANCH ===
-    bandwidth_unlock: {
-        id: 'bandwidth_unlock',
-        name: 'Bandwidth',
-        icon: '📶',
+    network_switch: {
+        id: 'network_switch',
+        name: 'Network Switch',
+        icon: '🔀',
         tier: 3,
+        branch: 'network',
         x: 1400,
-        y: 1900,
-        description: 'Unlocks bandwidth as a new resource with passive generation.',
-        requires: ['router', 'firewall'],
-        cost: { energy: 30, data: 10 },
+        y: 1700,
+        description: 'Connect multiple devices efficiently.',
+        requires: ['router'],
+        cost: { energy: 22, data: 10 },
         effects: {
-            unlockBandwidth: true,
-            automation: { resource: 'bandwidth', rate: 1 },
-            description: 'Unlock Bandwidth resource, +1 Bandwidth/s'
-        }
-    },
-
-    encryption: {
-        id: 'encryption',
-        name: 'Encryption',
-        icon: '🔐',
-        tier: 3,
-        x: 1800,
-        y: 1750,
-        description: 'Secure data transmission protocols.',
-        requires: ['firewall'],
-        cost: { energy: 25, data: 8 },
-        effects: {
-            description: 'Required for advanced security'
+            automation: { resource: 'data', rate: 0.5 },
+            description: '+0.5 Data/second (passive)'
         }
     },
 
@@ -206,267 +146,34 @@ export const tier3Nodes = {
         name: 'Load Balancer',
         icon: '⚖️',
         tier: 3,
-        x: 1000,
+        branch: 'network',
+        x: 1150,
         y: 1750,
-        description: 'Distribute network load evenly.',
+        description: 'Distributes network load efficiently.',
         requires: ['router'],
-        cost: { energy: 22, data: 7 },
+        cost: { energy: 28, data: 14 },
         effects: {
-            allRatesMultiplier: 1.15,
-            description: '1.15x all passive rates'
+            dataMultiplier: 1.3,
+            description: '1.3x Data processing'
         }
     },
 
-    gateway: {
-        id: 'gateway',
-        name: 'Gateway',
-        icon: '🚪',
+    // === RESEARCH BRANCH TIER 3 (unlocks Research) ===
+    algorithms: {
+        id: 'algorithms',
+        name: 'Algorithms',
+        icon: '🧮',
         tier: 3,
-        x: 1200,
-        y: 1850,
-        description: 'Connect to external networks.',
-        requires: ['switch', 'router'],
-        cost: { energy: 20, data: 6 },
-        effects: {
-            automation: { resource: 'data', rate: 1 },
-            description: '+1 Data/second (passive)'
-        }
-    },
-
-    proxy: {
-        id: 'proxy',
-        name: 'Proxy Server',
-        icon: '🎭',
-        tier: 3,
-        x: 1600,
-        y: 1850,
-        description: 'Hide your network traffic.',
-        requires: ['switch', 'firewall'],
-        cost: { energy: 18, data: 5 },
-        effects: {
-            dataMultiplier: 1.25,
-            description: '1.25x Data gains'
-        }
-    },
-
-    // === RESEARCH BRANCH ===
-    machine_learning: {
-        id: 'machine_learning',
-        name: 'Machine Learning',
-        icon: '🤖',
-        tier: 3,
-        x: 1100,
-        y: 600,
-        description: 'Teach machines to learn patterns.',
-        requires: ['algorithms'],
-        cost: { energy: 20, data: 10 },
-        effects: {
-            dataMultiplier: 1.4,
-            description: '1.4x Data gains'
-        }
-    },
-
-    deep_learning: {
-        id: 'deep_learning',
-        name: 'Deep Learning',
-        icon: '🧬',
-        tier: 3,
-        x: 1700,
-        y: 600,
-        description: 'Multi-layer neural processing.',
-        requires: ['optimization'],
-        cost: { energy: 25, data: 12 },
-        effects: {
-            allRatesMultiplier: 1.2,
-            description: '1.2x all passive rates'
-        }
-    },
-
-    monte_carlo: {
-        id: 'monte_carlo',
-        name: 'Monte Carlo',
-        icon: '🎲',
-        tier: 3,
+        branch: 'research',
+        isTierGate: true,
         x: 1400,
-        y: 550,
-        description: 'Probabilistic simulations.',
-        requires: ['simulation'],
-        cost: { energy: 18, data: 8 },
+        y: 750,
+        description: 'Develop efficient algorithms and unlock Research branch.',
+        requires: ['core'],
+        cost: { energy: 200, data: 50 },
         effects: {
-            dataPerClick: 2,
-            energyPerClick: 2,
-            description: '+2 Energy and Data per action'
-        }
-    },
-
-    genetic_algorithm: {
-        id: 'genetic_algorithm',
-        name: 'Genetic Algorithm',
-        icon: '🧬',
-        tier: 3,
-        x: 1250,
-        y: 500,
-        description: 'Evolution-based optimization.',
-        requires: ['algorithms', 'simulation'],
-        cost: { energy: 22, data: 9 },
-        effects: {
-            allRatesMultiplier: 1.15,
-            description: '1.15x all passive rates'
-        }
-    },
-
-    // === NEW NODES ===
-    hydro_dam: {
-        id: 'hydro_dam',
-        name: 'Hydro Dam',
-        icon: '💧',
-        tier: 3,
-        description: 'Power from flowing water.',
-        requires: ['wind_turbine'],
-        cost: { energy: 18, data: 4 },
-        effects: {
-            automation: { resource: 'energy', rate: 4 },
-            description: '+4 Energy/second'
-        }
-    },
-
-    biomass_burner: {
-        id: 'biomass_burner',
-        name: 'Biomass',
-        icon: '🍂',
-        tier: 3,
-        description: 'Burn organic matter.',
-        requires: ['generator_mk2'],
-        cost: { energy: 15, data: 3 },
-        effects: {
-            automation: { resource: 'energy', rate: 3 },
-            description: '+3 Energy/second'
-        }
-    },
-
-    smart_grid: {
-        id: 'smart_grid',
-        name: 'Smart Grid',
-        icon: '🕸️',
-        tier: 3,
-        description: 'Intelligent energy distribution.',
-        requires: ['battery_array'],
-        cost: { energy: 20, data: 10 },
-        effects: {
-            allRatesMultiplier: 1.1,
-            description: '1.1x all passive rates'
-        }
-    },
-
-    fiber_optics: {
-        id: 'fiber_optics',
-        name: 'Fiber Optics',
-        icon: '〰️',
-        tier: 3,
-        description: 'Light-speed data transmission.',
-        requires: ['gateway'],
-        cost: { energy: 25, data: 12 },
-        effects: {
-            dataMultiplier: 1.2,
-            description: '1.2x Data multiplier'
-        }
-    },
-
-    satellite_dish: {
-        id: 'satellite_dish',
-        name: 'Sat Dish',
-        icon: '📡',
-        tier: 3,
-        description: 'Long-range communication.',
-        requires: ['proxy'],
-        cost: { energy: 30, data: 8 },
-        effects: {
-            automation: { resource: 'bandwidth', rate: 0.5 },
-            description: '+0.5 Bandwidth/second'
-        }
-    },
-
-    firewall_v2: {
-        id: 'firewall_v2',
-        name: 'Firewall V2',
-        icon: '🧱',
-        tier: 3,
-        description: 'Advanced packet filtering.',
-        requires: ['firewall'],
-        cost: { energy: 22, data: 10 },
-        effects: {
-            dataMultiplier: 1.15,
-            description: '1.15x Data multiplier'
-        }
-    },
-
-    intrusion_detection: {
-        id: 'intrusion_detection',
-        name: 'IDS',
-        icon: '🚨',
-        tier: 3,
-        description: 'Detect network intruders.',
-        requires: ['firewall_v2'],
-        cost: { energy: 25, data: 12 },
-        effects: {
-            allRatesMultiplier: 1.1,
-            description: '1.1x all passive rates'
-        }
-    },
-
-    api_gateway: {
-        id: 'api_gateway',
-        name: 'API Gateway',
-        icon: '🔌',
-        tier: 3,
-        description: 'Manage API traffic.',
-        requires: ['load_balancer'],
-        cost: { energy: 20, data: 15 },
-        effects: {
-            automation: { resource: 'data', rate: 3 },
-            description: '+3 Data/second'
-        }
-    },
-
-    big_table: {
-        id: 'big_table',
-        name: 'Big Table',
-        icon: '🧾',
-        tier: 3,
-        description: 'Distributed storage system.',
-        requires: ['database'],
-        cost: { energy: 18, data: 12 },
-        effects: {
-            automation: { resource: 'data', rate: 2 },
-            description: '+2 Data/second'
-        }
-    },
-
-    nosql_db: {
-        id: 'nosql_db',
-        name: 'NoSQL DB',
-        icon: '📄',
-        tier: 3,
-        description: 'Flexible data models.',
-        requires: ['database'],
-        cost: { energy: 16, data: 10 },
-        effects: {
-            dataPerClick: 3,
-            description: '+3 Data per click'
-        }
-    },
-
-    stream_processing: {
-        id: 'stream_processing',
-        name: 'Stream Proc',
-        icon: '🌊',
-        tier: 3,
-        description: 'Real-time data processing.',
-        requires: ['parallel_processing'],
-        cost: { energy: 20, data: 15 },
-        effects: {
-            automation: { resource: 'data', rate: 4 },
-            description: '+4 Data/second'
+            dataPerClick: 4,
+            description: 'Unlocks Research branch and Tier 4. +4 Data per process'
         }
     }
 };

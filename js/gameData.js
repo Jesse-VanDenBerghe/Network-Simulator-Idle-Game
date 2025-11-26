@@ -9,7 +9,7 @@
 // This file provides backward compatibility by re-exporting everything as GameData
 
 import { allNodes } from './data/nodes/index.js';
-import { TIER_COST_MULTIPLIERS, TIER_GATES } from './data/constants.js';
+import { TIER_COST_MULTIPLIERS, TIER_GATES, BRANCH_UNLOCK_ORDER, BRANCH_UNLOCK_TIER } from './data/constants.js';
 import { RESOURCES } from './data/resources.js';
 import { FEATURE_FLAGS } from './data/config.js';
 import { 
@@ -24,6 +24,8 @@ const GameData = {
     FEATURE_FLAGS,
     TIER_COST_MULTIPLIERS,
     TIER_GATES,
+    BRANCH_UNLOCK_ORDER,
+    BRANCH_UNLOCK_TIER,
     
     // Data
     resources: RESOURCES,

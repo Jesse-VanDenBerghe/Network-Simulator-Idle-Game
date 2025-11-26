@@ -65,8 +65,18 @@ const SkillTree = {
         },
         isNodeVisible(node) {
             if (!node) return false;
-            // Show if unlocked OR available
-            // Note: We SHOW tier-locked nodes if they are otherwise available (parents unlocked)
+            
+            // Tier gate nodes are visible even if their branch isn't unlocked yet
+            // (they are the nodes that unlock their branch)
+            if (!node.isTierGate) {
+                // Check if the node's branch is unlocked
+                // Access branchUtils from global scope (loaded via gameData.js)
+                if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, this.unlockedNodes, this.nodes)) {
+                    return false;
+                }
+            }
+            
+            // Show if unlocked OR available (parents unlocked)
             return this.unlockedNodes.has(node.id) || this.isAvailable(node);
         },
         isConnectionUnlocked(connection) {

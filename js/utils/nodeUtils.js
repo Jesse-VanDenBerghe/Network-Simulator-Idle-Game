@@ -83,6 +83,12 @@ export function getConnections(nodesData) {
         node.requires.forEach(reqId => {
             const reqNode = nodesData[reqId];
             if (reqNode) {
+                // Skip connections from tier gates to nodes in a different branch
+                // This prevents visual connections between unlocking gates and newly unlocked branches
+                if (reqNode.isTierGate && node.branch !== reqNode.branch) {
+                    return; // Skip this connection
+                }
+                
                 connections.push({
                     from: reqId,
                     to: node.id,

@@ -3,6 +3,7 @@
 // Manages core game state: resources, automations, unlocked nodes
 
 const { ref, reactive, computed } = Vue;
+import { getUnlockedBranches } from '../utils/branchUtils.js';
 
 export function useGameState() {
     // ==========================================
@@ -62,6 +63,10 @@ export function useGameState() {
         totalData: totalResources.data
     }));
 
+    const unlockedBranches = computed(() => {
+        return getUnlockedBranches(unlockedNodes.value, GameData.nodes);
+    });
+
     // ==========================================
     // METHODS
     // ==========================================
@@ -107,6 +112,7 @@ export function useGameState() {
         canProcessData,
         highestTierReached,
         stats,
+        unlockedBranches,
         
         // Methods
         selectNode,
