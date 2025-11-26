@@ -259,5 +259,132 @@ export const tier2Nodes = {
             automation: { resource: 'energy', rate: 0.3 },
             description: '+0.3 Energy/second (passive)'
         }
+    },
+
+    // === NEW NODES ===
+    hydro_turbine_small: {
+        id: 'hydro_turbine_small',
+        name: 'Water Wheel',
+        icon: '💧',
+        tier: 2,
+        description: 'Small water turbine.',
+        requires: ['generator_mk1'],
+        cost: { energy: 20, data: 2 },
+        effects: {
+            automation: { resource: 'energy', rate: 1.5 },
+            description: '+1.5 Energy/second'
+        }
+    },
+
+    coal_burner: {
+        id: 'coal_burner',
+        name: 'Coal Burner',
+        icon: '🔥',
+        tier: 2,
+        description: 'Simple combustion generator.',
+        requires: ['generator_mk1'],
+        cost: { energy: 18, data: 1 },
+        effects: {
+            automation: { resource: 'energy', rate: 1.2 },
+            description: '+1.2 Energy/second'
+        }
+    },
+
+    backup_generator: {
+        id: 'backup_generator',
+        name: 'Backup Gen',
+        icon: '⛽',
+        tier: 2,
+        description: 'Emergency power supply.',
+        requires: ['capacitor'],
+        cost: { energy: 25, data: 5 },
+        effects: {
+            energyPerClick: 3,
+            description: '+3 Energy per click'
+        }
+    },
+
+    copper_wiring: {
+        id: 'copper_wiring',
+        name: 'Copper Wiring',
+        icon: '🧶',
+        tier: 2,
+        description: 'Improved connectivity.',
+        requires: ['efficiency_1'],
+        cost: { energy: 15, data: 5 },
+        effects: {
+            allRatesMultiplier: 1.05,
+            description: '1.05x all passive rates'
+        }
+    },
+
+    ethernet_cable: {
+        id: 'ethernet_cable',
+        name: 'Ethernet',
+        icon: '🔌',
+        tier: 2,
+        description: 'Wired network connection.',
+        requires: ['switch'],
+        cost: { energy: 20, data: 8 },
+        effects: {
+            automation: { resource: 'data', rate: 0.4 },
+            description: '+0.4 Data/second'
+        }
+    },
+
+    local_server: {
+        id: 'local_server',
+        name: 'Local Server',
+        icon: '🖥️',
+        tier: 2,
+        description: 'Host files locally.',
+        requires: ['data_storage'],
+        cost: { energy: 25, data: 10 },
+        effects: {
+            automation: { resource: 'data', rate: 0.8 },
+            description: '+0.8 Data/second'
+        }
+    },
+
+    network_hub: {
+        id: 'network_hub',
+        name: 'Hub',
+        icon: '⭕',
+        tier: 2,
+        description: 'Basic network concentrator.',
+        requires: ['switch'],
+        cost: { energy: 15, data: 5 },
+        effects: {
+            dataMultiplier: 1.1,
+            description: '1.1x Data multiplier'
+        }
+    },
+
+    antivirus: {
+        id: 'antivirus',
+        name: 'Antivirus',
+        icon: '🦠',
+        tier: 2,
+        description: 'Basic system protection.',
+        requires: ['firewall'],
+        cost: { energy: 20, data: 10 },
+        effects: {
+            automation: { resource: 'data', rate: 0.5 },
+            description: '+0.5 Data/second'
+        }
+    },
+
+    packet_sniffer: {
+        id: 'packet_sniffer',
+        name: 'Packet Sniffer',
+        icon: '👃',
+        tier: 2,
+        description: 'Analyze network traffic.',
+        requires: ['router'],
+        cost: { energy: 18, data: 8 },
+        effects: {
+            dataPerClick: 2,
+            description: '+2 Data per process'
+        }
     }
 };

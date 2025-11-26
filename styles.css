@@ -587,13 +587,20 @@ body {
 .node.tier-1 { --tier-color: #00aaff; }
 .node.tier-2 { --tier-color: #aa00ff; }
 .node.tier-3 { --tier-color: #ff00aa; }
-.node.tier-4 { --tier-color: #ffaa00; }
+.node.tier-5 { --tier-color: #ff5500; }
+.node.tier-6 { --tier-color: #ff00ff; }
+.node.tier-7 { --tier-color: #ffffff; }
+.node.tier-8 { --tier-color: #00ffff; }
 
 .node.unlocked.tier-0 { border-color: #00ffaa; box-shadow: 0 0 20px rgba(0, 255, 170, 0.5); }
 .node.unlocked.tier-1 { border-color: #00aaff; box-shadow: 0 0 20px rgba(0, 170, 255, 0.5); }
 .node.unlocked.tier-2 { border-color: #aa00ff; box-shadow: 0 0 20px rgba(170, 0, 255, 0.5); }
 .node.unlocked.tier-3 { border-color: #ff00aa; box-shadow: 0 0 20px rgba(255, 0, 170, 0.5); }
 .node.unlocked.tier-4 { border-color: #ffaa00; box-shadow: 0 0 20px rgba(255, 170, 0, 0.5); }
+.node.unlocked.tier-5 { border-color: #ff5500; box-shadow: 0 0 20px rgba(255, 85, 0, 0.5); }
+.node.unlocked.tier-6 { border-color: #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.5); }
+.node.unlocked.tier-7 { border-color: #ffffff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+.node.unlocked.tier-8 { border-color: #00ffff; box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
 
 /* Info Panel */
 #info-panel {

@@ -9,6 +9,7 @@ import { tier4Nodes } from './tier4.js';
 import { tier5Nodes } from './tier5.js';
 import { tier6Nodes } from './tier6.js';
 import { tier7Nodes } from './tier7.js';
+import { tier8Nodes } from './tier8.js';
 
 // Combine all node tiers into a single nodes object
 export const allNodes = {
@@ -19,5 +20,6 @@ export const allNodes = {
     ...tier4Nodes,
     ...tier5Nodes,
     ...tier6Nodes,
-    ...tier7Nodes
+    ...tier7Nodes,
+    ...tier8Nodes
 };

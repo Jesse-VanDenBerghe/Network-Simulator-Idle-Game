@@ -316,5 +316,236 @@ export const tier4Nodes = {
             energyPerClick: 5,
             description: '+5 Energy and Data per action'
         }
+    },
+
+    // === NEW ENERGY NODES ===
+    geothermal_plant: {
+        id: 'geothermal_plant',
+        name: 'Geothermal',
+        icon: '🌋',
+        tier: 4,
+        description: 'Energy from Earth\'s core.',
+        requires: ['fusion_core'],
+        cost: { energy: 25, data: 5, bandwidth: 1 },
+        effects: {
+            automation: { resource: 'energy', rate: 12 },
+            description: '+12 Energy/second'
+        }
+    },
+
+    tidal_generator: {
+        id: 'tidal_generator',
+        name: 'Tidal Gen',
+        icon: '🌊',
+        tier: 4,
+        description: 'Harness gravitational forces.',
+        requires: ['wind_turbine'],
+        cost: { energy: 20, data: 4, bandwidth: 1 },
+        effects: {
+            automation: { resource: 'energy', rate: 8 },
+            description: '+8 Energy/second'
+        }
+    },
+
+    microwave_transmission: {
+        id: 'microwave_transmission',
+        name: 'Microwave Power',
+        icon: '📡',
+        tier: 4,
+        description: 'Wireless energy transmission.',
+        requires: ['plasma_conduit'],
+        cost: { energy: 30, data: 10, bandwidth: 2 },
+        effects: {
+            energyPerClick: 8,
+            automation: { resource: 'energy', rate: 5 },
+            description: '+5 Energy/s, +8/click'
+        }
+    },
+
+    nanobot_construction: {
+        id: 'nanobot_construction',
+        name: 'Nanobot Build',
+        icon: '🦟',
+        tier: 4,
+        description: 'Self-repairing infrastructure.',
+        requires: ['zero_point'],
+        cost: { energy: 45, data: 15, bandwidth: 2 },
+        effects: {
+            allRatesMultiplier: 1.2,
+            description: '1.2x all passive rates'
+        }
+    },
+
+    // === NEW DATA NODES ===
+    quantum_cryptography: {
+        id: 'quantum_cryptography',
+        name: 'Quantum Crypto',
+        icon: '🔐',
+        tier: 4,
+        description: 'Unbreakable security keys.',
+        requires: ['quantum_processor'],
+        cost: { energy: 25, data: 15, bandwidth: 2 },
+        effects: {
+            dataMultiplier: 2,
+            description: '2x Data multiplier'
+        }
+    },
+
+    blockchain_network: {
+        id: 'blockchain_network',
+        name: 'Blockchain',
+        icon: '⛓️',
+        tier: 4,
+        description: 'Decentralized ledger.',
+        requires: ['distributed_computing'],
+        cost: { energy: 30, data: 20, bandwidth: 2 },
+        effects: {
+            automation: { resource: 'data', rate: 5 },
+            dataPerClick: 10,
+            description: '+5 Data/s, +10/click'
+        }
+    },
+
+    cloud_compute_cluster: {
+        id: 'cloud_compute_cluster',
+        name: 'Cloud Cluster',
+        icon: '☁️',
+        tier: 4,
+        description: 'Scalable computing resources.',
+        requires: ['data_lake'],
+        cost: { energy: 20, data: 15, bandwidth: 3 },
+        effects: {
+            automation: { resource: 'data', rate: 8 },
+            description: '+8 Data/second'
+        }
+    },
+
+    edge_computing: {
+        id: 'edge_computing',
+        name: 'Edge Computing',
+        icon: '📱',
+        tier: 4,
+        description: 'Processing near the source.',
+        requires: ['cloud_compute_cluster'],
+        cost: { energy: 25, data: 12, bandwidth: 4 },
+        effects: {
+            dataMultiplier: 1.5,
+            automation: { resource: 'data', rate: 6 },
+            description: '+6 Data/s, 1.5x multiplier'
+        }
+    },
+
+    // === NEW NETWORK NODES ===
+    satellite_constellation: {
+        id: 'satellite_constellation',
+        name: 'Sat Constellation',
+        icon: '🛰️',
+        tier: 4,
+        description: 'Global internet coverage.',
+        requires: ['mesh_network'],
+        cost: { energy: 40, data: 10, bandwidth: 5 },
+        effects: {
+            automation: { resource: 'bandwidth', rate: 4 },
+            description: '+4 Bandwidth/second'
+        }
+    },
+
+    undersea_cable: {
+        id: 'undersea_cable',
+        name: 'Undersea Cable',
+        icon: '🦑',
+        tier: 4,
+        description: 'High-speed transoceanic links.',
+        requires: ['cdn'],
+        cost: { energy: 35, data: 8, bandwidth: 3 },
+        effects: {
+            automation: { resource: 'bandwidth', rate: 3 },
+            description: '+3 Bandwidth/second'
+        }
+    },
+
+    cyber_warfare: {
+        id: 'cyber_warfare',
+        name: 'Cyber Warfare',
+        icon: '⚔️',
+        tier: 4,
+        description: 'Offensive network capabilities.',
+        requires: ['zero_day'],
+        cost: { energy: 50, data: 20, bandwidth: 5 },
+        effects: {
+            allRatesMultiplier: 1.3,
+            description: '1.3x all passive rates'
+        }
+    },
+
+    penetration_testing: {
+        id: 'penetration_testing',
+        name: 'Pen Testing',
+        icon: '🕵️',
+        tier: 4,
+        description: 'Identify system weaknesses.',
+        requires: ['vpn'],
+        cost: { energy: 20, data: 10, bandwidth: 2 },
+        effects: {
+            dataMultiplier: 1.5,
+            description: '1.5x Data multiplier'
+        }
+    },
+
+    // === NEW RESEARCH NODES ===
+    genetic_algorithm_v2: {
+        id: 'genetic_algorithm_v2',
+        name: 'Genetic Algo V2',
+        icon: '🧬',
+        tier: 4,
+        description: 'Advanced evolutionary code.',
+        requires: ['quantum_simulation'],
+        cost: { energy: 30, data: 20, bandwidth: 2 },
+        effects: {
+            automation: { resource: 'data', rate: 10 },
+            description: '+10 Data/second'
+        }
+    },
+
+    automated_trading: {
+        id: 'automated_trading',
+        name: 'Auto Trading',
+        icon: '📈',
+        tier: 4,
+        description: 'High-frequency algorithmic trading.',
+        requires: ['ai_core'],
+        cost: { energy: 25, data: 25, bandwidth: 3 },
+        effects: {
+            energyPerClick: 15,
+            description: '+15 Energy per click'
+        }
+    },
+
+    predictive_analytics: {
+        id: 'predictive_analytics',
+        name: 'Predictive Analytics',
+        icon: '🔮',
+        tier: 4,
+        description: 'Predict future trends.',
+        requires: ['big_data'],
+        cost: { energy: 35, data: 30, bandwidth: 2 },
+        effects: {
+            dataMultiplier: 2,
+            description: '2x Data multiplier'
+        }
+    },
+
+    virtual_reality: {
+        id: 'virtual_reality',
+        name: 'Virtual Reality',
+        icon: '🥽',
+        tier: 4,
+        description: 'Immersive digital worlds.',
+        requires: ['neural_processor'],
+        cost: { energy: 40, data: 40, bandwidth: 5 },
+        effects: {
+            automation: { resource: 'bandwidth', rate: 2 },
+            description: '+2 Bandwidth/second'
+        }
     }
 };

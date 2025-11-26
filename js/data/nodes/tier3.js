@@ -313,5 +313,160 @@ export const tier3Nodes = {
             allRatesMultiplier: 1.15,
             description: '1.15x all passive rates'
         }
+    },
+
+    // === NEW NODES ===
+    hydro_dam: {
+        id: 'hydro_dam',
+        name: 'Hydro Dam',
+        icon: '💧',
+        tier: 3,
+        description: 'Power from flowing water.',
+        requires: ['wind_turbine'],
+        cost: { energy: 18, data: 4 },
+        effects: {
+            automation: { resource: 'energy', rate: 4 },
+            description: '+4 Energy/second'
+        }
+    },
+
+    biomass_burner: {
+        id: 'biomass_burner',
+        name: 'Biomass',
+        icon: '🍂',
+        tier: 3,
+        description: 'Burn organic matter.',
+        requires: ['generator_mk2'],
+        cost: { energy: 15, data: 3 },
+        effects: {
+            automation: { resource: 'energy', rate: 3 },
+            description: '+3 Energy/second'
+        }
+    },
+
+    smart_grid: {
+        id: 'smart_grid',
+        name: 'Smart Grid',
+        icon: '🕸️',
+        tier: 3,
+        description: 'Intelligent energy distribution.',
+        requires: ['battery_array'],
+        cost: { energy: 20, data: 10 },
+        effects: {
+            allRatesMultiplier: 1.1,
+            description: '1.1x all passive rates'
+        }
+    },
+
+    fiber_optics: {
+        id: 'fiber_optics',
+        name: 'Fiber Optics',
+        icon: '〰️',
+        tier: 3,
+        description: 'Light-speed data transmission.',
+        requires: ['gateway'],
+        cost: { energy: 25, data: 12 },
+        effects: {
+            dataMultiplier: 1.2,
+            description: '1.2x Data multiplier'
+        }
+    },
+
+    satellite_dish: {
+        id: 'satellite_dish',
+        name: 'Sat Dish',
+        icon: '📡',
+        tier: 3,
+        description: 'Long-range communication.',
+        requires: ['proxy'],
+        cost: { energy: 30, data: 8 },
+        effects: {
+            automation: { resource: 'bandwidth', rate: 0.5 },
+            description: '+0.5 Bandwidth/second'
+        }
+    },
+
+    firewall_v2: {
+        id: 'firewall_v2',
+        name: 'Firewall V2',
+        icon: '🧱',
+        tier: 3,
+        description: 'Advanced packet filtering.',
+        requires: ['firewall'],
+        cost: { energy: 22, data: 10 },
+        effects: {
+            dataMultiplier: 1.15,
+            description: '1.15x Data multiplier'
+        }
+    },
+
+    intrusion_detection: {
+        id: 'intrusion_detection',
+        name: 'IDS',
+        icon: '🚨',
+        tier: 3,
+        description: 'Detect network intruders.',
+        requires: ['firewall_v2'],
+        cost: { energy: 25, data: 12 },
+        effects: {
+            allRatesMultiplier: 1.1,
+            description: '1.1x all passive rates'
+        }
+    },
+
+    api_gateway: {
+        id: 'api_gateway',
+        name: 'API Gateway',
+        icon: '🔌',
+        tier: 3,
+        description: 'Manage API traffic.',
+        requires: ['load_balancer'],
+        cost: { energy: 20, data: 15 },
+        effects: {
+            automation: { resource: 'data', rate: 3 },
+            description: '+3 Data/second'
+        }
+    },
+
+    big_table: {
+        id: 'big_table',
+        name: 'Big Table',
+        icon: '🧾',
+        tier: 3,
+        description: 'Distributed storage system.',
+        requires: ['database'],
+        cost: { energy: 18, data: 12 },
+        effects: {
+            automation: { resource: 'data', rate: 2 },
+            description: '+2 Data/second'
+        }
+    },
+
+    nosql_db: {
+        id: 'nosql_db',
+        name: 'NoSQL DB',
+        icon: '📄',
+        tier: 3,
+        description: 'Flexible data models.',
+        requires: ['database'],
+        cost: { energy: 16, data: 10 },
+        effects: {
+            dataPerClick: 3,
+            description: '+3 Data per click'
+        }
+    },
+
+    stream_processing: {
+        id: 'stream_processing',
+        name: 'Stream Proc',
+        icon: '🌊',
+        tier: 3,
+        description: 'Real-time data processing.',
+        requires: ['parallel_processing'],
+        cost: { energy: 20, data: 15 },
+        effects: {
+            automation: { resource: 'data', rate: 4 },
+            description: '+4 Data/second'
+        }
     }
 };
