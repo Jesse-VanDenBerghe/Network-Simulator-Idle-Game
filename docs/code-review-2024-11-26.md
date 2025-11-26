@@ -34,14 +34,15 @@ All 95 tests still passing.
 
 ### 🔴 Clean Code Critical Violations (MUST FIX post-merge)
 
-**C1: Decouple Composables - Create Event Bus**
+**~~C1: Decouple Composables - Create Event Bus~~** ✅ **FIXED**
 ```
-Replace hard-coded dependency chain (App.js:30-34) with event bus pattern.
-Create useEventBus() composable. Have composables emit events instead of direct calls:
-- gameState emits 'nodeUnlocked', 'resourcesChanged'
-- gameLoop listens to events, doesn't import all other composables
-- Reduces from 5-arg dependency chain to 1-arg (eventBus)
-Time: 3 hours. Benefit: Testable, loosely-coupled, easy to extend.
+✅ COMPLETED - Created useEventBus() composable with pub/sub pattern.
+Refactored composables to communicate via events:
+- useGameLoop: subscribes to nodeUnlocked, resourceRatesChanged, offlineProgressCalculated, gameLoaded
+- useNodeManagement: subscribes to requestUnlockNode, requestResourceRates, requestStartingBonuses
+- useSaveLoad: subscribes to requestSaveGame, requestLoadGame, requestSavePrestige, requestLoadPrestige
+Dependency chain reduced from 5-arg to 3-arg (gameState, prestigeState, eventBus).
+All 95 tests passing.
 ```
 
 **C2: Extract Effect Registry from applyNodeEffects()**

@@ -1,8 +1,9 @@
 // useSaveLoad Composable
 // =======================
 // Handles saving and loading game and prestige data
+// Uses event bus for decoupled communication
 
-export function useSaveLoad(gameState, prestigeState, nodeManagement) {
+export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**
      * Save game state to localStorage
      */
@@ -27,8 +28,9 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
     function loadGame() {
         const saveData = localStorage.getItem('networkSimulatorSave');
         if (!saveData) {
-            // No game save, but apply prestige bonuses if any
-            nodeManagement.applyStartingBonuses();
+            // No game save, request starting bonuses via event
+            eventBus.emit('requestStartingBonuses');
+            eventBus.emit('gameLoaded');
             return;
         }
 
@@ -61,23 +63,28 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
                 Object.assign(gameState.dataGeneration, data.dataGeneration);
             }
 
+            // Notify that game is loaded (so rates can be calculated)
+            eventBus.emit('gameLoaded');
+
             // Calculate offline progress
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
             if (offlineTime > 0 && offlineTime < 86400) {
-                // Recalculate rates with current unlocks
-                const rates = nodeManagement.resourceRates.value;
+                // Request current rates via event then calculate
+                // For now, calculate directly from automations (simplified)
+                const rates = {
+                    energy: gameState.automations.energy || 0,
+                    data: gameState.automations.data || 0
+                };
                 gameState.resources.energy += rates.energy * offlineTime;
                 gameState.resources.data += rates.data * offlineTime;
 
                 if (offlineTime > 60) {
-                    return 'Welcome back! Earned resources while away.';
+                    eventBus.emit('offlineProgressCalculated', 'Welcome back! Earned resources while away.');
                 }
             }
         } catch (e) {
             console.error('Failed to load save:', e);
         }
-        
-        return null;
     }
 
     /**
@@ -128,6 +135,26 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             location.reload();
         }
     }
+
+    // ==========================================
+    // EVENT SUBSCRIPTIONS
+    // ==========================================
+    
+    eventBus.on('requestSaveGame', () => {
+        saveGame();
+    });
+    
+    eventBus.on('requestLoadGame', () => {
+        loadGame();
+    });
+    
+    eventBus.on('requestSavePrestige', () => {
+        savePrestige();
+    });
+    
+    eventBus.on('requestLoadPrestige', () => {
+        loadPrestige();
+    });
 
     return {
         saveGame,

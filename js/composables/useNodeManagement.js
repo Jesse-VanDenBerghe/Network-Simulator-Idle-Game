@@ -4,7 +4,7 @@
 
 const { computed } = Vue;
 
-export function useNodeManagement(gameState, prestigeState) {
+export function useNodeManagement(gameState, prestigeState, eventBus) {
     // ==========================================
     // COMPUTED
     // ==========================================
@@ -222,6 +222,14 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects
         applyNodeEffects(node, isUpgrade, currentLevel + 1);
 
+        // Emit event for listeners (gameLoop, etc.)
+        eventBus.emit('nodeUnlocked', { 
+            node, 
+            newLevel: currentLevel + 1,
+            isUpgrade,
+            rates: resourceRates.value
+        });
+
         // Return node and new level for caller to handle effects like toast/narration
         return { node, newLevel: currentLevel + 1 };
     }
@@ -403,7 +411,30 @@ export function useNodeManagement(gameState, prestigeState) {
                 applyNodeEffects(node);
             }
         });
+        
+        // Emit updated rates after applying bonuses
+        eventBus.emit('resourceRatesChanged', resourceRates.value);
     }
+
+    // ==========================================
+    // EVENT SUBSCRIPTIONS
+    // ==========================================
+    
+    // Handle unlock requests from gameLoop
+    eventBus.on('requestUnlockNode', ({ nodeId }) => {
+        const result = unlockNode(nodeId);
+        // nodeUnlocked event is already emitted in unlockNode()
+    });
+    
+    // Handle rate requests
+    eventBus.on('requestResourceRates', () => {
+        eventBus.emit('resourceRatesChanged', resourceRates.value);
+    });
+    
+    // Handle starting bonus requests (for ascension)
+    eventBus.on('requestStartingBonuses', () => {
+        applyStartingBonuses();
+    });
 
     // ==========================================
     // RETURN

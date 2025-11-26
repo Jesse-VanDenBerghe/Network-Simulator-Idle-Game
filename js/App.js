@@ -10,6 +10,7 @@ import { usePrestigeState } from './composables/usePrestigeState.js';
 import { useNodeManagement } from './composables/useNodeManagement.js';
 import { useSaveLoad } from './composables/useSaveLoad.js';
 import { useGameLoop } from './composables/useGameLoop.js';
+import { useEventBus } from './composables/useEventBus.js';
 
 const App = {
     name: 'App',
@@ -25,13 +26,20 @@ const App = {
     },
     setup() {
         // ==========================================
-        // COMPOSABLES
+        // EVENT BUS (for composable communication)
+        // ==========================================
+        const eventBus = useEventBus();
+
+        // ==========================================
+        // COMPOSABLES (decoupled via event bus)
         // ==========================================
         const gameState = useGameState();
         const prestigeState = usePrestigeState();
-        const nodeManagement = useNodeManagement(gameState, prestigeState);
-        const saveLoad = useSaveLoad(gameState, prestigeState, nodeManagement);
-        const gameLoop = useGameLoop(gameState, prestigeState, nodeManagement, saveLoad);
+        
+        // These composables communicate via eventBus instead of direct dependencies
+        const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus);
+        const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
+        const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
 
         // ==========================================
         // COMPUTED (for ascension)
