@@ -2,6 +2,14 @@
 // ===============
 
 /**
+ * Branch unlock order and tier mapping
+ */
+export const BRANCH_UNLOCK_ORDER = [
+    'energy',
+    'computer'
+];
+
+/**
  * Cost multipliers per tier - exponential scaling
  */
 export const TIER_COST_MULTIPLIERS = {
@@ -12,7 +20,8 @@ export const TIER_COST_MULTIPLIERS = {
     4: 500,    // 5K-20K energy
     5: 5000,   // 50K-200K energy
     6: 50000,  // 500K-2M energy
-    7: 500000  // 10M-50M energy
+    7: 500000, // 10M-50M energy
+    8: 5000000 // 100M+ energy
 };
 
 /**
@@ -25,5 +34,6 @@ export const TIER_GATES = {
     4: { requiredTier: 3, requiredCount: 0 },
     5: { requiredTier: 4, requiredCount: 0 },
     6: { requiredTier: 5, requiredCount: 0 },
-    7: { requiredTier: 6, requiredCount: 0 }
+    7: { requiredTier: 6, requiredCount: 0 },
+    8: { requiredTier: 7, requiredCount: 1 }
 };

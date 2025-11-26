@@ -10,23 +10,22 @@ export function useGameState() {
     // ==========================================
     const resources = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const totalResources = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const automations = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const unlockedNodes = ref(new Set(['core']));
+    const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
+    const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, etc.)
     const selectedNodeId = ref(null);
     const lastUnlockedNodeId = ref(null);
 
@@ -34,11 +33,7 @@ export function useGameState() {
     // COMPUTED
     // ==========================================
     const dataUnlocked = computed(() => {
-        return unlockedNodes.value.has('data_processing');
-    });
-
-    const bandwidthUnlocked = computed(() => {
-        return unlockedNodes.value.has('bandwidth_unlock');
+        return unlockedFeatures.value.has('dataProcessing');
     });
 
     const canProcessData = computed(() => {
@@ -77,6 +72,24 @@ export function useGameState() {
 
     function resetNodes() {
         unlockedNodes.value = new Set(['core']);
+        unlockedBranches.value = new Set(['energy']);
+        unlockedFeatures.value = new Set();
+    }
+
+    function unlockBranch(branch) {
+        if (!unlockedBranches.value.has(branch)) {
+            const newBranches = new Set(unlockedBranches.value);
+            newBranches.add(branch);
+            unlockedBranches.value = newBranches;
+        }
+    }
+
+    function unlockFeature(feature) {
+        if (!unlockedFeatures.value.has(feature)) {
+            const newFeatures = new Set(unlockedFeatures.value);
+            newFeatures.add(feature);
+            unlockedFeatures.value = newFeatures;
+        }
     }
 
     function setLastUnlockedNode(nodeId) {
@@ -98,12 +111,13 @@ export function useGameState() {
         totalResources,
         automations,
         unlockedNodes,
+        unlockedBranches,
+        unlockedFeatures,
         selectedNodeId,
         lastUnlockedNodeId,
         
         // Computed
         dataUnlocked,
-        bandwidthUnlocked,
         canProcessData,
         highestTierReached,
         stats,
@@ -112,6 +126,8 @@ export function useGameState() {
         selectNode,
         resetResources,
         resetNodes,
+        unlockBranch,
+        unlockFeature,
         setLastUnlockedNode
     };
 }

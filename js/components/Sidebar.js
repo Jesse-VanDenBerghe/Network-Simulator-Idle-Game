@@ -36,7 +36,7 @@ const Sidebar = {
                 <div class="action-wrapper" @click="handleEnergyClick">
                     <ActionButton
                         icon="⚡"
-                        text="Generate Energy"
+                        text="Turn Crank"
                         :value="'+' + formatNumber(energyPerClick)"
                     />
                     <ParticleBurst ref="energyParticles" />

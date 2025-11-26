@@ -41,12 +41,12 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     /**
      * Show a notification toast
      */
-    function showNotification(message, type = 'info') {
+    function showNotification(message, type = 'info', duration = 10_000) {
         const id = ++notificationId;
-        notifications.value.push({ id, message, type });
+        notifications.value.push({ id, message, type, duration });
         setTimeout(() => {
             notifications.value = notifications.value.filter(n => n.id !== id);
-        }, 3000);
+        }, duration);
     }
 
     /**
@@ -121,10 +121,20 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Handle node unlock with notification
      */
     function handleUnlockNode(nodeId) {
-        const success = nodeManagement.unlockNode(nodeId);
-        if (success) {
-            const node = GameData.nodes[nodeId];
+        const node = nodeManagement.unlockNode(nodeId);
+        if (node) {
             showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+            
+            // Show narration message if node has one
+            if (node.effects.narrate) {
+                const narrate = node.effects.narrate;
+                const text = typeof narrate === 'string' ? narrate : narrate.text;
+                const duration = typeof narrate === 'string' ? 5_000 : (narrate.duration || 10_000);
+                setTimeout(() => {
+                    showNotification(text, 'narration', duration);
+                }, 500);
+            }
+            
             // Trigger unlock animation
             gameState.setLastUnlockedNode(nodeId);
             saveLoad.saveGame();

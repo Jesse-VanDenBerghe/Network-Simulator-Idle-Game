@@ -45,8 +45,7 @@ export function useNodeManagement(gameState, prestigeState) {
         const bonuses = prestigeState.prestigeBonuses.value;
         return {
             energy: gameState.automations.energy * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier,
-            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier,
-            bandwidth: gameState.automations.bandwidth * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier
+            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier
         };
     });
 
@@ -175,7 +174,8 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects
         applyNodeEffects(node);
 
-        return true;
+        // Return node for caller to handle effects like toast
+        return node;
     }
 
     /**
@@ -187,6 +187,16 @@ export function useNodeManagement(gameState, prestigeState) {
         // Add automation
         if (effects.automation) {
             gameState.automations[effects.automation.resource] += effects.automation.rate;
+        }
+
+        // Unlock branch
+        if (effects.unlockBranch) {
+            gameState.unlockBranch(effects.unlockBranch);
+        }
+
+        // Unlock features (data processing, etc.)
+        if (effects.unlockDataProcessing) {
+            gameState.unlockFeature('dataProcessing');
         }
 
         // Instant unlock (Zero Day effect)

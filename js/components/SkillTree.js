@@ -7,6 +7,7 @@ const SkillTree = {
     props: {
         nodes: { type: Object, required: true },
         unlockedNodes: { type: Set, required: true },
+        unlockedBranches: { type: Set, required: true },
         selectedNodeId: { type: String, default: null },
         resources: { type: Object, required: true },
         ascensionCount: { type: Number, default: 0 },
@@ -65,8 +66,17 @@ const SkillTree = {
         },
         isNodeVisible(node) {
             if (!node) return false;
-            // Show if unlocked OR available
-            // Note: We SHOW tier-locked nodes if they are otherwise available (parents unlocked)
+            
+            // Tier gate nodes are visible even if their branch isn't unlocked yet
+            // (they are the nodes that unlock their branch)
+            if (!node.isTierGate) {
+                // Check if the node's branch is unlocked
+                if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, this.unlockedBranches)) {
+                    return false;
+                }
+            }
+            
+            // Show if unlocked OR available (parents unlocked)
             return this.unlockedNodes.has(node.id) || this.isAvailable(node);
         },
         isConnectionUnlocked(connection) {

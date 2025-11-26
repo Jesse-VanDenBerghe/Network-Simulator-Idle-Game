@@ -12,6 +12,8 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             totalResources: { ...gameState.totalResources },
             automations: { ...gameState.automations },
             unlockedNodes: Array.from(gameState.unlockedNodes.value),
+            unlockedBranches: Array.from(gameState.unlockedBranches.value),
+            unlockedFeatures: Array.from(gameState.unlockedFeatures.value),
             lastUpdate: Date.now()
         };
         localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
@@ -44,6 +46,12 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             if (data.unlockedNodes) {
                 gameState.unlockedNodes.value = new Set(data.unlockedNodes);
             }
+            if (data.unlockedBranches) {
+                gameState.unlockedBranches.value = new Set(data.unlockedBranches);
+            }
+            if (data.unlockedFeatures) {
+                gameState.unlockedFeatures.value = new Set(data.unlockedFeatures);
+            }
 
             // Calculate offline progress
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
@@ -52,7 +60,6 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
                 const rates = nodeManagement.resourceRates.value;
                 gameState.resources.energy += rates.energy * offlineTime;
                 gameState.resources.data += rates.data * offlineTime;
-                gameState.resources.bandwidth += rates.bandwidth * offlineTime;
 
                 if (offlineTime > 60) {
                     return 'Welcome back! Earned resources while away.';
