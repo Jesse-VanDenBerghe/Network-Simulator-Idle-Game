@@ -29,6 +29,14 @@ export function useGameState() {
     const selectedNodeId = ref(null);
     const lastUnlockedNodeId = ref(null);
 
+    const dataGeneration = reactive({
+        active: false,
+        progress: 0, // 0-100%
+        interval: 20000, // 20 seconds default
+        bitsPerTick: 1,
+        energyCost: 1
+    });
+
     // ==========================================
     // COMPUTED
     // ==========================================
@@ -74,6 +82,12 @@ export function useGameState() {
         unlockedNodes.value = new Set(['core']);
         unlockedBranches.value = new Set(['energy']);
         unlockedFeatures.value = new Set();
+        // Reset data generation
+        dataGeneration.active = false;
+        dataGeneration.progress = 0;
+        dataGeneration.interval = 20000;
+        dataGeneration.bitsPerTick = 1;
+        dataGeneration.energyCost = 1;
     }
 
     function unlockBranch(branch) {
@@ -115,6 +129,7 @@ export function useGameState() {
         unlockedFeatures,
         selectedNodeId,
         lastUnlockedNodeId,
+        dataGeneration,
         
         // Computed
         dataUnlocked,

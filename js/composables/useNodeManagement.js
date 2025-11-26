@@ -199,6 +199,11 @@ export function useNodeManagement(gameState, prestigeState) {
             gameState.unlockFeature('dataProcessing');
         }
 
+        // Unlock data generation (auto-generates bits over time)
+        if (effects.unlockDataGeneration) {
+            gameState.dataGeneration.active = true;
+        }
+
         // Instant unlock (Zero Day effect)
         if (effects.instantUnlock) {
             const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>

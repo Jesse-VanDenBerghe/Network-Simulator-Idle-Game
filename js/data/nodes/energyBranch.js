@@ -14,7 +14,7 @@ export const energyBranch = {
         requires: ['core'],
         cost: { energy: 0 },
         effects: {
-            energyPerClick: 1,
+            energyPerClick: 1000,
             narrate: {
                 text: 'When you turn the crank, you hear a faint humming sound...',
                 duration: 8000

@@ -52,6 +52,7 @@ export const computerBranch = {
         cost: { energy: 50 },
         effects: {
             unlockDataGeneration: true,
+            unlockDataProcessing: true,
             narrate: {
                 text: 'You execute /generate. On the screen appears a single progressbar that slowly fills up. VEEEERY SLOW. After a while, it completes you see: "Data generation complete. 1 bit created."',
                 duration: 10000

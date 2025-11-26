@@ -197,6 +197,29 @@ body {
     color: var(--text-muted);
 }
 
+/* Action Button Progress Bar */
+.action-btn.has-progress {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn .progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(0, 170, 255, 0.3);
+    transition: width 0.1s linear;
+    z-index: 0;
+}
+
+.action-btn.has-progress .btn-icon,
+.action-btn.has-progress .btn-text,
+.action-btn.has-progress .btn-value {
+    position: relative;
+    z-index: 1;
+}
+
 /* Automations */
 .automation-item {
     background: var(--bg-light);

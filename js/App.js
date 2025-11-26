@@ -94,6 +94,7 @@ const App = {
             unlockedBranches: gameState.unlockedBranches,
             selectedNodeId: gameState.selectedNodeId,
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
+            dataGeneration: gameState.dataGeneration,
             notifications: gameLoop.notifications,
             
             // Prestige State
@@ -153,13 +154,13 @@ const App = {
                 <div id="resources">
                     <ResourceBar
                         icon="⚡"
-                        name="Energy"
+                        name="W"
                         :amount="resources.energy"
                         :rate="resourceRates.energy"
                     />
                     <ResourceBar
                         icon="📊"
-                        name="Data"
+                        name="B"
                         :amount="resources.data"
                         :rate="resourceRates.data"
                         :visible="dataUnlocked"
@@ -173,6 +174,7 @@ const App = {
                     :data-per-click="dataPerClickDisplay"
                     :data-unlocked="dataUnlocked"
                     :can-process-data="canProcessData"
+                    :data-generation="dataGeneration"
                     :automations="automations"
                     :effective-rates="resourceRates"
                     :stats="stats"

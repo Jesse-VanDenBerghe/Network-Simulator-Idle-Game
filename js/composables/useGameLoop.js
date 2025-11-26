@@ -36,6 +36,29 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         gameState.totalResources.energy += rates.energy * delta;
         gameState.totalResources.data += rates.data * delta;
         gameState.totalResources.bandwidth += rates.bandwidth * delta;
+
+        // Process auto data generation
+        processDataGeneration(delta);
+    }
+
+    /**
+     * Auto data generation - fills progress bar and generates bits
+     */
+    function processDataGeneration(delta) {
+        const dg = gameState.dataGeneration;
+        if (!dg.active) return;
+        if (gameState.resources.energy < dg.energyCost) return;
+
+        // Progress = % of interval completed per second
+        const progressPerSecond = 100 / (dg.interval / 1000);
+        dg.progress += progressPerSecond * delta;
+
+        if (dg.progress >= 100) {
+            dg.progress = 0;
+            gameState.resources.energy -= dg.energyCost;
+            gameState.resources.data += dg.bitsPerTick;
+            gameState.totalResources.data += dg.bitsPerTick;
+        }
     }
 
     /**
