@@ -12,7 +12,7 @@ export const computerBranch = {
         tier: 1,
         branch: 'computer',
         description: 'An old computer left behind by your grandfather. Let\'s boot it up and see what it can do!',
-        requires: ['core'],
+        requires: ['old_shed'],
         cost: { energy: 15 },
         effects: {
             description: 'Unlock computer systems and the Computer branch',
@@ -59,5 +59,39 @@ export const computerBranch = {
             },
             description: 'Unlock data processing capabilities'
         }
-    }
+    },
+
+    // == Tier 3 Nodes ==
+
+    ram_adjustment: {
+        id: 'ram_adjustment',
+        name: 'RAM Adjustment',
+        icon: '🧠',
+        tier: 3,
+        branch: 'computer',
+        description: 'A ram stick is loose, better adjust it to improve processing speed.',
+        requires: ['command_generate'],
+        cost: { energy: 40, data: 10 },
+        effects: {
+            dataGenSpeedMultiplier: 1.5,
+            description: 'Data generates 50% faster'
+        }
+    },
+
+    overclock: {
+        id: 'overclock',
+        name: 'Overclock',
+        icon: '⚡',
+        tier: 3,
+        branch: 'computer',
+        description: 'When building your own gaming rig, you always overclocked the CPU for that extra performance boost. Let\'s do it here too!',
+        requires: ['command_generate'],
+        cost: { energy: 40, data: 10 },
+        maxLevel: 10,
+        costScaling: 1.5,
+        effects: {
+            dataGenAmountBonus: 1,
+            description: 'Generate +1 additional bit of data per tick'
+        }
+    },
 };

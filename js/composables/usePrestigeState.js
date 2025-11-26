@@ -64,7 +64,7 @@ export function usePrestigeState() {
         const bonuses = {
             startingEnergy: 0,
             startingAutomation: { energy: 0, data: 0, bandwidth: 0 },
-            startingNodes: new Set(['core']),
+            startingNodes: new Set(['old_shed']),
             costMultiplier: 1,
             automationMultiplier: 1,
             bonusEnergyPerClick: 0,

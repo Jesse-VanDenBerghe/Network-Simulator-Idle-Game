@@ -204,7 +204,7 @@ const SkillTree = {
         spawnDotsFromCore() {
             // Find connections from core to unlocked nodes (and optionally available nodes)
             const coreConnections = this.connections.filter(conn => {
-                if (conn.from !== 'core') return false;
+                if (conn.from !== 'old_shed') return false;
                 if (this.isUnlocked(conn.to)) return true;
                 // Only include available nodes if feature flag is enabled
                 return GameData.FEATURE_FLAGS.DOTS_TO_AVAILABLE_NODES && this.isAvailable(this.nodes[conn.to]);
@@ -276,7 +276,7 @@ const SkillTree = {
         // Center on core node
         this.$nextTick(() => {
             const container = this.$refs.container;
-            const coreNode = this.nodes.core;
+            const coreNode = this.nodes.old_shed;
             if (container && coreNode) {
                 container.scrollLeft = coreNode.x - container.clientWidth / 2 + 40;
                 container.scrollTop = coreNode.y - container.clientHeight / 2 + 40;

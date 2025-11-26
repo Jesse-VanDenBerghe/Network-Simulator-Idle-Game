@@ -23,7 +23,7 @@ export function useGameState() {
         data: 0
     });
 
-    const unlockedNodes = ref(new Set(['core']));
+    const unlockedNodes = ref(new Set(['old_shed']));
     const nodeLevels = reactive({}); // Track levels for each node (0=locked, 1+=unlocked)
     const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
     const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, etc.)
@@ -80,7 +80,7 @@ export function useGameState() {
     }
 
     function resetNodes() {
-        unlockedNodes.value = new Set(['core']);
+        unlockedNodes.value = new Set(['old_shed']);
         // Reset node levels
         Object.keys(nodeLevels).forEach(k => delete nodeLevels[k]);
         unlockedBranches.value = new Set(['energy']);

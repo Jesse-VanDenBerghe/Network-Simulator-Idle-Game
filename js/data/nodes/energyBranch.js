@@ -11,7 +11,7 @@ export const energyBranch = {
         tier: 1,
         branch: 'energy',
         description: 'You find a simple hand crank. Why not give it a turn, whats the worst that could happen?.....',
-        requires: ['core'],
+        requires: ['old_shed'],
         cost: { energy: 0 },
         effects: {
             energyPerClick: 1,
@@ -100,6 +100,8 @@ export const energyBranch = {
         description: 'Why not put some muscle into it? Give that crank a good, hard turn!',
         requires: ['lubricant'],
         cost: { energy: 5 },
+        maxLevel: 10,
+        costScaling: 1.5,
         effects: {
             energyPerClick: 2,
             description: '+2 Energy per crank'

@@ -256,6 +256,16 @@ export function useNodeManagement(gameState, prestigeState) {
                 gameState.dataGeneration.active = true;
             }
 
+            // Data generation speed multiplier (reduces interval)
+            if (effects.dataGenSpeedMultiplier) {
+                gameState.dataGeneration.interval /= effects.dataGenSpeedMultiplier;
+            }
+
+            // Data generation amount bonus (adds to bitsPerTick)
+            if (effects.dataGenAmountBonus) {
+                gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
+            }
+
             // Instant unlock (Zero Day effect)
             if (effects.instantUnlock) {
                 const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
@@ -306,7 +316,7 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects from starting nodes
         newUnlocked.forEach(nodeId => {
             const node = GameData.nodes[nodeId];
-            if (node && node.id !== 'core') {
+            if (node && node.id !== 'old_shed') {
                 applyNodeEffects(node);
             }
         });

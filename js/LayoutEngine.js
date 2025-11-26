@@ -102,10 +102,10 @@ const LayoutEngine = {
      * Tier 1 nodes are spread evenly around the circle
      */
     assignBranches(nodes, tree) {
-        // Core is special
-        if (nodes.core) {
-            nodes.core.branch = 'core';
-            nodes.core.branchAngle = 0;
+        // Old shed is special
+        if (nodes.old_shed) {
+            nodes.old_shed.branch = 'old_shed';
+            nodes.old_shed.branchAngle = 0;
         }
 
         // Tier 1 nodes: spread evenly around the circle
@@ -204,10 +204,10 @@ const LayoutEngine = {
     calculatePositions(nodes, tree) {
         const { centerX, centerY, tierSpacing } = this.config;
 
-        // Position core at center
-        if (nodes.core) {
-            nodes.core.x = centerX;
-            nodes.core.y = centerY;
+        // Position old_shed at center
+        if (nodes.old_shed) {
+            nodes.old_shed.x = centerX;
+            nodes.old_shed.y = centerY;
         }
 
         // Calculate depth info for all nodes (based on parent chain, not tier)
@@ -297,7 +297,7 @@ const LayoutEngine = {
         nodeIds.forEach(nodeId => {
             const node = nodes[nodeId];
             // Use first parent as the grouping key
-            const parentId = node.requires && node.requires.length > 0 ? getReqId(node.requires[0]) : 'core';
+            const parentId = node.requires && node.requires.length > 0 ? getReqId(node.requires[0]) : 'old_shed';
             
             if (!groups[parentId]) {
                 groups[parentId] = { parentId, nodes: [] };
@@ -377,12 +377,12 @@ const LayoutEngine = {
                         const pushX = (dx / distance) * overlap * 0.5;
                         const pushY = (dy / distance) * overlap * 0.5;
                         
-                        // Don't move the core node
-                        if (nodeA.id !== 'core') {
+                        // Don't move the old_shed node
+                        if (nodeA.id !== 'old_shed') {
                             nodeA.x -= pushX;
                             nodeA.y -= pushY;
                         }
-                        if (nodeB.id !== 'core') {
+                        if (nodeB.id !== 'old_shed') {
                             nodeB.x += pushX;
                             nodeB.y += pushY;
                         }
