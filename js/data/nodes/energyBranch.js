@@ -7,7 +7,7 @@ export const energyBranch = {
     energy_unlock: {
         id: 'energy_unlock',
         name: 'Hand crank',
-        icon: '⚡',
+        icon: '🔧',
         tier: 1,
         branch: 'energy',
         description: 'You find a simple hand crank. Why not give it a turn, whats the worst that could happen?.....',
@@ -26,8 +26,8 @@ export const energyBranch = {
     // == Tier 2 Nodes ==
     energy_2_1: {
         id: 'energy_2_1',
-        name: 'Oil',
-        icon: '⚡',
+        name: 'Lubricant',
+        icon: '🧴',
         tier: 2,
         branch: 'energy',
         description: 'The crank is a bit stiff, maybe some oil would help it turn more smoothly?',
@@ -60,7 +60,7 @@ export const energyBranch = {
     energy_2_3: {
         id: 'energy_2_3',
         name: 'Hamster Wheel',
-        icon: '⚡',
+        icon: '🐹',
         tier: 2,
         branch: 'energy',
         description: ' My hamster loves running in this thing, and it generates energy too!',

@@ -1,34 +1,92 @@
-# Document description
+# Network Simulator - Game Narration & Progression Guide
 
-This document outlines the narration of the game's branch progression plan, detailing how players will unlock and progress through various technology branches in the skill tree.
+This document blends technical documentation with the narrative journey players experience as they unlock and develop various technology branches in the skill tree.
 
-# Outlines
+---
 
-The user begins their journey with nothing but an old shed inherited from their grandfather. While exploring the shed, they discover basic tools and a crank generator. This marks the beginning of their adventure into building a vast network.
+## The Story Begins
 
-# Branch Progression
+You arrive at an old shed—an inheritance from your grandfather. As you explore the dusty, forgotten space, you find something peculiar: a simple hand crank mechanism. When you give it a turn, you hear a faint humming sound. It works. This marks the beginning of your journey into building a vast computational network.
 
-Each branch represents a different technological focus area, and players will unlock these branches as they reach specific milestones in the game.
+---
 
-## Core (🏠)
-**Old Shed** - You just inherited this old shed from your grandfather. It looks abandoned, but maybe there's something useful inside?
+# Core: The Old Shed (🏠)
 
-## Branch 1: Energy (⚡)
-The user discovers an old hand crank in the shed. Turning it generates energy. Without energy, nothing can function. Progressing through this branch will allow the user to generate and manage energy more efficiently.
+**Location:** Grandpa's abandoned shed  
+**The Setup:** You just inherited this old shed from your grandfather. It looks abandoned, but maybe there's something useful inside?
 
-### Tier 1:
-- **Hand Crank** - You find a simple hand crank. Why not give it a turn, what's the worst that could happen?
+This is where it all begins. The shed serves as your base of operations—a place where old technology meets possibility.
 
-### Tier 2:
-- **Oil** - The crank is a bit stiff, maybe some oil would help it turn more smoothly?
-- **Hamster Wheel** - My hamster loves running in this thing, and it generates energy too! (+0.5 Energy/second passive)
-- **Lightbulb** - Let there be light! Can't see in the dark? No problem, this lightbulb will help you out.
+---
 
-### Tier 3:
-- **Explore Attic** - Since we have light now, why not search grandpa's attic for cool stuff? (Unlocks Computer branch)
+# Branch 1: Energy Generation (🔧)
 
-## Branch 2: Computer (�)
-The user discovers grandpa's old PC in the attic. This branch focuses on turning energy into raw data.
+> *"Without energy, nothing can function. Every great invention needs a power source."*
 
-### Tier 1:
-- **Grandpa's old PC** - An old computer left behind by your grandfather. Let's boot it up and see what it can do!
+The energy branch focuses on harnessing various power sources to drive your network. Each upgrade increases your capacity to generate and manage energy more efficiently.
+
+## Tier 1: The Hand Crank
+
+**Hand Crank (🔧)** - You find a simple hand crank. Why not give it a turn, whats the worst that could happen?
+- *Narration:* "When you turn the crank, you hear a faint humming sound..."
+- **Effect:** +1 Energy per click
+- **Role:** The foundation of your energy generation. Manual, but reliable.
+
+## Tier 2: Optimizations & Alternatives
+
+This tier focuses on improving your energy output through mechanical optimization and discovering alternative sources.
+
+**Lubricant (🧴)** - The crank is a bit stiff, maybe some oil would help it turn more smoothly?
+- **Requirement:** Hand Crank
+- **Cost:** 5 Energy
+- **Effect:** +1 Energy per click (smoother operation)
+- **Role:** Mechanical optimization. Sometimes small improvements compound.
+
+**Hamster Wheel (🐹)** - My hamster loves running in this thing, and it generates energy too!
+- **Requirement:** Hand Crank
+- **Cost:** 5 Energy
+- **Effect:** +0.5 Energy/second (passive automation)
+- **Role:** Your first automated system. Set it and forget it.
+
+**Lightbulb (💡)** - Let there be light!
+- **Requirements:** Both Lubricant AND Hamster Wheel
+- **Cost:** 25 Energy
+- **Effect:** Illuminates the shed, revealing new possibilities
+- *Narration:* "When you turn on the light, the room is illuminated. The shed is empty, but there's an attic hatch above you that wasn't visible before."
+- **Role:** A crucial milestone. Visibility leads to discovery.
+
+## Tier 2+: The Discovery
+
+**Explore Attic (📦)** - Since we have light now, why not search grandpa's attic for cool stuff?
+- **Requirement:** Lightbulb
+- **Cost:** 5 Energy
+- **Effect:** Unlocks the Computer branch
+- *Narration:* "You found an old computer up in the attic! Lets see if it still works..."
+- **Role:** The gateway to the next phase of your journey.
+
+---
+
+# Branch 2: Computing (💻)
+
+> *"Energy is power, but data is knowledge. Knowledge is everything."*
+
+Your grandfather's old computer awaits. This branch transforms raw energy into computational power, allowing you to process and manage information at scale.
+
+## Tier 1: Boot Up
+
+**Grandpa's Old PC (💻)** - An old computer left behind by your grandfather. Let's boot it up and see what it can do!
+- **Requirement:** Explore Attic
+- **Cost:** 15 Energy
+- **Role:** The foundation of your computational network. Old hardware, but it has potential.
+
+---
+
+## Design Philosophy: Progression & Story
+
+Each branch represents a technological focus area. As you progress:
+
+1. **Early tiers** establish basic capabilities and introduce key mechanics
+2. **Mid tiers** introduce optimization, passive systems, and resource management
+3. **Late tiers** unlock new branches and exponentially expand your reach
+
+The network grows through discovery and optimization. What seemed impossible at the start becomes routine with the right investments. Every unlock tells a part of your grandfather's legacy—tools he left behind, systems waiting to be rediscovered, a path from manual labor to automated computational power.
