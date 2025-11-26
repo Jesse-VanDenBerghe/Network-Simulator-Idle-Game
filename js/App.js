@@ -91,6 +91,7 @@ const App = {
             resources: gameState.resources,
             automations: gameState.automations,
             unlockedNodes: gameState.unlockedNodes,
+            unlockedBranches: gameState.unlockedBranches,
             selectedNodeId: gameState.selectedNodeId,
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             notifications: gameLoop.notifications,
@@ -192,6 +193,7 @@ const App = {
                 <SkillTree
                     :nodes="nodes"
                     :unlocked-nodes="unlockedNodes"
+                    :unlocked-branches="unlockedBranches"
                     :selected-node-id="selectedNodeId"
                     :resources="resources"
                     :ascension-count="prestigeState.ascensionCount"

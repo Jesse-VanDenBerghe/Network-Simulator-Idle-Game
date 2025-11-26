@@ -189,6 +189,19 @@ export function useNodeManagement(gameState, prestigeState) {
             gameState.automations[effects.automation.resource] += effects.automation.rate;
         }
 
+        // Unlock branch
+        if (effects.unlockBranch) {
+            gameState.unlockBranch(effects.unlockBranch);
+        }
+
+        // Unlock features (data processing, bandwidth, etc.)
+        if (effects.unlockDataProcessing) {
+            gameState.unlockFeature('dataProcessing');
+        }
+        if (effects.unlockBandwidth) {
+            gameState.unlockFeature('bandwidth');
+        }
+
         // Instant unlock (Zero Day effect)
         if (effects.instantUnlock) {
             const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>

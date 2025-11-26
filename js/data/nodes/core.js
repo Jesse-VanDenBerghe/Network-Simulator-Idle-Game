@@ -1,7 +1,7 @@
 // Tier 0 Nodes - Core
 // ====================
 
-export const tier0Nodes = {
+export const core = {
     core: {
         id: 'core',
         name: 'Core System',

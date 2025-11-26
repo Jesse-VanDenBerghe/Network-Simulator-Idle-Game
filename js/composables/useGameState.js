@@ -3,7 +3,6 @@
 // Manages core game state: resources, automations, unlocked nodes
 
 const { ref, reactive, computed } = Vue;
-import { getUnlockedBranches } from '../utils/branchUtils.js';
 
 export function useGameState() {
     // ==========================================
@@ -28,6 +27,8 @@ export function useGameState() {
     });
 
     const unlockedNodes = ref(new Set(['core']));
+    const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
+    const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, bandwidth, etc.)
     const selectedNodeId = ref(null);
     const lastUnlockedNodeId = ref(null);
 
@@ -35,11 +36,11 @@ export function useGameState() {
     // COMPUTED
     // ==========================================
     const dataUnlocked = computed(() => {
-        return unlockedNodes.value.has('data_processing');
+        return unlockedFeatures.value.has('dataProcessing');
     });
 
     const bandwidthUnlocked = computed(() => {
-        return unlockedNodes.value.has('bandwidth_unlock');
+        return unlockedFeatures.value.has('bandwidth');
     });
 
     const canProcessData = computed(() => {
@@ -63,10 +64,6 @@ export function useGameState() {
         totalData: totalResources.data
     }));
 
-    const unlockedBranches = computed(() => {
-        return getUnlockedBranches(unlockedNodes.value, GameData.nodes);
-    });
-
     // ==========================================
     // METHODS
     // ==========================================
@@ -82,6 +79,24 @@ export function useGameState() {
 
     function resetNodes() {
         unlockedNodes.value = new Set(['core']);
+        unlockedBranches.value = new Set(['energy']);
+        unlockedFeatures.value = new Set();
+    }
+
+    function unlockBranch(branch) {
+        if (!unlockedBranches.value.has(branch)) {
+            const newBranches = new Set(unlockedBranches.value);
+            newBranches.add(branch);
+            unlockedBranches.value = newBranches;
+        }
+    }
+
+    function unlockFeature(feature) {
+        if (!unlockedFeatures.value.has(feature)) {
+            const newFeatures = new Set(unlockedFeatures.value);
+            newFeatures.add(feature);
+            unlockedFeatures.value = newFeatures;
+        }
     }
 
     function setLastUnlockedNode(nodeId) {
@@ -103,6 +118,8 @@ export function useGameState() {
         totalResources,
         automations,
         unlockedNodes,
+        unlockedBranches,
+        unlockedFeatures,
         selectedNodeId,
         lastUnlockedNodeId,
         
@@ -112,12 +129,13 @@ export function useGameState() {
         canProcessData,
         highestTierReached,
         stats,
-        unlockedBranches,
         
         // Methods
         selectNode,
         resetResources,
         resetNodes,
+        unlockBranch,
+        unlockFeature,
         setLastUnlockedNode
     };
 }

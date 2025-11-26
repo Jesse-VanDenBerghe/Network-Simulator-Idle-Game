@@ -7,6 +7,7 @@ const SkillTree = {
     props: {
         nodes: { type: Object, required: true },
         unlockedNodes: { type: Set, required: true },
+        unlockedBranches: { type: Set, required: true },
         selectedNodeId: { type: String, default: null },
         resources: { type: Object, required: true },
         ascensionCount: { type: Number, default: 0 },
@@ -70,8 +71,7 @@ const SkillTree = {
             // (they are the nodes that unlock their branch)
             if (!node.isTierGate) {
                 // Check if the node's branch is unlocked
-                // Access branchUtils from global scope (loaded via gameData.js)
-                if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, this.unlockedNodes, this.nodes)) {
+                if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(node.branch, this.unlockedBranches)) {
                     return false;
                 }
             }

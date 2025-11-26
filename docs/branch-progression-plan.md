@@ -16,8 +16,8 @@ Redesign node progression from tier-based unlocking to branch-based progression 
 
 **Add `branch` property to all nodes:**
 - `null` - Core (Tier 0)
-- `'power'` - Energy generation (⚡)
-- `'processing'` - Data production (📊)
+- `'energy'` - Energy generation (⚡)
+- `'data'` - Data production (📊)
 - `'network'` - Bandwidth/connectivity (📡)
 - `'research'` - Efficiency/multipliers (🔬)
 - `'security'` - Cost reduction (🛡️)
@@ -28,8 +28,7 @@ Redesign node progression from tier-based unlocking to branch-based progression 
 - Boolean flag on nodes that unlock the next branch
 
 **Update `constants.js`:**
-- Add `BRANCH_UNLOCK_ORDER: ['power', 'processing', 'network', 'research', 'security', 'cloud', 'endgame']`
-- Add `BRANCH_UNLOCK_TIER` mapping: which tier each branch becomes available
+- Add `BRANCH_UNLOCK_ORDER: ['energy', 'data', 'network', 'research', 'security', 'cloud', 'endgame']`
 
 ### 2. New Branch Unlocking Logic
 
