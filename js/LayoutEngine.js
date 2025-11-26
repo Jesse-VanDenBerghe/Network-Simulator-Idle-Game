@@ -25,7 +25,7 @@ const LayoutEngine = {
      * @returns {Object} - Nodes with updated x, y positions
      */
     calculateLayout(nodes) {
-        const nodesCopy = JSON.parse(JSON.stringify(nodes));
+        const nodesCopy = structuredClone(nodes);
         
         // Step 1: Build the tree structure
         const tree = this.buildTree(nodesCopy);
