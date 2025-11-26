@@ -281,6 +281,10 @@ export function useNodeManagement(gameState, prestigeState) {
                 }
             }
         }
+
+        if (effects.dataGenAmountBonus) {
+            gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
+        }
     }
 
     /**

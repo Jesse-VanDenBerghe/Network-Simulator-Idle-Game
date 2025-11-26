@@ -831,6 +831,7 @@ body {
     animation-fill-mode: none, forwards;
     animation-timing-function: ease, ease;
     box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
+    max-width: 400px;
 }
 
 .notification.success {
