@@ -86,12 +86,29 @@ export const computerBranch = {
         branch: 'computer',
         description: 'When building your own gaming rig, you always overclocked the CPU for that extra performance boost. Let\'s do it here too!',
         requires: ['command_generate'],
-        cost: { energy: 40, data: 10 },
+        cost: { energy: 40, data: 5 },
         maxLevel: 10,
         costScaling: 1.5,
         effects: {
             dataGenAmountBonus: 1,
-            description: 'Generate +1 additional bit of data per tick'
+            description: 'Generate +1 additional bit of data per tick',
+            narrate: [
+                {
+                    text: 'You carefully adjust the system settings to overclock the CPU. The computer hums louder as it works harder, but data generation speeds up noticeably.',
+                    duration: 8000,
+                    level: 2
+                },
+                {
+                    text: 'The overclocking is really paying off now! The computer is pushing its limits, and data is flowing in at an impressive rate.',
+                    duration: 8000,
+                    level: 5
+                },
+                {
+                    text: 'As you see steam start to rise from the computer, you realize you might have pushed it a bit too far. I guess this is the most this old machine can handle!',
+                    duration: 8000,
+                    level: 10
+                }
+            ]
         }
     },
 };

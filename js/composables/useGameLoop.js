@@ -144,18 +144,35 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Handle node unlock with notification
      */
     function handleUnlockNode(nodeId) {
-        const node = nodeManagement.unlockNode(nodeId);
-        if (node) {
-            showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+        const result = nodeManagement.unlockNode(nodeId);
+        if (result) {
+            const { node, newLevel } = result;
+            const isUpgrade = newLevel > 1;
             
-            // Show narration message if node has one
+            if (isUpgrade) {
+                showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, 'success');
+            } else {
+                showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+            }
+            
+            // Show narration message if node has one and level matches
             if (node.effects.narrate) {
-                const narrate = node.effects.narrate;
-                const text = typeof narrate === 'string' ? narrate : narrate.text;
-                const duration = typeof narrate === 'string' ? 5_000 : (narrate.duration || 10_000);
-                setTimeout(() => {
-                    showNotification(text, 'narration', duration);
-                }, 500);
+                const narrations = Array.isArray(node.effects.narrate) 
+                    ? node.effects.narrate 
+                    : [node.effects.narrate];
+                
+                narrations.forEach(narrate => {
+                    const narrateLevel = typeof narrate === 'object' ? narrate.level : undefined;
+                    const shouldNarrate = narrateLevel === undefined ? !isUpgrade : narrateLevel === newLevel;
+                    
+                    if (shouldNarrate) {
+                        const text = typeof narrate === 'string' ? narrate : narrate.text;
+                        const duration = typeof narrate === 'string' ? 5_000 : (narrate.duration || 10_000);
+                        setTimeout(() => {
+                            showNotification(text, 'narration', duration);
+                        }, 500);
+                    }
+                });
             }
             
             // Trigger unlock animation

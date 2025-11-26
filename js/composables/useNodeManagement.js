@@ -222,8 +222,8 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects
         applyNodeEffects(node, isUpgrade);
 
-        // Return node for caller to handle effects like toast
-        return node;
+        // Return node and new level for caller to handle effects like toast/narration
+        return { node, newLevel: currentLevel + 1 };
     }
 
     /**
