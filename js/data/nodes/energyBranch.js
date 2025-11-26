@@ -105,26 +105,23 @@ export const energyBranch = {
         effects: {
             energyPerClick: 2,
             description: '+2 Energy per crank',
-            narrate: [
-                {
-                    text: 'You put your back into it and crank even harder. You feel the burn in your arms, but the energy output increases noticeably.',
-                    duration: 8000,
-                    level: 1
-                },
-                {
-                    text: 'Sweat drips down your forehead as you crank with all your might. The shed seems to vibrate slightly from the effort, and the energy generation is impressive now.',
-                    duration: 8000,
-                    level: 5
-                },
-                {
-                    text: 'With a final, Herculean effort, you crank the handle as hard as you can. CRA-A-A-A-A-A-CK! With a loud snap, the crank handle breaks off in your hands. Well, at least you gave it your all!',
-                    duration: 8000,
-                    level: 10
-                }
-            ],
+            narrate: {
+                text: 'You put your back into it and crank even harder. You feel the burn in your arms, but the energy output increases noticeably.',
+                duration: 8000
+            },
             levelEffects: {
+                5: {
+                    narrate: {
+                        text: 'Sweat drips down your forehead as you crank with all your might. The shed seems to vibrate slightly from the effort, and the energy generation is impressive now.',
+                        duration: 8000
+                    }
+                },
                 10: {
-                    disableCrank: true
+                    disableCrank: true,
+                    narrate: {
+                        text: 'With a final, Herculean effort, you crank the handle as hard as you can. CRA-A-A-A-A-A-CK! With a loud snap, the crank handle breaks off in your hands. Well, at least you gave it your all!',
+                        duration: 8000
+                    }
                 }
             }
         }
@@ -146,8 +143,7 @@ export const energyBranch = {
             description: '+1 Energy/second per level (passive)',
             narrate: {
                 text: 'You caught the rat! It seems eager to run in the wheel.',
-                duration: 8000,
-                level: 1
+                duration: 8000
             }
         }
     },

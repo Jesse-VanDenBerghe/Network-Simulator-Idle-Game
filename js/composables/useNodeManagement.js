@@ -303,22 +303,65 @@ export function useNodeManagement(gameState, prestigeState) {
             gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
         }
 
-        // Apply level-specific effects
+        // Apply level-specific effects (only triggers at that exact level)
         if (effects.levelEffects && effects.levelEffects[newLevel]) {
-            const levelEffect = effects.levelEffects[newLevel];
-            
-            if (levelEffect.disableCrank) {
-                gameState.crankDisabled.value = true;
+            applyEffectSet(effects.levelEffects[newLevel]);
+        }
+    }
+
+    /**
+     * Apply a set of effects (used for both base effects and levelEffects)
+     */
+    function applyEffectSet(effectSet) {
+        if (effectSet.automation) {
+            gameState.automations[effectSet.automation.resource] += effectSet.automation.rate;
+        }
+
+        if (effectSet.unlockBranch) {
+            gameState.unlockBranch(effectSet.unlockBranch);
+        }
+
+        if (effectSet.unlockDataProcessing) {
+            gameState.unlockFeature('dataProcessing');
+        }
+
+        if (effectSet.unlockDataGeneration) {
+            gameState.dataGeneration.active = true;
+        }
+
+        if (effectSet.dataGenSpeedMultiplier) {
+            gameState.dataGeneration.interval /= effectSet.dataGenSpeedMultiplier;
+        }
+
+        if (effectSet.dataGenAmountBonus) {
+            gameState.dataGeneration.bitsPerTick += effectSet.dataGenAmountBonus;
+        }
+
+        if (effectSet.instantUnlock) {
+            const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
+                !gameState.unlockedNodes.value.has(n.id) &&
+                checkRequirements(n)
+            );
+            if (lockedAvailableNodes.length > 0) {
+                const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
+                const newUnlocked = new Set(gameState.unlockedNodes.value);
+                newUnlocked.add(randomNode.id);
+                gameState.unlockedNodes.value = newUnlocked;
+                applyNodeEffects(randomNode);
             }
-            
-            if (levelEffect.unlockEnergyGeneration) {
-                gameState.energyGeneration.active = true;
-                if (levelEffect.energyGenRate) {
-                    gameState.energyGeneration.energyPerTick = levelEffect.energyGenRate;
-                }
-                if (levelEffect.energyGenInterval) {
-                    gameState.energyGeneration.interval = levelEffect.energyGenInterval;
-                }
+        }
+
+        if (effectSet.disableCrank) {
+            gameState.crankDisabled.value = true;
+        }
+
+        if (effectSet.unlockEnergyGeneration) {
+            gameState.energyGeneration.active = true;
+            if (effectSet.energyGenRate) {
+                gameState.energyGeneration.energyPerTick = effectSet.energyGenRate;
+            }
+            if (effectSet.energyGenInterval) {
+                gameState.energyGeneration.interval = effectSet.energyGenInterval;
             }
         }
     }

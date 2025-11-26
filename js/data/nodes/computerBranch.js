@@ -92,23 +92,26 @@ export const computerBranch = {
         effects: {
             dataGenAmountBonus: 1,
             description: 'Generate +1 additional bit of data per tick',
-            narrate: [
-                {
-                    text: 'You carefully adjust the system settings to overclock the CPU. The computer hums louder as it works harder, but data generation speeds up noticeably.',
-                    duration: 8000,
-                    level: 2
+            levelEffects: {
+                2: {
+                    narrate: {
+                        text: 'You carefully adjust the system settings to overclock the CPU. The computer hums louder as it works harder, but data generation speeds up noticeably.',
+                        duration: 8000
+                    }
                 },
-                {
-                    text: 'The overclocking is really paying off now! The computer is pushing its limits, and data is flowing in at an impressive rate.',
-                    duration: 8000,
-                    level: 5
+                5: {
+                    narrate: {
+                        text: 'The overclocking is really paying off now! The computer is pushing its limits, and data is flowing in at an impressive rate.',
+                        duration: 8000
+                    }
                 },
-                {
-                    text: 'As you see steam start to rise from the computer, you realize you might have pushed it a bit too far. I guess this is the most this old machine can handle!',
-                    duration: 8000,
-                    level: 10
+                10: {
+                    narrate: {
+                        text: 'As you see steam start to rise from the computer, you realize you might have pushed it a bit too far. I guess this is the most this old machine can handle!',
+                        duration: 8000
+                    }
                 }
-            ]
+            }
         }
     },
 };

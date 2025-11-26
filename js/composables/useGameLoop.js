@@ -105,6 +105,19 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     }
 
     /**
+     * Show narration(s) from a narrate effect
+     * Supports string, object with text/duration, or array of either
+     */
+    function showNarration(narrate) {
+        const narrations = Array.isArray(narrate) ? narrate : [narrate];
+        narrations.forEach(n => {
+            const text = typeof n === 'string' ? n : n.text;
+            const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
+            setTimeout(() => showNotification(text, 'narration', duration), 500);
+        });
+    }
+
+    /**
      * Save notification history to localStorage
      */
     function saveNotificationHistory() {
@@ -223,24 +236,14 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
                 showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
             }
             
-            // Show narration message if node has one and level matches
-            if (node.effects.narrate) {
-                const narrations = Array.isArray(node.effects.narrate) 
-                    ? node.effects.narrate 
-                    : [node.effects.narrate];
-                
-                narrations.forEach(narrate => {
-                    const narrateLevel = typeof narrate === 'object' ? narrate.level : undefined;
-                    const shouldNarrate = narrateLevel === undefined ? !isUpgrade : narrateLevel === newLevel;
-                    
-                    if (shouldNarrate) {
-                        const text = typeof narrate === 'string' ? narrate : narrate.text;
-                        const duration = typeof narrate === 'string' ? 5_000 : (narrate.duration || 10_000);
-                        setTimeout(() => {
-                            showNotification(text, 'narration', duration);
-                        }, 500);
-                    }
-                });
+            // Show narration from base effects (on initial unlock only)
+            if (!isUpgrade && node.effects.narrate) {
+                showNarration(node.effects.narrate);
+            }
+            
+            // Show narration from levelEffects
+            if (node.effects.levelEffects?.[newLevel]?.narrate) {
+                showNarration(node.effects.levelEffects[newLevel].narrate);
             }
             
             // Trigger unlock animation
