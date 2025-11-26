@@ -119,6 +119,10 @@ const App = {
             canAffordSelectedNode: nodeManagement.canAffordSelectedNode,
             isTierLocked: nodeManagement.isTierLocked,
             tierGateRequirement: nodeManagement.tierGateRequirement,
+            getNodeLevel: nodeManagement.getNodeLevel,
+            getNodeMaxLevel: nodeManagement.getNodeMaxLevel,
+            canUpgradeNode: nodeManagement.canUpgradeNode,
+            nodeLevels: gameState.nodeLevels,
             
             // Methods
             selectNode: gameState.selectNode,
@@ -194,6 +198,7 @@ const App = {
                     :ascension-count="prestigeState.ascensionCount"
                     :prestige-bonuses="prestigeBonuses"
                     :last-unlocked-node-id="lastUnlockedNodeId"
+                    :node-levels="nodeLevels"
                     @select-node="selectNode"
                 />
 
@@ -208,6 +213,8 @@ const App = {
                     :unlocked-nodes="unlockedNodes"
                     :ascension-count="prestigeState.ascensionCount"
                     :prestige-bonuses="prestigeBonuses"
+                    :node-level="selectedNode ? getNodeLevel(selectedNode.id) : 0"
+                    :can-upgrade="selectedNode ? canUpgradeNode(selectedNode) : false"
                     @unlock="unlockNode"
                 />
             </main>

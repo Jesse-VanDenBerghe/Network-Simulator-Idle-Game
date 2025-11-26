@@ -115,9 +115,11 @@ export const energyBranch = {
         description: 'There\'s a rat running around in here, maybe we can train it to run in the wheel?',
         requires: ['energy_2_3'],
         cost: { energy: 10 },
+        maxLevel: 5,
+        costScaling: 1.5,
         effects: {
             automation: { resource: 'energy', rate: 1 },
-            description: '+1 Energy/second (passive)'
+            description: '+1 Energy/second per level (passive)'
         }
     },
 

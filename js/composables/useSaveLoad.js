@@ -12,6 +12,7 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             totalResources: { ...gameState.totalResources },
             automations: { ...gameState.automations },
             unlockedNodes: Array.from(gameState.unlockedNodes.value),
+            nodeLevels: { ...gameState.nodeLevels },
             unlockedBranches: Array.from(gameState.unlockedBranches.value),
             unlockedFeatures: Array.from(gameState.unlockedFeatures.value),
             dataGeneration: { ...gameState.dataGeneration },
@@ -46,6 +47,9 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             }
             if (data.unlockedNodes) {
                 gameState.unlockedNodes.value = new Set(data.unlockedNodes);
+            }
+            if (data.nodeLevels) {
+                Object.assign(gameState.nodeLevels, data.nodeLevels);
             }
             if (data.unlockedBranches) {
                 gameState.unlockedBranches.value = new Set(data.unlockedBranches);

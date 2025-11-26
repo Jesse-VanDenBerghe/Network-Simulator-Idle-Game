@@ -573,6 +573,27 @@ body {
     color: var(--text-primary);
 }
 
+/* Node Level Indicator */
+.node-level {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.55rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--text-secondary);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.node.unlocked .node-level {
+    color: var(--energy-color);
+}
+
+.node.max-level .node-level {
+    color: gold;
+}
+
 /* Progress Ring */
 .progress-ring {
     position: absolute;

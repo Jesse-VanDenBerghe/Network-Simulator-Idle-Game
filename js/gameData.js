@@ -49,8 +49,8 @@ const GameData = {
         return scaled.toFixed(decimals) + suffixes[tier];
     },
     
-    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
-        return getScaledNodeCostUtil(node, ascensionCount, prestigeBonuses);
+    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0) {
+        return getScaledNodeCostUtil(node, ascensionCount, prestigeBonuses, currentLevel);
     },
     
     countUnlockedInTier(tier, unlockedNodeIds) {

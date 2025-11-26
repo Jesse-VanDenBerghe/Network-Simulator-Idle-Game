@@ -24,6 +24,7 @@ export function useGameState() {
     });
 
     const unlockedNodes = ref(new Set(['core']));
+    const nodeLevels = reactive({}); // Track levels for each node (0=locked, 1+=unlocked)
     const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
     const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, etc.)
     const selectedNodeId = ref(null);
@@ -80,6 +81,8 @@ export function useGameState() {
 
     function resetNodes() {
         unlockedNodes.value = new Set(['core']);
+        // Reset node levels
+        Object.keys(nodeLevels).forEach(k => delete nodeLevels[k]);
         unlockedBranches.value = new Set(['energy']);
         unlockedFeatures.value = new Set();
         // Reset data generation
@@ -125,6 +128,7 @@ export function useGameState() {
         totalResources,
         automations,
         unlockedNodes,
+        nodeLevels,
         unlockedBranches,
         unlockedFeatures,
         selectedNodeId,

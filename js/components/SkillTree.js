@@ -12,7 +12,8 @@ const SkillTree = {
         resources: { type: Object, required: true },
         ascensionCount: { type: Number, default: 0 },
         prestigeBonuses: { type: Object, default: null },
-        lastUnlockedNodeId: { type: String, default: null }
+        lastUnlockedNodeId: { type: String, default: null },
+        nodeLevels: { type: Object, default: () => ({}) }
     },
     emits: ['select-node'],
     data() {
@@ -398,6 +399,7 @@ const SkillTree = {
                         :is-selected="selectedNodeId === node.id"
                         :just-unlocked="justUnlockedNodeId === node.id"
                         :progress-percent="getNodeProgressPercent(node.id)"
+                        :node-level="nodeLevels[node.id] || 0"
                         @select="selectNode"
                     />
                 </div>
