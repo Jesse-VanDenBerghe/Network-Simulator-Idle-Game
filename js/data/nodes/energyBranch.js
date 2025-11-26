@@ -1,20 +1,20 @@
 // Energy branch
-// Focusses on energy generation and management.
+// Focuses on energy generation
 // ====================
 
 export const energyBranch = {
     // == Tier 1 Nodes ==
     energy_unlock: {
         id: 'energy_unlock',
-        name: 'Energy!',
+        name: 'Hand crank',
         icon: '⚡',
         tier: 1,
         branch: 'energy',
         x: 0,
         y: 0,
-        description: 'Increases manual energy generation.',
+        description: 'You find a simple hand crank. Why not give it a turn, whats the worst that could happen?.....',
         requires: ['core'],
-        cost: { energy: 10 },
+        cost: { energy: 0 },
         effects: {
             energyPerClick: 1,
             description: '+1 Energy per click'
@@ -24,35 +24,34 @@ export const energyBranch = {
     // == Tier 2 Nodes ==
     energy_2_1: {
         id: 'energy_2_1',
-        name: 'Power outlet',
+        name: 'Oil',
         icon: '⚡',
         tier: 2,
         branch: 'energy',
         x: 0,
         y: 0,
-        description: 'Basic energy generator. Produces energy automatically.',
+        description: 'The crank is a bit stiff, maybe some oil would help it turn more smoothly?',
         requires: ['energy_unlock'],
         cost: { energy: 5 },
         effects: {
-            automation: { resource: 'energy', rate: 1 },
-            description: '+1 Energy/second (passive)'
+            energyPerClick: 1,
+            description: '+1 Energy per click'
         }
     },
 
     energy_2_2: {
         id: 'energy_2_2',
-        name: 'Data??',
-        icon: '❓',
+        name: 'Lightbulb',
+        icon: '💡',
         tier: 2,
         branch: 'energy',
         x: 0,
         y: 0,
-        description: 'What to do with all this energy?',
-        requires: ['energy_unlock'],
+        description: 'Let there be light!',
+        requires: ['energy_2_1', 'energy_2_3'],
         cost: { energy: 25 },
         effects: {
-            unlockBranch: 'data',
-            description: 'Unlock the Data branch'
+            description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.'
         }
     },
 
@@ -64,13 +63,31 @@ export const energyBranch = {
         branch: 'energy',
         x: 0,
         y: 0,
-        description: 'Harness the power of the sun.',
+        description: ' My hamster loves running in this thing, and it generates energy too!',
         requires: ['energy_unlock'],
         cost: { energy: 5},
         effects: {
             automation: { resource: 'energy', rate: 0.5 },
             description: '+0.5 Energy/second (passive)'
         }
-    }
+    },
 
+    // == Tier 3 Nodes ==
+    
+    energy_3_1: {
+        id: 'energy_3_1',
+        name: 'Explore Attic',
+        icon: '📦',
+        tier: 3,
+        branch: 'energy',
+        x: 0,
+        y: 0,
+        description: 'Since we have light now, why not search grandpa\'s attic for cool stuff?',
+        requires: ['energy_2_2'],
+        cost: { energy: 5 },
+        effects: {
+            unlockBranch: 'computer',
+            description: 'You found an old computer up in the attic! Lets see if it still works...'
+        }
+    },
 };

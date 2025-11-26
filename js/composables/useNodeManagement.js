@@ -45,8 +45,7 @@ export function useNodeManagement(gameState, prestigeState) {
         const bonuses = prestigeState.prestigeBonuses.value;
         return {
             energy: gameState.automations.energy * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier,
-            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier,
-            bandwidth: gameState.automations.bandwidth * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier
+            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier
         };
     });
 
@@ -194,12 +193,9 @@ export function useNodeManagement(gameState, prestigeState) {
             gameState.unlockBranch(effects.unlockBranch);
         }
 
-        // Unlock features (data processing, bandwidth, etc.)
+        // Unlock features (data processing, etc.)
         if (effects.unlockDataProcessing) {
             gameState.unlockFeature('dataProcessing');
-        }
-        if (effects.unlockBandwidth) {
-            gameState.unlockFeature('bandwidth');
         }
 
         // Instant unlock (Zero Day effect)

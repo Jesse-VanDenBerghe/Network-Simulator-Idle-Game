@@ -16,11 +16,5 @@ export const RESOURCES = {
         name: 'Data',
         icon: '📊',
         color: '#00aaff'
-    },
-    bandwidth: {
-        id: 'bandwidth',
-        name: 'Bandwidth',
-        icon: '📡',
-        color: '#ff00aa'
     }
 };

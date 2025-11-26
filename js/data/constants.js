@@ -6,13 +6,7 @@
  */
 export const BRANCH_UNLOCK_ORDER = [
     'energy',
-    'data',
-    'processing', 
-    'network',
-    'research',
-    'security',
-    'cloud',
-    'endgame'
+    'computer'
 ];
 
 /**

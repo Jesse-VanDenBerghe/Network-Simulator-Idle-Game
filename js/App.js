@@ -105,7 +105,6 @@ const App = {
             computedValues: nodeManagement.computedValues,
             resourceRates: nodeManagement.resourceRates,
             dataUnlocked: gameState.dataUnlocked,
-            bandwidthUnlocked: gameState.bandwidthUnlocked,
             canProcessData: gameState.canProcessData,
             dataPerClickDisplay: nodeManagement.dataPerClickDisplay,
             highestTierReached: gameState.highestTierReached,
@@ -163,13 +162,7 @@ const App = {
                         name="Data"
                         :amount="resources.data"
                         :rate="resourceRates.data"
-                    />
-                    <ResourceBar
-                        icon="📡"
-                        name="Bandwidth"
-                        :amount="resources.bandwidth"
-                        :rate="resourceRates.bandwidth"
-                        :visible="bandwidthUnlocked"
+                        :visible="dataUnlocked"
                     />
                 </div>
             </header>

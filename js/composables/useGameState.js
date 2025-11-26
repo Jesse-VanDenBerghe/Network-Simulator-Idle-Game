@@ -10,25 +10,22 @@ export function useGameState() {
     // ==========================================
     const resources = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const totalResources = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const automations = reactive({
         energy: 0,
-        data: 0,
-        bandwidth: 0
+        data: 0
     });
 
     const unlockedNodes = ref(new Set(['core']));
     const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
-    const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, bandwidth, etc.)
+    const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, etc.)
     const selectedNodeId = ref(null);
     const lastUnlockedNodeId = ref(null);
 
@@ -37,10 +34,6 @@ export function useGameState() {
     // ==========================================
     const dataUnlocked = computed(() => {
         return unlockedFeatures.value.has('dataProcessing');
-    });
-
-    const bandwidthUnlocked = computed(() => {
-        return unlockedFeatures.value.has('bandwidth');
     });
 
     const canProcessData = computed(() => {
@@ -125,7 +118,6 @@ export function useGameState() {
         
         // Computed
         dataUnlocked,
-        bandwidthUnlocked,
         canProcessData,
         highestTierReached,
         stats,

@@ -60,7 +60,6 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
                 const rates = nodeManagement.resourceRates.value;
                 gameState.resources.energy += rates.energy * offlineTime;
                 gameState.resources.data += rates.data * offlineTime;
-                gameState.resources.bandwidth += rates.bandwidth * offlineTime;
 
                 if (offlineTime > 60) {
                     return 'Welcome back! Earned resources while away.';
