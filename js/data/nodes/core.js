@@ -8,8 +8,6 @@ export const core = {
         icon: '🏠',
         tier: 0,
         branch: null,
-        x: 1400,
-        y: 1200,
         description: 'You just inherited this old shed from your grandfather. It looks abandoned, but maybe there\'s something useful inside?',
         requires: [],
         cost: {},

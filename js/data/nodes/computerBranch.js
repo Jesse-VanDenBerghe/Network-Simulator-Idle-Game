@@ -11,8 +11,6 @@ export const computerBranch = {
         icon: '💻',
         tier: 1,
         branch: 'computer',
-        x: 0,
-        y: 0,
         description: 'An old computer left behind by your grandfather. Let\'s boot it up and see what it can do!',
         requires: ['core'],
         cost: { energy: 15 },
