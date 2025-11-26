@@ -9,11 +9,10 @@
 
 ### 🔴 Critical Issues (MUST FIX for 1000 nodes)
 
-**M1: Animation Frame Memory Leak**
+**~~M1: Animation Frame Memory Leak~~** ✅ **FIXED**
 ```
-In SkillTree.js, add beforeUnmount() lifecycle hook to call cancelAnimationFrame() 
-on this.glowAnimationFrame and this.dotAnimationFrame, and clearInterval() on 
-this.dotInterval. Store IDs properly and clean up all animation timers.
+✅ COMPLETED - beforeUnmount() lifecycle hook exists at line 339 in SkillTree.js.
+Properly cancels glowAnimationFrame, dotAnimationFrame, and clears dotInterval.
 ```
 
 **M2: Inefficient JSON Deep Clone**
@@ -220,14 +219,14 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 
 ```
 🔴 Critical Issues: 0 (blocking bugs)
-🟠 Major Issues: 3 (performance at scale)
+🟠 Major Issues: 2 (performance at scale)
 🟡 Minor Issues: 9 (quality/robustness)
 🔴 Clean Code Violations: 15 (architecture/maintainability)
 ✅ Positive Notes: 8
 ```
 
 **Breakdown by Category:**
-- Performance (scale): M1, M2, M3
+- Performance (scale): ~~M1~~, M2, M3
 - Robustness: m1-m4, m8
 - Code Quality: m5-m7, m9
 - Clean Code/Architecture: C1-C15
@@ -241,41 +240,12 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 
 ### 🟠 MAJOR ISSUES
 
-#### **M1: Memory Leak - Animation Frames Not Cleaned**
-**Location:** `js/components/SkillTree.js`, lines 150, 205  
+#### **~~M1: Memory Leak - Animation Frames Not Cleaned~~** ✅ **FIXED**
+**Location:** `js/components/SkillTree.js`, line 339  
 **Category:** Performance / Resource Management  
 **Severity:** Major  
 
-**Issue:**
-```javascript
-// ❌ BAD - Animation frames stored but not cleared
-this.glowAnimationFrame = requestAnimationFrame(animate);
-this.dotAnimationFrame = requestAnimationFrame(animate);
-this.dotInterval = setInterval(() => { ... }, 3000);
-```
-
-Animation frames and intervals stored but `beforeUnmount()` lifecycle hook missing. Frames continue after component destruction.
-
-**Impact:**
-- Memory leak accumulates over long sessions
-- CPU waste on destroyed components
-- Performance degrades over time
-
-**Fix:**
-```javascript
-// ✅ GOOD - Add cleanup
-beforeUnmount() {
-    if (this.glowAnimationFrame) {
-        cancelAnimationFrame(this.glowAnimationFrame);
-    }
-    if (this.dotAnimationFrame) {
-        cancelAnimationFrame(this.dotAnimationFrame);
-    }
-    if (this.dotInterval) {
-        clearInterval(this.dotInterval);
-    }
-}
-```
+**Status:** ✅ **RESOLVED** - `beforeUnmount()` lifecycle hook properly implemented with cleanup for all animation frames and intervals.
 
 ---
 
@@ -1242,8 +1212,8 @@ computed: {
 - ⚠️ Major issues are performance at scale, not bugs
 - ⚠️ Current 70-node game fully functional
 
-**Before Merge (15 min):**
-1. Fix animation frame cleanup (M1)
+**Before Merge (5 min):**
+1. ~~Fix animation frame cleanup (M1)~~ ✅ Done
 2. Remove debug console.logs (m1)
 
 **Before Adding More Nodes (8 hours):**
@@ -1276,7 +1246,7 @@ computed: {
 ### 🔥 Do Immediately (Before 1000 nodes)
 1. M2: structuredClone (10 min) - **40x faster**
 2. M3: Spatial partitioning (2 hours) - **100x fewer checks**
-3. M1: Animation cleanup (15 min) - **Prevents memory leak**
+3. ~~M1: Animation cleanup (15 min)~~ ✅ Done
 4. Virtual rendering (4 hours) - **10-20x render improvement**
 
 ### 🔨 Do Soon (Quality + Clean Code)
