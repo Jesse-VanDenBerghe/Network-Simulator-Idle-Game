@@ -21,9 +21,9 @@ export const TIER_COST_MULTIPLIERS = {
  * Meaning: Need Y nodes from tier X unlocked to access this tier
  */
 export const TIER_GATES = {
-    3: { requiredTier: 2, requiredCount: 3 },
-    4: { requiredTier: 3, requiredCount: 6 },
-    5: { requiredTier: 4, requiredCount: 10 },
-    6: { requiredTier: 5, requiredCount: 15 },
-    7: { requiredTier: 6, requiredCount: 20 }
+    3: { requiredTier: 2, requiredCount: 0 },
+    4: { requiredTier: 3, requiredCount: 0 },
+    5: { requiredTier: 4, requiredCount: 0 },
+    6: { requiredTier: 5, requiredCount: 0 },
+    7: { requiredTier: 6, requiredCount: 0 }
 };
