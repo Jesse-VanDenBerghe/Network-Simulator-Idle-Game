@@ -349,14 +349,15 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
     }
 
     /**
-     * Apply a set of effects (used for both base effects and levelEffects)
+     * Apply a set of effects using all effect handlers
+     * @param {Object} effectSet - The effect set object containing effect properties
      */
     function applyEffectSet(effectSet) {
         Object.values(EffectRegistry).forEach(handler => handler(effectSet));
     }
 
     /**
-     * Apply starting bonuses from prestige upgrades
+     * Apply starting bonuses from prestige upgrades (called on new game/ascension)
      */
     function applyStartingBonuses() {
         const bonuses = prestigeState.getAccumulatedBonuses();
