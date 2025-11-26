@@ -29,7 +29,11 @@ const InfoPanel = {
         },
         costEntries() {
             if (!this.node || !this.node.cost) return [];
-            const scaledCost = GameData.getScaledNodeCost(this.node, this.ascensionCount, this.prestigeBonuses, this.nodeLevel);
+            const scaledCost = GameData.getScaledNodeCost(this.node, {
+                ascensionCount: this.ascensionCount,
+                prestigeBonuses: this.prestigeBonuses,
+                currentLevel: this.nodeLevel
+            });
             return Object.entries(scaledCost).map(([resource, amount]) => ({
                 resource,
                 resourceName: resource.charAt(0).toUpperCase() + resource.slice(1),

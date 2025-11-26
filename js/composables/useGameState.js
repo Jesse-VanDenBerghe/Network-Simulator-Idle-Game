@@ -45,17 +45,17 @@ export function useGameState() {
         energyPerTick: 1
     });
 
-    const crankDisabled = ref(false);
+    const isCrankDisabled = ref(false);
 
     // ==========================================
     // COMPUTED
     // ==========================================
-    const dataUnlocked = computed(() => {
+    const isDataUnlocked = computed(() => {
         return unlockedFeatures.value.has('dataProcessing');
     });
 
     const canProcessData = computed(() => {
-        return dataUnlocked.value && resources.energy >= 5;
+        return isDataUnlocked.value && resources.energy >= 5;
     });
 
     const highestTierReached = computed(() => {
@@ -78,16 +78,27 @@ export function useGameState() {
     // ==========================================
     // METHODS
     // ==========================================
+    
+    /**
+     * Select a node for viewing in the info panel
+     * @param {string|null} nodeId - The node ID to select, or null to deselect
+     */
     function selectNode(nodeId) {
         selectedNodeId.value = nodeId;
     }
 
+    /**
+     * Reset all resources and automations to zero
+     */
     function resetResources() {
         Object.keys(resources).forEach(k => resources[k] = 0);
         Object.keys(totalResources).forEach(k => totalResources[k] = 0);
         Object.keys(automations).forEach(k => automations[k] = 0);
     }
 
+    /**
+     * Reset all node-related state to initial values (for ascension)
+     */
     function resetNodes() {
         unlockedNodes.value = new Set(['old_shed']);
         // Reset node levels
@@ -105,9 +116,13 @@ export function useGameState() {
         energyGeneration.progress = 0;
         energyGeneration.interval = 1000;
         energyGeneration.energyPerTick = 1;
-        crankDisabled.value = false;
+        isCrankDisabled.value = false;
     }
 
+    /**
+     * Unlock a branch for node visibility
+     * @param {string} branch - The branch name to unlock
+     */
     function unlockBranch(branch) {
         if (!unlockedBranches.value.has(branch)) {
             const newBranches = new Set(unlockedBranches.value);
@@ -116,6 +131,10 @@ export function useGameState() {
         }
     }
 
+    /**
+     * Unlock a game feature (e.g., 'dataProcessing')
+     * @param {string} feature - The feature name to unlock
+     */
     function unlockFeature(feature) {
         if (!unlockedFeatures.value.has(feature)) {
             const newFeatures = new Set(unlockedFeatures.value);
@@ -124,6 +143,10 @@ export function useGameState() {
         }
     }
 
+    /**
+     * Set the last unlocked node for animation purposes
+     * @param {string} nodeId - The node ID that was just unlocked
+     */
     function setLastUnlockedNode(nodeId) {
         lastUnlockedNodeId.value = nodeId;
         // Clear after animation completes
@@ -150,10 +173,10 @@ export function useGameState() {
         lastUnlockedNodeId,
         dataGeneration,
         energyGeneration,
-        crankDisabled,
+        isCrankDisabled,
         
         // Computed
-        dataUnlocked,
+        isDataUnlocked,
         canProcessData,
         highestTierReached,
         stats,

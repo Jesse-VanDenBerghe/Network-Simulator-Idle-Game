@@ -10,6 +10,7 @@ import { usePrestigeState } from './composables/usePrestigeState.js';
 import { useNodeManagement } from './composables/useNodeManagement.js';
 import { useSaveLoad } from './composables/useSaveLoad.js';
 import { useGameLoop } from './composables/useGameLoop.js';
+import { useEventBus } from './composables/useEventBus.js';
 
 const App = {
     name: 'App',
@@ -25,13 +26,20 @@ const App = {
     },
     setup() {
         // ==========================================
-        // COMPOSABLES
+        // EVENT BUS (for composable communication)
+        // ==========================================
+        const eventBus = useEventBus();
+
+        // ==========================================
+        // COMPOSABLES (decoupled via event bus)
         // ==========================================
         const gameState = useGameState();
         const prestigeState = usePrestigeState();
-        const nodeManagement = useNodeManagement(gameState, prestigeState);
-        const saveLoad = useSaveLoad(gameState, prestigeState, nodeManagement);
-        const gameLoop = useGameLoop(gameState, prestigeState, nodeManagement, saveLoad);
+        
+        // These composables communicate via eventBus instead of direct dependencies
+        const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus, GameData.nodes);
+        const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
+        const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
 
         // ==========================================
         // COMPUTED (for ascension)
@@ -97,7 +105,7 @@ const App = {
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             dataGeneration: gameState.dataGeneration,
             energyGeneration: gameState.energyGeneration,
-            crankDisabled: gameState.crankDisabled,
+            isCrankDisabled: gameState.isCrankDisabled,
             notifications: gameLoop.notifications,
             notificationHistory: gameLoop.notificationHistory,
             showNotificationHistory: gameLoop.showNotificationHistory,
@@ -111,7 +119,7 @@ const App = {
             // Computed Values
             computedValues: nodeManagement.computedValues,
             resourceRates: nodeManagement.resourceRates,
-            dataUnlocked: gameState.dataUnlocked,
+            isDataUnlocked: gameState.isDataUnlocked,
             canProcessData: gameState.canProcessData,
             dataPerClickDisplay: nodeManagement.dataPerClickDisplay,
             highestTierReached: gameState.highestTierReached,
@@ -176,25 +184,16 @@ const App = {
                         name="B"
                         :amount="resources.data"
                         :rate="resourceRates.data"
-                        :visible="dataUnlocked"
+                        :visible="isDataUnlocked"
                     />
                 </div>
             </header>
 
             <main id="main-content">
                 <Sidebar
-                    :energy-per-click="computedValues.energyPerClick"
-                    :data-per-click="dataPerClickDisplay"
-                    :data-unlocked="dataUnlocked"
-                    :can-process-data="canProcessData"
-                    :data-generation="dataGeneration"
-                    :energy-generation="energyGeneration"
-                    :crank-disabled="crankDisabled"
-                    :automations="automations"
-                    :effective-rates="resourceRates"
-                    :stats="stats"
-                    :cores-earned="coresEarned"
-                    :highest-tier-reached="highestTierReached"
+                    :resource-stats="{ energyPerClick: computedValues.energyPerClick, dataPerClick: dataPerClickDisplay, stats: stats }"
+                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, isCrankDisabled: isCrankDisabled }"
+                    :game-stats="{ automations: automations, effectiveRates: resourceRates, coresEarned: coresEarned, highestTierReached: highestTierReached, isDataUnlocked: isDataUnlocked, canProcessData: canProcessData }"
                     @generate-energy="generateEnergy"
                     @process-data="processData"
                     @ascend="ascend"

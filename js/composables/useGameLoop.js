@@ -1,12 +1,14 @@
 // useGameLoop Composable
 // =======================
 // Manages game loop, notifications, and ascension logic
+// Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType } from '../data/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
-export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) {
+export function useGameLoop(gameState, prestigeState, eventBus) {
     // ==========================================
     // STATE
     // ==========================================
@@ -19,6 +21,9 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     let gameLoopInterval = null;
     let saveInterval = null;
     let prestigeSaveInterval = null;
+    
+    // Cached resource rates (updated via events)
+    let cachedResourceRates = { energy: 0, data: 0, bandwidth: 0 };
 
     // ==========================================
     // METHODS
@@ -32,15 +37,15 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         const delta = (now - lastUpdate.value) / 1000;
         lastUpdate.value = now;
 
-        // Apply automation rates
-        const rates = nodeManagement.resourceRates.value;
+        // Apply automation rates (from cached event data)
+        const rates = cachedResourceRates;
         gameState.resources.energy += rates.energy * delta;
         gameState.resources.data += rates.data * delta;
-        gameState.resources.bandwidth += rates.bandwidth * delta;
+        gameState.resources.bandwidth += (rates.bandwidth || 0) * delta;
 
         gameState.totalResources.energy += rates.energy * delta;
         gameState.totalResources.data += rates.data * delta;
-        gameState.totalResources.bandwidth += rates.bandwidth * delta;
+        gameState.totalResources.bandwidth += (rates.bandwidth || 0) * delta;
 
         // Process auto data generation
         processDataGeneration(delta);
@@ -100,7 +105,10 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         saveNotificationHistory();
         
         setTimeout(() => {
-            notifications.value = notifications.value.filter(n => n.id !== id);
+            const index = notifications.value.findIndex(n => n.id === id);
+            if (index !== -1) {
+                notifications.value.splice(index, 1);
+            }
         }, duration);
     }
 
@@ -113,7 +121,7 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         narrations.forEach(n => {
             const text = typeof n === 'string' ? n : n.text;
             const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
-            setTimeout(() => showNotification(text, 'narration', duration), 500);
+            setTimeout(() => showNotification(text, NotificationType.NARRATION, duration), 500);
         });
     }
 
@@ -123,7 +131,13 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     function saveNotificationHistory() {
         try {
             localStorage.setItem(NOTIFICATION_HISTORY_KEY, JSON.stringify(notificationHistory.value));
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('Storage quota exceeded - notification history not saved');
+            } else {
+                console.error('Failed to save notification history:', e);
+            }
+        }
     }
 
     /**
@@ -135,7 +149,11 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
             if (saved) {
                 notificationHistory.value = JSON.parse(saved);
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+            console.error('Failed to load notification history:', e);
+            // Clear corrupted data
+            notificationHistory.value = [];
+        }
     }
 
     /**
@@ -163,7 +181,7 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         );
         
         if (cores < 1) {
-            showNotification('Need at least 1 Quantum Core to ascend!', 'error');
+            showNotification('Need at least 1 Quantum Core to ascend!', NotificationType.ERROR);
             return;
         }
         
@@ -184,10 +202,10 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         // Reset game state
         resetGameState();
         
-        // Save prestige
-        saveLoad.savePrestige();
+        // Request prestige save via event
+        eventBus.emit('requestSavePrestige');
         
-        showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, 'prestige');
+        showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, NotificationType.SUCCESS);
     }
 
     /**
@@ -203,8 +221,8 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         // Reset run timer
         prestigeState.resetRunTimer();
         
-        // Apply starting bonuses from upgrades
-        nodeManagement.applyStartingBonuses();
+        // Request starting bonuses via event
+        eventBus.emit('requestStartingBonuses');
     }
 
     /**
@@ -214,8 +232,8 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         const success = prestigeState.purchaseUpgrade(upgradeId);
         if (success) {
             const upgrade = PrestigeData.upgrades[upgradeId];
-            showNotification(`✨ ${upgrade.name} purchased!`, 'success');
-            saveLoad.savePrestige();
+            showNotification(`✨ ${upgrade.name} purchased!`, NotificationType.SUCCESS);
+            eventBus.emit('requestSavePrestige');
             return true;
         }
         return false;
@@ -225,42 +243,47 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Handle node unlock with notification
      */
     function handleUnlockNode(nodeId) {
-        const result = nodeManagement.unlockNode(nodeId);
-        if (result) {
-            const { node, newLevel } = result;
-            const isUpgrade = newLevel > 1;
-            
-            if (isUpgrade) {
-                showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, 'success');
-            } else {
-                showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
-            }
-            
-            // Show narration from base effects (on initial unlock only)
-            if (!isUpgrade && node.effects.narrate) {
-                showNarration(node.effects.narrate);
-            }
-            
-            // Show narration from levelEffects
-            if (node.effects.levelEffects?.[newLevel]?.narrate) {
-                showNarration(node.effects.levelEffects[newLevel].narrate);
-            }
-            
-            // Trigger unlock animation
-            gameState.setLastUnlockedNode(nodeId);
-            saveLoad.saveGame();
-            return true;
+        // Request unlock via event, response comes back via nodeUnlocked event
+        eventBus.emit('requestUnlockNode', { nodeId });
+    }
+    
+    /**
+     * Handle nodeUnlocked event from nodeManagement
+     */
+    function onNodeUnlocked({ node, newLevel, isUpgrade, rates }) {
+        // Update cached rates
+        cachedResourceRates = rates;
+        
+        if (isUpgrade) {
+            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.SUCCESS);
+        } else {
+            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.SUCCESS);
         }
-        return false;
+        
+        // Show narration from base effects (on initial unlock only)
+        if (!isUpgrade && node.effects.narrate) {
+            showNarration(node.effects.narrate);
+        }
+        
+        // Show narration from levelEffects
+        if (node.effects.levelEffects?.[newLevel]?.narrate) {
+            showNarration(node.effects.levelEffects[newLevel].narrate);
+        }
+        
+        // Trigger unlock animation
+        gameState.setLastUnlockedNode(node.id);
+        
+        // Request save via event
+        eventBus.emit('requestSaveGame');
     }
 
     /**
      * Start game intervals
      */
     function startIntervals() {
-        gameLoopInterval = setInterval(gameLoop, 100);
-        saveInterval = setInterval(saveLoad.saveGame, 30000);
-        prestigeSaveInterval = setInterval(saveLoad.savePrestige, 30000);
+        gameLoopInterval = setInterval(gameLoop, GAME_LOOP_INTERVAL_MS);
+        saveInterval = setInterval(() => eventBus.emit('requestSaveGame'), AUTOSAVE_INTERVAL_MS);
+        prestigeSaveInterval = setInterval(() => eventBus.emit('requestSavePrestige'), AUTOSAVE_INTERVAL_MS);
     }
 
     /**
@@ -277,11 +300,26 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      */
     function initialize() {
         loadNotificationHistory();
-        saveLoad.loadPrestige();
-        const offlineMessage = saveLoad.loadGame();
-        if (offlineMessage) {
-            showNotification(offlineMessage, 'info');
-        }
+        
+        // Subscribe to events from other composables
+        eventBus.on('nodeUnlocked', onNodeUnlocked);
+        eventBus.on('resourceRatesChanged', (rates) => {
+            cachedResourceRates = rates;
+        });
+        eventBus.on('offlineProgressCalculated', (message) => {
+            if (message) {
+                showNotification(message, NotificationType.INFO);
+            }
+        });
+        eventBus.on('gameLoaded', () => {
+            // Game state has been restored, request current rates
+            eventBus.emit('requestResourceRates');
+        });
+        
+        // Request initial load
+        eventBus.emit('requestLoadPrestige');
+        eventBus.emit('requestLoadGame');
+        
         startIntervals();
     }
 

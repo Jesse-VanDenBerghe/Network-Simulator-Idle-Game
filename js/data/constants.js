@@ -29,3 +29,17 @@ export const COST_SHIFT_FOR_RESOURCE = {
     data: 2,
     bandwidth: -4
 }
+
+/**
+ * Timing constants for game loop and saves
+ */
+export const GAME_LOOP_INTERVAL_MS = 100;       // 10 ticks per second
+export const AUTOSAVE_INTERVAL_MS = 30_000;     // Save every 30 seconds
+export const MAX_OFFLINE_TIME_S = 86_400;       // 24 hours max offline progress
+
+export const NotificationType = Object.freeze({
+    INFO: 'info',
+    ERROR: 'error',
+    SUCCESS: 'success',
+    NARRATION: 'narration'
+});
