@@ -7,7 +7,7 @@
 
 ## 🎯 Quick Fix Prompts
 
-### Critical Issues (MUST FIX for 1000 nodes)
+### 🔴 Critical Issues (MUST FIX for 1000 nodes)
 
 **M1: Animation Frame Memory Leak**
 ```
@@ -29,7 +29,38 @@ In LayoutEngine.js, refactor resolveCollisions() to use spatial partitioning
 between nodes in same/adjacent cells. This reduces complexity from O(n²) to O(n*k).
 ```
 
-### Minor Issues (Should Fix)
+### 🔴 Clean Code Critical Violations (MUST FIX post-merge)
+
+**C1: Decouple Composables - Create Event Bus**
+```
+Replace hard-coded dependency chain (App.js:30-34) with event bus pattern.
+Create useEventBus() composable. Have composables emit events instead of direct calls:
+- gameState emits 'nodeUnlocked', 'resourcesChanged'
+- gameLoop listens to events, doesn't import all other composables
+- Reduces from 5-arg dependency chain to 1-arg (eventBus)
+Time: 3 hours. Benefit: Testable, loosely-coupled, easy to extend.
+```
+
+**C2: Extract Effect Registry from applyNodeEffects()**
+```
+In useNodeManagement.js, extract 80-line applyNodeEffects() into effect handlers.
+Create EffectRegistry object: { automation, unlockBranch, dataGeneration, ... }
+Each handler is testable function: (node, gameState) => void
+Replace massive if-chain with: Object.entries(node.effects).forEach(([key, val]) => registry[key](node, state))
+Time: 2 hours. Benefit: Testable, maintainable, easy to add new effects.
+```
+
+**C4: Refactor LayoutEngine into 3 Classes**
+```
+In LayoutEngine.js, split 250+ line god object into:
+- TreeBuilder: buildTree(), buildChildren() - pure functions
+- PositionCalculator: calculatePositions(), assignBranches() - spatial logic
+- CollisionResolver: resolveCollisions(), detectOverlap() - physics
+- Compose in LayoutEngine.calculateLayout() = builder.build() → calc.positions() → resolver.collisions()
+Time: 4 hours. Benefit: Testable independently, modify without side effects.
+```
+
+### 🟡 Minor Issues (Should Fix)
 
 **m1: Debug Console Logs**
 ```
@@ -85,6 +116,104 @@ Add JSDoc type annotations to all functions. Use explicit Number() conversions
 instead of implicit coercion.
 ```
 
+### 🟠 Clean Code Major Violations (Should Fix)
+
+**C5: Reduce Sidebar Props from 12 to 3**
+```
+In Sidebar.js:10-22, group 12 individual props into 3 logical objects:
+- resourceStats: { energyPerClick, dataPerClick, stats }
+- generationState: { dataGeneration, energyGeneration, crankDisabled }
+- gameStats: { coresEarned, highestTierReached, canProcessData, dataUnlocked }
+Parent call becomes: :resource-stats="res" :generation="gen" :stats="stats"
+Time: 30 min. Benefit: Clearer contracts, easier parent/child changes.
+```
+
+**C6: Extract Requirement Validation Logic**
+```
+In SkillTree.js isAvailable():70-80, extract nested ternaries to helper function.
+Create checkRequirementMet(req, unlockedNodes, nodeLevels) that handles string vs object cases.
+Replace complex .every() with simple .every(req => checkRequirementMet(...))
+Time: 15 min. Benefit: Reusable, testable, readable.
+```
+
+**C7: Use Named Object Parameters Instead of Long Signatures**
+```
+In nodeUtils.js getScaledNodeCost(), change from:
+  getScaledNodeCost(node, ascensionCount=0, prestigeBonuses=null, currentLevel=0)
+To: getScaledNodeCost(node, { ascensionCount=0, prestigeBonuses=null, currentLevel=0 })
+All 4+ arg functions should use destructured options object.
+Time: 1 hour. Benefit: Self-documenting, extensible, no parameter order mistakes.
+```
+
+### 🟡 Clean Code Minor Violations (Nice to Have)
+
+**C8: Move Validation Logic to Composable**
+```
+Create useNodeValidation(gameState, prestigeState) composable.
+Move SkillTree.isAvailable() and canAfford() methods there.
+Have SkillTree.js call computed props from composable instead of duplicating logic.
+Time: 2 hours. Benefit: DRY, testable, reusable in other components.
+```
+
+**C9: Replace Empty Catch Blocks with Proper Error Handling**
+```
+In useGameLoop.js:123,132 and useSaveLoad.js, replace catch(e){/*ignore*/} with:
+  if (e.name === 'QuotaExceededError') { showNotification('Storage full') }
+  else { console.error('Save failed:', e) }
+Time: 30 min. Benefit: Visible errors, better UX, easier debugging.
+```
+
+**C10: Pass Global Dependencies as Parameters**
+```
+In useNodeManagement.js, GameData is used as global. Instead:
+- Add "nodes" parameter to functions that need it
+- Replace Object.values(GameData.nodes).filter(...) with Object.values(nodes).filter(...)
+- Makes functions testable and pure.
+Time: 1 hour. Benefit: Testable, mockable, no hidden dependencies.
+```
+
+**C11: Standardize Naming - Use is*/can*/get* Prefixes Consistently**
+```
+Audit entire codebase:
+- Boolean getters: isNodeUnlocked(), isDataUnlocked(), isTierLocked()
+- Actions: canAffordNode(), canUpgradeNode()
+- Data getters: getAccumulatedBonuses(), getBonusValue()
+- No mixing: dataUnlocked, crankDisabled (use isDataUnlocked, isCrankDisabled)
+Time: 30 min. Benefit: Predictable, easier to understand code at a glance.
+```
+
+**C12: Replace Magic Strings with Enums**
+```
+Create NotificationType, EffectType, ResourceType enums:
+  const NotificationType = { INFO: 'info', ERROR: 'error', NARRATION: 'narration' }
+Replace all showNotification(msg, 'error') with showNotification(msg, NotificationType.ERROR)
+Time: 1 hour. Benefit: No typos, IDE autocomplete, refactoring safety.
+```
+
+**C13: Memoize Render-Path Filters**
+```
+In SkillTree.js nodesList():40, Object.values().filter() runs on every render.
+Convert to: computed(() => this.nodes.filter(...)) and cache result.
+Or pre-filter nodes in parent App.js setup.
+Time: 30 min. Benefit: Fewer re-renders, better performance.
+```
+
+**C14: Extract Layout Config to Named Constants**
+```
+In LayoutEngine.js:12-17, replace inline config with:
+  export const LAYOUT_CONFIG = { TIER_SPACING: 180, NODE_SPACING: 100, ... }
+Create function getLayoutCenter(canvasWidth, canvasHeight) to handle responsive design.
+Time: 15 min. Benefit: Configurable, responsive, DRY.
+```
+
+**C15: Inject Utilities Instead of Using window Globals**
+```
+In SkillTree.js:99, replace window.BranchUtils with injected prop/composable.
+Add: props: { branchUtils: { type: Object, required: true } }
+In App.js, pass: :branch-utils="branchUtils"
+Time: 1 hour. Benefit: Testable, mockable, no global state.
+```
+
 ---
 
 ## 📊 Review Summary
@@ -93,10 +222,18 @@ instead of implicit coercion.
 🔴 Critical Issues: 0 (blocking bugs)
 🟠 Major Issues: 3 (performance at scale)
 🟡 Minor Issues: 9 (quality/robustness)
+🔴 Clean Code Violations: 15 (architecture/maintainability)
 ✅ Positive Notes: 8
 ```
 
-**Verdict:** ✅ **Can merge with critical fixes for 1000-node scale**
+**Breakdown by Category:**
+- Performance (scale): M1, M2, M3
+- Robustness: m1-m4, m8
+- Code Quality: m5-m7, m9
+- Clean Code/Architecture: C1-C15
+
+**Verdict:** ✅ **Can merge with critical fixes for 1000-node scale**  
+⚠️ **Major refactoring recommended post-merge for maintainability (esp. C1-C4)**
 
 ---
 
@@ -613,6 +750,468 @@ Implicit number/string coercion could lead to unexpected behavior.
 
 ---
 
+## 🚨 Clean Code Violations & Code Smells
+
+### 🔴 CRITICAL VIOLATIONS (Must Fix)
+
+#### **C1: Feature Envy - Excessive Cross-Composable Dependencies**
+**Location:** `js/App.js`, lines 30-34; `js/composables/useGameLoop.js`, line 9  
+**Category:** SOLID Violation (Dependency Inversion)  
+**Issue:**
+```javascript
+// ❌ BAD - Circular/tight coupling
+const gameState = useGameState();
+const prestigeState = usePrestigeState();
+const nodeManagement = useNodeManagement(gameState, prestigeState);
+const saveLoad = useSaveLoad(gameState, prestigeState, nodeManagement);
+const gameLoop = useGameLoop(gameState, prestigeState, nodeManagement, saveLoad);
+```
+
+Long chain of dependencies creates brittle architecture. 5 interdependent composables = hard to test, maintain, extend.
+
+**Impact:**
+- Can't test `useGameLoop` without all 4 other composables
+- Changes to `gameState` ripple through 4+ dependent composables
+- Deep dependency hierarchy (gameState → nodeManagement → gameLoop → saveLoad)
+
+**Fix:**
+- Create event/message bus: `useEventBus()` for inter-composable communication
+- Decouple via subscription model instead of direct dependencies
+- Inject only what each composable needs (interface segregation)
+
+---
+
+#### **C2: Huge Function - `applyNodeEffects()` with 40+ Lines & Multiple Levels of If**
+**Location:** `js/composables/useNodeManagement.js`, lines 235-315  
+**Category:** Code Smell (God Function, High Complexity)  
+**Issue:**
+```javascript
+// ❌ BAD - Does too much, hard to test each branch
+function applyNodeEffects(node, isUpgrade = false, newLevel = 1) {
+    // 50+ lines of if-statements
+    // - Applies automation
+    // - Unlocks branches
+    // - Unlocks features
+    // - Unlocks data generation
+    // - Applies speed multipliers
+    // - Adds amount bonuses
+    // - Handles instant unlock (complex random logic)
+    // - Disables crank
+    // - Unlocks energy generation
+    // - Applies level-specific effects
+    // - Handles dataGenAmountBonus TWICE (bug!)
+}
+```
+
+**Problems:**
+- 80 lines doing 10 different things
+- Can't unit-test individual effects
+- Cyclomatic complexity ~15
+- Duplicated `dataGenAmountBonus` application (lines 262 & 304)
+- No easy way to add new effects
+
+**Fix:**
+```javascript
+// ✅ GOOD - Effect registry pattern
+const EffectRegistry = {
+    automation: (node, state) => { state.automations[...] += ... },
+    unlockBranch: (node, state) => { state.unlockBranch(node.effects.unlockBranch) },
+    dataGeneration: (node, state) => { state.dataGeneration.active = true },
+    // ... more effect handlers
+};
+
+function applyNodeEffects(node, isUpgrade = false) {
+    Object.entries(node.effects).forEach(([effectKey, effectValue]) => {
+        const handler = EffectRegistry[effectKey];
+        if (handler) handler(node, gameState);
+    });
+}
+```
+
+---
+
+#### **C3: Duplicate Code - `applyNodeEffects` Called Recursively in Multiple Places**
+**Location:** `js/composables/useNodeManagement.js`, lines 277, 346  
+**Category:** DRY Violation  
+**Issue:**
+```javascript
+// Lines 272-280 - First occurrence
+if (effects.instantUnlock) {
+    const lockedAvailableNodes = Object.values(GameData.nodes).filter(...);
+    const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
+    const newUnlocked = new Set(gameState.unlockedNodes.value);
+    newUnlocked.add(randomNode.id);
+    gameState.unlockedNodes.value = newUnlocked;
+    applyNodeEffects(randomNode);
+}
+
+// Lines 341-349 - Exact duplicate in applyEffectSet()
+if (effectSet.randomUnlock) {
+    const lockedAvailableNodes = Object.values(GameData.nodes).filter(...);
+    const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
+    const newUnlocked = new Set(gameState.unlockedNodes.value);
+    newUnlocked.add(randomNode.id);
+    gameState.unlockedNodes.value = newUnlocked;
+    applyNodeEffects(randomNode);
+}
+```
+
+**Fix:** Extract to helper:
+```javascript
+function unlockRandomNode() {
+    const available = Object.values(GameData.nodes).filter(...);
+    if (available.length > 0) {
+        const node = available[Math.floor(Math.random() * available.length)];
+        gameState.unlockedNodes.value = new Set([...gameState.unlockedNodes.value, node.id]);
+        applyNodeEffects(node);
+    }
+}
+```
+
+---
+
+#### **C4: God Class - `LayoutEngine` Does Everything (250+ Lines)**
+**Location:** `js/LayoutEngine.js`  
+**Category:** God Object Anti-pattern  
+**Issue:**
+`LayoutEngine` has 15+ methods doing unrelated things:
+- Building tree structure
+- Assigning branches & sub-positions
+- Calculating physics-based positions
+- Resolving collisions
+- Counting descendants
+- Managing tier assignments
+- Applying forces
+
+**Impact:**
+- Hard to test: can't test tree building without position calc
+- Hard to modify: change to physics breaks tree building
+- Violates Single Responsibility
+
+**Fix:** Break into focused classes:
+```javascript
+class TreeBuilder { buildTree(), buildChildren() }
+class PositionCalculator { calculatePositions(), assignBranches() }
+class CollisionResolver { resolveCollisions(), detectOverlap() }
+class LayoutEngine { 
+    constructor(builder, positionCalc, collisionResolver) { ... }
+    calculateLayout() { return builder.build() → positionCalc.calc() → collisionResolver.resolve() }
+}
+```
+
+---
+
+### 🟠 MAJOR VIOLATIONS
+
+#### **C5: Too Many Props - `Sidebar` Has 12 Props**
+**Location:** `js/components/Sidebar.js`, lines 10-22  
+**Category:** Interface Segregation Violation, Props Drilling  
+**Issue:**
+```javascript
+props: {
+    energyPerClick: { type: Number, required: true },
+    dataPerClick: { type: Number, required: true },
+    dataUnlocked: { type: Boolean, default: false },
+    canProcessData: { type: Boolean, default: false },
+    dataGeneration: { type: Object, default: null },
+    energyGeneration: { type: Object, default: null },
+    crankDisabled: { type: Boolean, default: false },
+    automations: { type: Object, required: true },
+    effectiveRates: { type: Object, required: true },
+    stats: { type: Object, required: true },
+    coresEarned: { type: Number, default: 0 },
+    highestTierReached: { type: Number, default: 0 }
+}
+```
+
+Signature is verbose, hard to change, tight coupling to parent.
+
+**Fix:** Create data object:
+```javascript
+props: {
+    resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, ... }
+    generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, ... }
+    gameStats: { type: Object, required: true } // { stats, coresEarned, ... }
+}
+```
+
+---
+
+#### **C6: Complex Condition in `isAvailable()` Method**
+**Location:** `js/components/SkillTree.js`, lines 70-80  
+**Category:** Conditional Complexity  
+**Issue:**
+```javascript
+isAvailable(node) {
+    if (this.unlockedNodes.has(node.id)) return false;
+    return node.requires.every(req => {
+        if (typeof req === 'string') {
+            return this.unlockedNodes.has(req);
+        } else {
+            if (!this.unlockedNodes.has(req.id)) return false;
+            const level = this.nodeLevels?.[req.id] || 1;
+            return level >= (req.level || 1);
+        }
+    });
+}
+```
+
+Nested ternaries, mixed concerns (type checking + requirement validation).
+
+**Fix:** Extract requirements checking:
+```javascript
+function checkRequirementMet(req, unlockedNodes, nodeLevels) {
+    const id = typeof req === 'string' ? req : req.id;
+    if (!unlockedNodes.has(id)) return false;
+    if (typeof req === 'string') return true;
+    const nodeLevel = nodeLevels?.[id] || 1;
+    return nodeLevel >= (req.level || 1);
+}
+
+isAvailable(node) {
+    return !this.unlockedNodes.has(node.id) && 
+           node.requires.every(req => checkRequirementMet(req, this.unlockedNodes, this.nodeLevels));
+}
+```
+
+---
+
+#### **C7: Passing Generic Objects Instead of Typed Data**
+**Location:** All composables  
+**Category:** Type Safety / Self-Documenting Code  
+**Issue:**
+```javascript
+// ❌ Unclear what properties are needed
+function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0)
+
+// 📥 Called like:
+GameData.getScaledNodeCost(node, this.ascensionCount, this.prestigeBonuses);
+// Question: Is 4th param omitted? How many params can be omitted?
+```
+
+**Fix:** Use destructuring:
+```javascript
+function getScaledNodeCost(node, options = {}) {
+    const { ascensionCount = 0, prestigeBonuses = null, currentLevel = 0 } = options;
+    // ...
+}
+
+// Called like:
+GameData.getScaledNodeCost(node, { ascensionCount: 2, prestigeBonuses: myBonuses })
+// Clear what you're passing
+```
+
+---
+
+### 🟡 MINOR VIOLATIONS
+
+#### **C8: Mixed Concerns - Business Logic in Vue Component**
+**Location:** `js/components/SkillTree.js`, entire file  
+**Category:** Separation of Concerns  
+**Issue:**
+- `isAvailable()` duplicates logic from `useNodeManagement.checkRequirements()`
+- `canAfford()` duplicates cost logic from `GameData.getScaledNodeCost()`
+- Component mixes presentation + validation logic
+
+**Fix:** Move validation to composable:
+```javascript
+// useNodeValidation.js
+export function useNodeValidation(gameState, prestigeState) {
+    function isNodeAvailable(node) { ... }
+    function canAffordNode(node) { ... }
+    return { isNodeAvailable, canAffordNode };
+}
+
+// SkillTree.js
+const validation = useNodeValidation(gameState, prestigeState);
+computed: {
+    isNodeAvailable: () => validation.isNodeAvailable(...)
+}
+```
+
+---
+
+#### **C9: Silent Failures - Empty Catch Blocks**
+**Location:** `js/composables/useGameLoop.js`, lines 123, 132  
+**Category:** Error Handling  
+**Issue:**
+```javascript
+try {
+    localStorage.setItem(...);
+} catch (e) { /* ignore */ }
+
+try {
+    const saved = localStorage.getItem(...);
+} catch (e) { /* ignore */ }
+```
+
+Silently swallows errors. Quota exceeded, access denied - all invisible.
+
+**Fix:**
+```javascript
+try {
+    localStorage.setItem(...);
+} catch (e) {
+    if (e.name === 'QuotaExceededError') {
+        console.warn('Storage full', e);
+        // Notify user or use fallback
+    } else {
+        console.error('Save failed', e);
+    }
+}
+```
+
+---
+
+#### **C10: Global State Dependencies**
+**Location:** `js/composables/useNodeManagement.js`, lines 270-280  
+**Category:** Hidden Dependencies  
+**Issue:**
+```javascript
+// Uses global GameData without passing as parameter
+const lockedAvailableNodes = Object.values(GameData.nodes).filter(...);
+const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
+```
+
+Hard to test (can't mock GameData), unclear dependencies.
+
+**Fix:**
+```javascript
+function unlockRandomNode(nodes) {  // Pass nodes explicitly
+    const available = Object.values(nodes).filter(...);
+    ...
+}
+```
+
+---
+
+#### **C11: Inconsistent Naming Conventions**
+**Location:** Multiple files  
+**Category:** Code Consistency  
+**Issues:**
+- Some functions: `calculateQuantumCores`, `getAccumulatedBonuses`, `checkRequirements`
+- Some variables: `energyPerClick`, `dataPerClick`, `coresEarned`
+- Inconsistent: `isUnlocked`, `canAffordNode`, `isTierLocked` (is_, can_, get_?)
+- Boolean getters: `dataUnlocked` vs `isDataUnlocked`
+
+**Fix:** Standardize:
+```javascript
+// Getters: use get* or is*
+getBonuses(), isNodeUnlocked(), canAffordNode()
+
+// Avoid mixing conventions
+// ❌ dataUnlocked (is it boolean or getter?)
+// ✅ isDataUnlocked() or dataUnlockedFlag
+```
+
+---
+
+#### **C12: String-based Configuration Instead of Enums**
+**Location:** Throughout notification/effect system  
+**Category:** Type Safety  
+**Issue:**
+```javascript
+// ❌ Magic strings
+showNotification(message, 'info', 10_000);
+showNotification(message, 'error', 5_000);
+showNotification(message, 'narration', 10_000);
+// Risk: typo → 'erro' is silently accepted
+```
+
+**Fix:**
+```javascript
+const NotificationType = {
+    INFO: 'info',
+    ERROR: 'error',
+    NARRATION: 'narration',
+    SUCCESS: 'success'
+};
+
+showNotification(message, NotificationType.INFO, 10_000);
+```
+
+---
+
+#### **C13: Large Data Operations in Render Path**
+**Location:** `js/components/SkillTree.js`, line 40  
+**Category:** Performance / Code Clarity  
+**Issue:**
+```javascript
+nodesList() {
+    // Filters ALL nodes on every render
+    // Should be pre-calculated/memoized
+    return Object.values(this.nodes).filter(node => this.isNodeVisible(node));
+}
+```
+
+**Fix:** Use `computed()` with proper memoization via Vue, or pre-filter at data level.
+
+---
+
+#### **C14: Hardcoded Layout Constants**
+**Location:** `js/LayoutEngine.js`, lines 12-17  
+**Category:** Magic Numbers (already covered in m5, but layout-specific)  
+**Issue:**
+```javascript
+config: {
+    centerX: 1400,      // Hardcoded
+    centerY: 1400,
+    tierSpacing: 180,
+    sameTierOffset: 60,
+    nodeSpacing: 100,
+    nodeSize: 80,
+}
+```
+
+Should respond to canvas size, be configurable.
+
+**Fix:**
+```javascript
+export const LAYOUT_CONFIG = {
+    TIER_SPACING_PX: 180,
+    SAME_TIER_OFFSET_PX: 60,
+    NODE_SPACING_PX: 100,
+    NODE_SIZE_PX: 80
+};
+
+function getLayoutCenter(canvas) {
+    return { x: canvas.width / 2, y: canvas.height / 2 };
+}
+```
+
+---
+
+#### **C15: No Dependency Injection - Tight Coupling to Window Globals**
+**Location:** `js/components/SkillTree.js`, line 99  
+**Category:** Dependency Coupling  
+**Issue:**
+```javascript
+if (window.BranchUtils && !window.BranchUtils.isBranchUnlocked(...)) {
+    return false;
+}
+```
+
+Accessing global `window.BranchUtils`. Hard to test, brittle.
+
+**Fix:** Inject via props or composable:
+```javascript
+// App.js
+const branchUtils = useBranchUtils();
+
+// SkillTree.js
+props: {
+    branchUtils: { type: Object, required: true }
+}
+
+computed: {
+    isBranchUnlocked() {
+        return this.branchUtils.isBranchUnlocked(...);
+    }
+}
+```
+
+---
+
 ## 📝 Testing Coverage
 
 **95 tests passing ✅**
@@ -680,19 +1279,47 @@ Implicit number/string coercion could lead to unexpected behavior.
 3. M1: Animation cleanup (15 min) - **Prevents memory leak**
 4. Virtual rendering (4 hours) - **10-20x render improvement**
 
-### 🔨 Do Soon (Quality)
+### 🔨 Do Soon (Quality + Clean Code)
 5. m1: Remove console.logs (5 min)
 6. m2: LocalStorage quota (30 min)
 7. m5: Extract magic numbers (15 min)
 8. m8: Cycle detection (15 min)
+9. **C1: Decouple composables with event bus (3 hours)** - **Critical for maintainability**
+10. **C2: Break up applyNodeEffects into effect registry (2 hours)** - **Easier to extend**
+11. **C4: Refactor LayoutEngine into focused classes (4 hours)** - **Testable, modular**
 
 ### 💡 Do Later (Polish)
-9. m3: Offline progress fix (30 min)
-10. m4: Input validation (30 min)
-11. m6: Array optimization (10 min)
-12. m7: Save debouncing (20 min)
-13. m9: Type annotations (2 hours)
+12. m3: Offline progress fix (30 min)
+13. m4: Input validation (30 min)
+14. m6: Array optimization (10 min)
+15. m7: Save debouncing (20 min)
+16. m9: Type annotations (2 hours)
+17. C5: Reduce Sidebar props (30 min)
+18. C6: Extract requirement validation (15 min)
+19. C7: Use object params instead of long signatures (1 hour)
+20. C8: Move component logic to composables (2 hours)
+21. C9: Proper error handling in try-catch (30 min)
+22. C10: Pass global dependencies as params (1 hour)
+23. C11: Standardize naming conventions (30 min)
+24. C12: Use enums for string configs (1 hour)
+25. C13: Memoize render-path filters (30 min)
+26. C14: Extract layout config to constants (15 min)
+27. C15: Inject utilities instead of globals (1 hour)
 
 ---
 
-**Final Assessment:** High-quality game code with excellent architecture. Critical fixes required for 1000-node scale. Current 70-node game is production-ready. 🚀
+**Final Assessment:** High-quality game code with excellent architecture fundamentals. Critical fixes required for 1000-node performance scale. **Major architectural refactoring recommended** to reduce coupling & improve testability/extensibility (esp. event bus decoupling, effect registry, LayoutEngine decomposition). Current 70-node game production-ready. 🚀
+
+---
+
+## 📚 Quick Reference: SOLID Principle Violations
+
+| Principle | Violation | Location | Impact |
+|-----------|-----------|----------|--------|
+| **S**ingle Resp. | applyNodeEffects() does 10 effects | C2 | Hard to test, extend |
+| **O**pen/Closed | LayoutEngine tightly coupled methods | C4 | Can't add new layout algorithms |
+| **L**iskov Subst. | N/A - no inheritance | - | ✅ OK |
+| **I**nterface Seg. | 12 props in Sidebar, 5-arg constructor chains | C5, C1 | Props drilling, verbose calls |
+| **D**ep. Inversion | GameData & BranchUtils as globals | C10, C15 | Can't mock, can't test |
+
+**Overall SOLID Score:** 65/100 (Good foundations, needs decoupling)
