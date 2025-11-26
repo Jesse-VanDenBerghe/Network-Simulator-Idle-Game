@@ -57,15 +57,9 @@ const SkillTree = {
         },
         isAvailable(node) {
             if (this.unlockedNodes.has(node.id)) return false;
-            return node.requires.every(req => {
-                if (typeof req === 'string') {
-                    return this.unlockedNodes.has(req);
-                } else {
-                    if (!this.unlockedNodes.has(req.id)) return false;
-                    const level = this.nodeLevels?.[req.id] || 1;
-                    return level >= (req.level || 1);
-                }
-            });
+            return node.requires.every(req => 
+                GameData.checkRequirementMet(req, this.unlockedNodes, this.nodeLevels)
+            );
         },
         canAfford(node) {
             if (!node || !this.isAvailable(node)) return false;

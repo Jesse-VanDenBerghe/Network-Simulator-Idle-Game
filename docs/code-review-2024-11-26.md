@@ -146,12 +146,12 @@ Updated App.js to pass grouped objects instead of individual props.
 All 95 tests still passing.
 ```
 
-**C6: Extract Requirement Validation Logic**
+**C6: Extract Requirement Validation Logic** ✅ **FIXED**
 ```
-In SkillTree.js isAvailable():70-80, extract nested ternaries to helper function.
-Create checkRequirementMet(req, unlockedNodes, nodeLevels) that handles string vs object cases.
-Replace complex .every() with simple .every(req => checkRequirementMet(...))
-Time: 15 min. Benefit: Reusable, testable, readable.
+✅ COMPLETED - Created checkRequirementMet(req, unlockedNodes, nodeLevels) helper 
+in nodeUtils.js and exposed via GameData. Handles string vs object requirement cases.
+SkillTree.isAvailable() now uses: node.requires.every(req => GameData.checkRequirementMet(...))
+Replaced nested ternaries with clean, reusable, testable helper function.
 ```
 
 **C7: Use Named Object Parameters Instead of Long Signatures**
@@ -813,42 +813,11 @@ props: {
 
 ---
 
-#### **C6: Complex Condition in `isAvailable()` Method**
-**Location:** `js/components/SkillTree.js`, lines 70-80  
+#### **~~C6: Complex Condition in `isAvailable()` Method~~** ✅ **FIXED**
+**Location:** `js/components/SkillTree.js`, lines 58-63  
 **Category:** Conditional Complexity  
-**Issue:**
-```javascript
-isAvailable(node) {
-    if (this.unlockedNodes.has(node.id)) return false;
-    return node.requires.every(req => {
-        if (typeof req === 'string') {
-            return this.unlockedNodes.has(req);
-        } else {
-            if (!this.unlockedNodes.has(req.id)) return false;
-            const level = this.nodeLevels?.[req.id] || 1;
-            return level >= (req.level || 1);
-        }
-    });
-}
-```
 
-Nested ternaries, mixed concerns (type checking + requirement validation).
-
-**Fix:** Extract requirements checking:
-```javascript
-function checkRequirementMet(req, unlockedNodes, nodeLevels) {
-    const id = typeof req === 'string' ? req : req.id;
-    if (!unlockedNodes.has(id)) return false;
-    if (typeof req === 'string') return true;
-    const nodeLevel = nodeLevels?.[id] || 1;
-    return nodeLevel >= (req.level || 1);
-}
-
-isAvailable(node) {
-    return !this.unlockedNodes.has(node.id) && 
-           node.requires.every(req => checkRequirementMet(req, this.unlockedNodes, this.nodeLevels));
-}
-```
+**Status:** ✅ **RESOLVED** - Extracted to `checkRequirementMet()` helper in `nodeUtils.js`. Exposed via `GameData.checkRequirementMet()`. SkillTree.js now uses clean `.every()` with the helper.
 
 ---
 

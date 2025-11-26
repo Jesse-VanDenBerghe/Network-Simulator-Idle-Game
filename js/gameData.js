@@ -16,7 +16,8 @@ import {
     getScaledNodeCost as getScaledNodeCostUtil,
     countUnlockedInTier as countUnlockedInTierUtil,
     isTierUnlocked as isTierUnlockedUtil,
-    getConnections as getConnectionsUtil
+    getConnections as getConnectionsUtil,
+    checkRequirementMet as checkRequirementMetUtil
 } from './utils/nodeUtils.js';
 
 const GameData = {
@@ -93,6 +94,17 @@ const GameData = {
      */
     getConnections() {
         return getConnectionsUtil(this.nodes);
+    },
+    
+    /**
+     * Check if a single requirement is met
+     * @param {string|Object} req - Requirement (string id or { id, level })
+     * @param {Set<string>} unlockedNodes - Set of unlocked node IDs
+     * @param {Object} nodeLevels - Map of node ID to level
+     * @returns {boolean} True if requirement is met
+     */
+    checkRequirementMet(req, unlockedNodes, nodeLevels) {
+        return checkRequirementMetUtil(req, unlockedNodes, nodeLevels);
     },
     
     /**
