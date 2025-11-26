@@ -19,6 +19,7 @@ const App = {
         SkillTree,
         InfoPanel,
         NotificationToast,
+        NotificationHistoryPanel,
         AscensionPanel,
         ChangelogModal
     },
@@ -96,6 +97,9 @@ const App = {
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             dataGeneration: gameState.dataGeneration,
             notifications: gameLoop.notifications,
+            notificationHistory: gameLoop.notificationHistory,
+            showNotificationHistory: gameLoop.showNotificationHistory,
+            narrateOnlyFilter: gameLoop.narrateOnlyFilter,
             
             // Prestige State
             prestigeState: prestigeState.prestigeState,
@@ -134,6 +138,8 @@ const App = {
             toggleAscensionPanel: prestigeState.toggleAscensionPanel,
             toggleChangelogModal,
             showChangelogModal,
+            toggleNotificationHistory: gameLoop.toggleNotificationHistory,
+            clearNotificationHistory: gameLoop.clearNotificationHistory,
             resetGame: saveLoad.resetGame,
             
             // Data
@@ -145,6 +151,7 @@ const App = {
             <header id="header">
                 <div class="header-left">
                     <h1>Network Simulator</h1>
+                    <button class="icon-button" @click="toggleNotificationHistory" title="Notification History">🔔</button>
                     <button class="icon-button" @click="toggleChangelogModal" title="View Changelog">📜</button>
                 </div>
                 <div class="prestige-header" v-if="prestigeState.ascensionCount > 0 || prestigeState.quantumCores > 0">
@@ -221,6 +228,14 @@ const App = {
             </main>
 
             <NotificationToast :notifications="notifications" />
+            
+            <NotificationHistoryPanel
+                :show="showNotificationHistory"
+                :history="notificationHistory"
+                :narrate-only-filter="narrateOnlyFilter"
+                @close="toggleNotificationHistory"
+                @update:narrate-only-filter="narrateOnlyFilter = $event"
+            />
             
             <AscensionPanel
                 :visible="showAscensionPanel"

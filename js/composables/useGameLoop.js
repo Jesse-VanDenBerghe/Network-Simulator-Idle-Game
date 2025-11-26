@@ -4,12 +4,17 @@
 
 const { ref, onMounted, onUnmounted } = Vue;
 
+const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
+
 export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) {
     // ==========================================
     // STATE
     // ==========================================
     const lastUpdate = ref(Date.now());
     const notifications = ref([]);
+    const notificationHistory = ref([]);
+    const showNotificationHistory = ref(false);
+    const narrateOnlyFilter = ref(false);
     let notificationId = 0;
     let gameLoopInterval = null;
     let saveInterval = null;
@@ -66,10 +71,52 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      */
     function showNotification(message, type = 'info', duration = 10_000) {
         const id = ++notificationId;
+        const timestamp = Date.now();
         notifications.value.push({ id, message, type, duration });
+        
+        // Add to history
+        notificationHistory.value.unshift({ id, message, type, timestamp });
+        saveNotificationHistory();
+        
         setTimeout(() => {
             notifications.value = notifications.value.filter(n => n.id !== id);
         }, duration);
+    }
+
+    /**
+     * Save notification history to localStorage
+     */
+    function saveNotificationHistory() {
+        try {
+            localStorage.setItem(NOTIFICATION_HISTORY_KEY, JSON.stringify(notificationHistory.value));
+        } catch (e) { /* ignore */ }
+    }
+
+    /**
+     * Load notification history from localStorage
+     */
+    function loadNotificationHistory() {
+        try {
+            const saved = localStorage.getItem(NOTIFICATION_HISTORY_KEY);
+            if (saved) {
+                notificationHistory.value = JSON.parse(saved);
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    /**
+     * Clear notification history
+     */
+    function clearNotificationHistory() {
+        notificationHistory.value = [];
+        saveNotificationHistory();
+    }
+
+    /**
+     * Toggle notification history panel
+     */
+    function toggleNotificationHistory() {
+        showNotificationHistory.value = !showNotificationHistory.value;
     }
 
     /**
@@ -205,6 +252,7 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Initialize game on mount
      */
     function initialize() {
+        loadNotificationHistory();
         saveLoad.loadPrestige();
         const offlineMessage = saveLoad.loadGame();
         if (offlineMessage) {
@@ -225,10 +273,15 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     return {
         // State
         notifications,
+        notificationHistory,
+        showNotificationHistory,
+        narrateOnlyFilter,
         
         // Methods
         gameLoop,
         showNotification,
+        toggleNotificationHistory,
+        clearNotificationHistory,
         ascend,
         resetGameState,
         handlePurchaseUpgrade,
