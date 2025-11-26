@@ -191,18 +191,9 @@ const App = {
 
             <main id="main-content">
                 <Sidebar
-                    :energy-per-click="computedValues.energyPerClick"
-                    :data-per-click="dataPerClickDisplay"
-                    :data-unlocked="dataUnlocked"
-                    :can-process-data="canProcessData"
-                    :data-generation="dataGeneration"
-                    :energy-generation="energyGeneration"
-                    :crank-disabled="crankDisabled"
-                    :automations="automations"
-                    :effective-rates="resourceRates"
-                    :stats="stats"
-                    :cores-earned="coresEarned"
-                    :highest-tier-reached="highestTierReached"
+                    :resource-stats="{ energyPerClick: computedValues.energyPerClick, dataPerClick: dataPerClickDisplay, stats: stats }"
+                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, crankDisabled: crankDisabled }"
+                    :game-stats="{ automations: automations, effectiveRates: resourceRates, coresEarned: coresEarned, highestTierReached: highestTierReached, dataUnlocked: dataUnlocked, canProcessData: canProcessData }"
                     @generate-energy="generateEnergy"
                     @process-data="processData"
                     @ascend="ascend"

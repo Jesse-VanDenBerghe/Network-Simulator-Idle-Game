@@ -135,14 +135,15 @@ at line 51-54 in LayoutEngine.js. Returns 0 on circular ref detection.
 
 ### 🟠 Clean Code Major Violations (Should Fix)
 
-**C5: Reduce Sidebar Props from 12 to 3**
+**~~C5: Reduce Sidebar Props from 12 to 3~~** ✅ **FIXED**
 ```
-In Sidebar.js:10-22, group 12 individual props into 3 logical objects:
+✅ COMPLETED - Grouped 12 individual props into 3 logical objects:
 - resourceStats: { energyPerClick, dataPerClick, stats }
 - generationState: { dataGeneration, energyGeneration, crankDisabled }
-- gameStats: { coresEarned, highestTierReached, canProcessData, dataUnlocked }
-Parent call becomes: :resource-stats="res" :generation="gen" :stats="stats"
-Time: 30 min. Benefit: Clearer contracts, easier parent/child changes.
+- gameStats: { automations, effectiveRates, coresEarned, highestTierReached, dataUnlocked, canProcessData }
+Updated Sidebar.js props and all computed properties/template references.
+Updated App.js to pass grouped objects instead of individual props.
+All 95 tests still passing.
 ```
 
 **C6: Extract Requirement Validation Logic**
@@ -237,9 +238,9 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 
 ```
 🔴 Critical Issues: 0 (blocking bugs)
-🟠 Major Issues: 2 (performance at scale)
+🟠 Major Issues: 1 (performance at scale)
 🟡 Minor Issues: 5 remaining (was 9, m1-m4 fixed)
-🔴 Clean Code Violations: 14 remaining (was 15, C2 fixed)
+🔴 Clean Code Violations: 13 remaining (was 15, C2 + C5 fixed)
 ✅ Positive Notes: 8
 ```
 
@@ -247,7 +248,7 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 - Performance (scale): ~~M1~~, M2, M3
 - Robustness: ~~m1-m4~~, m8
 - Code Quality: m5-m7, m9
-- Clean Code/Architecture: ~~C2~~, C1, C3-C15 (C2 fixed)
+- Clean Code/Architecture: ~~C2~~, ~~C5~~, C1, C3-C4, C6-C15
 
 **Verdict:** ✅ **Can merge with critical fixes for 1000-node scale**  
 ⚠️ **Major refactoring recommended post-merge for maintainability (esp. C1, C3-C4)**
