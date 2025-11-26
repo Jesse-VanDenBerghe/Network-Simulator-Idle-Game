@@ -1,8 +1,18 @@
 // Node Utilities
 // ===============
 
-import { TIER_COST_MULTIPLIERS, TIER_GATES } from '../data/constants.js';
+import { TIER_COST_MULTIPLIERS, COST_SHIFT_FOR_RESOURCE } from '../data/constants.js';
 import { ASCENSION_COST_MULTIPLIER } from '../data/config.js';
+
+/**
+ * Get tier multiplier for a resource, shifted by COST_SHIFT_FOR_RESOURCE
+ * e.g. data at tier 3 with shift 2 => uses multiplier for tier 1
+ */
+function getTierMultiplierForResource(tier, resource) {
+    const shift = COST_SHIFT_FOR_RESOURCE[resource] || 0;
+    const effectiveTier = Math.max(0, tier - shift);
+    return TIER_COST_MULTIPLIERS[effectiveTier] || 1;
+}
 
 /**
  * Get the cost of a node scaled by its tier multiplier, ascension count, and prestige bonuses
@@ -13,7 +23,6 @@ import { ASCENSION_COST_MULTIPLIER } from '../data/config.js';
  */
 export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
     const baseCost = node.cost;
-    const tierMultiplier = TIER_COST_MULTIPLIERS[node.tier] || 1;
     
     // Ascension scaling: each ascension increases costs by ASCENSION_COST_MULTIPLIER (compounds)
     const ascensionMultiplier = Math.pow(ASCENSION_COST_MULTIPLIER, ascensionCount);
@@ -33,6 +42,7 @@ export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = nu
     
     const scaled = {};
     for (const [resource, amount] of Object.entries(baseCost)) {
+        const tierMultiplier = getTierMultiplierForResource(node.tier, resource);
         const finalCost = amount * tierMultiplier * ascensionMultiplier * costReduction;
         scaled[resource] = Math.floor(finalCost);
     }
@@ -58,18 +68,14 @@ export function countUnlockedInTier(tier, unlockedNodeIds, nodesData) {
 }
 
 /**
- * Check if a tier is unlocked based on gate requirements
+ * Check if a tier is unlocked (always returns true now - tier gates removed)
  * @param {number} tier - The tier to check
  * @param {Set<string>} unlockedNodeIds - Set of unlocked node IDs
  * @param {Object} nodesData - All nodes data
  * @returns {boolean} True if the tier is unlocked
  */
 export function isTierUnlocked(tier, unlockedNodeIds, nodesData) {
-    const gate = TIER_GATES[tier];
-    if (!gate) return true;
-    
-    const count = countUnlockedInTier(gate.requiredTier, unlockedNodeIds, nodesData);
-    return count >= gate.requiredCount;
+    return true;
 }
 
 /**

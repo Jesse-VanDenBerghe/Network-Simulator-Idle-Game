@@ -10,7 +10,7 @@ export function useNodeManagement(gameState, prestigeState) {
     // ==========================================
     const computedValues = computed(() => {
         let values = {
-            energyPerClick: 1,
+            energyPerClick: 0,
             dataPerClick: 1,
             dataMultiplier: 1,
             allRatesMultiplier: 1
@@ -84,16 +84,7 @@ export function useNodeManagement(gameState, prestigeState) {
     });
 
     const tierGateRequirement = computed(() => {
-        if (!selectedNode.value) return null;
-        const gate = GameData.TIER_GATES[selectedNode.value.tier];
-        if (!gate) return null;
-        
-        const count = GameData.countUnlockedInTier(gate.requiredTier, gameState.unlockedNodes.value);
-        return {
-            ...gate,
-            currentCount: count,
-            remaining: Math.max(0, gate.requiredCount - count)
-        };
+        return null;
     });
 
     // ==========================================

@@ -32,7 +32,7 @@ export const energyBranch = {
         branch: 'energy',
         description: 'The crank is a bit stiff, maybe some oil would help it turn more smoothly?',
         requires: ['energy_unlock'],
-        cost: { energy: 5 },
+        cost: { energy: 10 },
         effects: {
             energyPerClick: 1,
             description: '+1 Energy per crank'
@@ -47,7 +47,7 @@ export const energyBranch = {
         branch: 'energy',
         description: 'Let there be light!',
         requires: ['energy_2_1', 'energy_2_3'],
-        cost: { energy: 25 },
+        cost: { energy: 50 },
         effects: {
             description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.',
             narrate: {
@@ -65,7 +65,7 @@ export const energyBranch = {
         branch: 'energy',
         description: ' My hamster loves running in this thing, and it generates energy too!',
         requires: ['energy_unlock'],
-        cost: { energy: 5},
+        cost: { energy: 25},
         effects: {
             automation: { resource: 'energy', rate: 0.5 },
             description: '+0.5 Energy/second (passive)'
@@ -80,7 +80,7 @@ export const energyBranch = {
         branch: 'energy',
         description: 'Since we have light now, why not search grandpa\'s attic for cool stuff?',
         requires: ['energy_2_2'],
-        cost: { energy: 5 },
+        cost: { energy: 100 },
         effects: {
             unlockBranch: 'computer',
             narrate: {
@@ -99,7 +99,7 @@ export const energyBranch = {
         branch: 'energy',
         description: 'Why not put some muscle into it? Give that crank a good, hard turn!',
         requires: ['energy_2_1'],
-        cost: { energy: 100 },
+        cost: { energy: 5 },
         effects: {
             energyPerClick: 2,
             description: '+2 Energy per crank'
