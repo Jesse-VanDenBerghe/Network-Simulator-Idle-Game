@@ -96,28 +96,32 @@ before applying offline progress. No longer relies on computed values.
 - Logs warning for malformed requirements
 ```
 
-**m5: Magic Numbers**
+**~~m5: Magic Numbers~~** ✅ **FIXED**
 ```
-Extract magic numbers to named constants: GAME_LOOP_INTERVAL_MS=100, 
-AUTOSAVE_INTERVAL_MS=30000, MAX_OFFLINE_TIME_S=86400.
-```
-
-**m6: Inefficient Array Filter**
-```
-In useGameLoop.js line 103, replace notifications.value.filter() with 
-findIndex() + splice() to avoid creating new array on every notification expire.
+✅ COMPLETED - Extracted to js/data/constants.js:
+- GAME_LOOP_INTERVAL_MS = 100
+- AUTOSAVE_INTERVAL_MS = 30_000
+- MAX_OFFLINE_TIME_S = 86_400
+Updated useGameLoop.js and useSaveLoad.js to import and use these constants.
 ```
 
-**m7: No Save Change Detection**
+**~~m6: Inefficient Array Filter~~** ✅ **FIXED**
 ```
-In useGameLoop.js, add state hash check before autosave. Only save if state 
-actually changed since last save.
+✅ COMPLETED - In useGameLoop.js showNotification(), replaced filter() with
+findIndex() + splice() to mutate in place instead of creating new array.
 ```
 
-**m8: Recursive Function Safety**
+**~~m7: No Save Change Detection~~** ✅ **FIXED**
 ```
-In LayoutEngine.js countDescendants(), add visited Set parameter to prevent 
-infinite recursion on circular dependencies.
+✅ COMPLETED - Added hashGameState() and lastSaveHash tracking in useSaveLoad.js.
+saveGame() now compares current hash with last saved hash and skips if unchanged.
+Hash includes: floor(energy), floor(data), unlockedNodes count, sum of nodeLevels.
+```
+
+**~~m8: Recursive Function Safety~~** ✅ **FIXED**
+```
+✅ COMPLETED - TreeBuilder.countDescendants() already has visited Set parameter
+at line 51-54 in LayoutEngine.js. Returns 0 on circular ref detection.
 ```
 
 **m9: Type Coercion**

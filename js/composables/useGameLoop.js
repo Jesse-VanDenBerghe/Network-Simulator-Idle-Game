@@ -4,6 +4,7 @@
 // Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS } from '../data/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -104,7 +105,10 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         saveNotificationHistory();
         
         setTimeout(() => {
-            notifications.value = notifications.value.filter(n => n.id !== id);
+            const index = notifications.value.findIndex(n => n.id === id);
+            if (index !== -1) {
+                notifications.value.splice(index, 1);
+            }
         }, duration);
     }
 
@@ -267,9 +271,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
      * Start game intervals
      */
     function startIntervals() {
-        gameLoopInterval = setInterval(gameLoop, 100);
-        saveInterval = setInterval(() => eventBus.emit('requestSaveGame'), 30000);
-        prestigeSaveInterval = setInterval(() => eventBus.emit('requestSavePrestige'), 30000);
+        gameLoopInterval = setInterval(gameLoop, GAME_LOOP_INTERVAL_MS);
+        saveInterval = setInterval(() => eventBus.emit('requestSaveGame'), AUTOSAVE_INTERVAL_MS);
+        prestigeSaveInterval = setInterval(() => eventBus.emit('requestSavePrestige'), AUTOSAVE_INTERVAL_MS);
     }
 
     /**

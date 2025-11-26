@@ -3,6 +3,8 @@
 // Handles saving and loading game and prestige data
 // Uses event bus for decoupled communication
 
+import { MAX_OFFLINE_TIME_S } from '../data/constants.js';
+
 export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**
      * Calculate resource rates explicitly from saved state data
@@ -39,10 +41,30 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         };
     }
 
+    // Track last saved state hash to avoid unnecessary saves
+    let lastSaveHash = null;
+
     /**
-     * Save game state to localStorage
+     * Generate a simple hash of key game state values
+     */
+    function hashGameState() {
+        return JSON.stringify({
+            energy: Math.floor(gameState.resources.energy),
+            data: Math.floor(gameState.resources.data),
+            unlockedCount: gameState.unlockedNodes.value.size,
+            nodeLevels: Object.values(gameState.nodeLevels).reduce((a, b) => a + b, 0)
+        });
+    }
+
+    /**
+     * Save game state to localStorage (only if changed)
      */
     function saveGame() {
+        const currentHash = hashGameState();
+        if (currentHash === lastSaveHash) {
+            return; // No changes since last save
+        }
+        
         const saveData = {
             resources: { ...gameState.resources },
             totalResources: { ...gameState.totalResources },
@@ -56,6 +78,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         };
         try {
             localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
+            lastSaveHash = currentHash;
         } catch (e) {
             if (e.name === 'QuotaExceededError') {
                 console.error('Storage quota exceeded - save failed');
@@ -112,7 +135,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
 
             // Calculate offline progress using explicit rate calculation from saved state
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
-            if (offlineTime > 0 && offlineTime < 86400) {
+            if (offlineTime > 0 && offlineTime < MAX_OFFLINE_TIME_S) {
                 // Calculate rates explicitly from saved state - don't rely on computed values
                 const rates = calculateRatesFromSavedState(data);
                 gameState.resources.energy += rates.energy * offlineTime;
