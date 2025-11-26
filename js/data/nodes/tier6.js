@@ -46,9 +46,9 @@ export const tier6Nodes = {
         requires: ['galactic_network', 'quantum_entanglement', 'shadow_network'],
         cost: { energy: 24, data: 8, bandwidth: 2 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 20 },
+            automation: { resource: 'bandwidth', rate: 40 },
             allRatesMultiplier: 5,
-            description: '+20 Bandwidth/s, 5x all rates'
+            description: '+40 Bandwidth/s, 5x all rates'
         }
     },
 

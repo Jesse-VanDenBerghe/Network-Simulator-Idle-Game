@@ -180,9 +180,9 @@ export const tier4Nodes = {
         requires: ['bandwidth_unlock'],
         cost: { energy: 30, data: 10, bandwidth: 2 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 1 },
+            automation: { resource: 'bandwidth', rate: 2 },
             allRatesMultiplier: 1.5,
-            description: '+1 Bandwidth/s, 1.5x all rates'
+            description: '+2 Bandwidth/s, 1.5x all rates'
         }
     },
 
@@ -213,8 +213,8 @@ export const tier4Nodes = {
         requires: ['encryption'],
         cost: { energy: 12, data: 5, bandwidth: 1 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 0.5 },
-            description: '+0.5 Bandwidth/second (passive)'
+            automation: { resource: 'bandwidth', rate: 1 },
+            description: '+1 Bandwidth/second (passive)'
         }
     },
 
@@ -229,8 +229,8 @@ export const tier4Nodes = {
         requires: ['load_balancer'],
         cost: { energy: 14, data: 6, bandwidth: 1 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 0.3 },
-            description: '+0.3 Bandwidth/s'
+            automation: { resource: 'bandwidth', rate: 0.6 },
+            description: '+0.6 Bandwidth/s'
         }
     },
 
@@ -245,9 +245,9 @@ export const tier4Nodes = {
         requires: ['gateway', 'bandwidth_unlock'],
         cost: { energy: 16, data: 7, bandwidth: 1 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 0.8 },
+            automation: { resource: 'bandwidth', rate: 1.6 },
             allRatesMultiplier: 1.2,
-            description: '+0.8 Bandwidth/s, 1.2x rates'
+            description: '+1.6 Bandwidth/s, 1.2x rates'
         }
     },
 
@@ -262,8 +262,8 @@ export const tier4Nodes = {
         requires: ['proxy', 'bandwidth_unlock'],
         cost: { energy: 20, data: 8, bandwidth: 2 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 0.5 },
-            description: '+0.5 Bandwidth/s'
+            automation: { resource: 'bandwidth', rate: 1 },
+            description: '+1 Bandwidth/s'
         }
     },
 

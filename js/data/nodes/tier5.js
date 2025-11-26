@@ -115,9 +115,9 @@ export const tier5Nodes = {
         requires: ['neural_network'],
         cost: { energy: 30, data: 10, bandwidth: 2 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 5 },
+            automation: { resource: 'bandwidth', rate: 10 },
             allRatesMultiplier: 2,
-            description: '+5 Bandwidth/s, 2x all rates'
+            description: '+10 Bandwidth/s, 2x all rates'
         }
     },
 
@@ -132,8 +132,8 @@ export const tier5Nodes = {
         requires: ['mesh_network'],
         cost: { energy: 20, data: 7, bandwidth: 1 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 3 },
-            description: '+3 Bandwidth/s'
+            automation: { resource: 'bandwidth', rate: 6 },
+            description: '+6 Bandwidth/s'
         }
     },
 
@@ -148,9 +148,9 @@ export const tier5Nodes = {
         requires: ['darknet', 'zero_day'],
         cost: { energy: 24, data: 8, bandwidth: 1 },
         effects: {
-            automation: { resource: 'bandwidth', rate: 4 },
+            automation: { resource: 'bandwidth', rate: 8 },
             dataMultiplier: 3,
-            description: '+4 Bandwidth/s, 3x Data'
+            description: '+8 Bandwidth/s, 3x Data'
         }
     },
 

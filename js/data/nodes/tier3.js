@@ -181,8 +181,8 @@ export const tier3Nodes = {
         cost: { energy: 30, data: 10 },
         effects: {
             unlockBandwidth: true,
-            automation: { resource: 'bandwidth', rate: 0.5 },
-            description: 'Unlock Bandwidth resource, +0.5 Bandwidth/s'
+            automation: { resource: 'bandwidth', rate: 1 },
+            description: 'Unlock Bandwidth resource, +1 Bandwidth/s'
         }
     },
 
