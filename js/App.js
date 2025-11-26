@@ -206,9 +206,8 @@ const App = {
 };
 
 // Initialize node layout before starting the app
-if (typeof GameData !== 'undefined' && GameData.nodes) {
-    console.log('Initializing layout for', Object.keys(GameData.nodes).length, 'nodes');
-    GameData.initializeLayout();
+if (typeof LayoutEngine !== 'undefined' && typeof GameData !== 'undefined') {
+    LayoutEngine.initializeLayout(GameData);
 }
 
 // Create and mount the app

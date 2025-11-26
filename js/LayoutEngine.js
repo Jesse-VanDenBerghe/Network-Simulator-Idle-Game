@@ -317,8 +317,24 @@ const LayoutEngine = {
         });
         
         return gameData;
+    },
+
+    /**
+     * Initialize layout - call once on load after GameData is ready
+     * @param {Object} gameData - The GameData object
+     */
+    initializeLayout(gameData) {
+        if (gameData && gameData.nodes) {
+            console.log('Initializing layout for', Object.keys(gameData.nodes).length, 'nodes');
+            this.applyLayout(gameData);
+        }
     }
 };
 
-// Note: Layout is now initialized explicitly from gameData.js after module loading
+// Export for ES6 module usage if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = LayoutEngine;
+}
+
+// Note: Layout is initialized explicitly from App.js after all modules are loaded
 // This ensures nodes are fully imported before layout calculation

@@ -4,15 +4,18 @@
 import { TIER_COST_MULTIPLIERS, TIER_GATES } from '../data/constants.js';
 
 /**
- * Get the cost of a node scaled by its tier multiplier and prestige bonuses
+ * Get the cost of a node scaled by its tier multiplier, ascension count, and prestige bonuses
  * @param {Object} node - The node object
- * @param {number} ascensionCount - Current ascension count (unused, kept for compatibility)
+ * @param {number} ascensionCount - Current ascension count (default 0)
  * @param {Object} prestigeBonuses - Prestige bonuses object (optional)
  * @returns {Object} The scaled cost object { resource: amount }
  */
 export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
     const baseCost = node.cost;
     const tierMultiplier = TIER_COST_MULTIPLIERS[node.tier] || 1;
+    
+    // Ascension scaling: each ascension increases costs by 50% (compounds)
+    const ascensionMultiplier = Math.pow(1.5, ascensionCount);
     
     // Prestige cost reduction
     let costReduction = 1;
@@ -29,7 +32,7 @@ export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = nu
     
     const scaled = {};
     for (const [resource, amount] of Object.entries(baseCost)) {
-        const finalCost = amount * tierMultiplier * costReduction;
+        const finalCost = amount * tierMultiplier * ascensionMultiplier * costReduction;
         scaled[resource] = Math.floor(finalCost);
     }
     return scaled;
