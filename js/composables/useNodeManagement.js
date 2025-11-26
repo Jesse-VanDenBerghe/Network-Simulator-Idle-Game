@@ -103,16 +103,22 @@ export function useNodeManagement(gameState, prestigeState, eventBus) {
      * Supports both string requirements ('node_id') and object requirements ({ id: 'node_id', level: 5 })
      */
     function checkRequirements(node) {
+        if (!node?.requires || !Array.isArray(node.requires)) return true;
+        
         return node.requires.every(req => {
             if (typeof req === 'string') {
                 // Simple requirement: just check if unlocked
                 return gameState.unlockedNodes.value.has(req);
-            } else {
+            } else if (req && typeof req === 'object' && req.id) {
                 // Object requirement: check id and level
                 const reqId = req.id;
                 const reqLevel = req.level || 1;
                 if (!gameState.unlockedNodes.value.has(reqId)) return false;
                 return getNodeLevel(reqId) >= reqLevel;
+            } else {
+                // Malformed requirement - log and skip
+                console.warn('Invalid requirement format:', req);
+                return false;
             }
         });
     }

@@ -5,6 +5,41 @@
 
 export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**
+     * Calculate resource rates explicitly from saved state data
+     * Prevents race condition with computed values not yet updated
+     */
+    function calculateRatesFromSavedState(data) {
+        let allRatesMultiplier = 1;
+        let dataMultiplier = 1;
+        
+        const unlockedNodes = data.unlockedNodes || [];
+        const nodeLevels = data.nodeLevels || {};
+        
+        unlockedNodes.forEach(nodeId => {
+            const node = GameData.nodes[nodeId];
+            if (!node?.effects) return;
+            
+            const level = nodeLevels[nodeId] || 1;
+            
+            if (node.effects.allRatesMultiplier) {
+                allRatesMultiplier *= Math.pow(node.effects.allRatesMultiplier, level);
+            }
+            if (node.effects.dataMultiplier) {
+                dataMultiplier *= Math.pow(node.effects.dataMultiplier, level);
+            }
+        });
+        
+        const baseEnergy = data.automations?.energy || 0;
+        const baseData = data.automations?.data || 0;
+        
+        // Note: prestige bonuses already applied to automations values when saved
+        return {
+            energy: baseEnergy * allRatesMultiplier,
+            data: baseData * allRatesMultiplier * dataMultiplier
+        };
+    }
+
+    /**
      * Save game state to localStorage
      */
     function saveGame() {
@@ -19,7 +54,16 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             dataGeneration: { ...gameState.dataGeneration },
             lastUpdate: Date.now()
         };
-        localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
+        try {
+            localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.error('Storage quota exceeded - save failed');
+                eventBus.emit('showNotification', { message: 'Storage full! Save failed.', type: 'error' });
+            } else {
+                console.error('Save failed:', e);
+            }
+        }
     }
 
     /**
@@ -66,15 +110,11 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             // Notify that game is loaded (so rates can be calculated)
             eventBus.emit('gameLoaded');
 
-            // Calculate offline progress
+            // Calculate offline progress using explicit rate calculation from saved state
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
             if (offlineTime > 0 && offlineTime < 86400) {
-                // Request current rates via event then calculate
-                // For now, calculate directly from automations (simplified)
-                const rates = {
-                    energy: gameState.automations.energy || 0,
-                    data: gameState.automations.data || 0
-                };
+                // Calculate rates explicitly from saved state - don't rely on computed values
+                const rates = calculateRatesFromSavedState(data);
                 gameState.resources.energy += rates.energy * offlineTime;
                 gameState.resources.data += rates.data * offlineTime;
 
@@ -98,7 +138,16 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             upgrades: Array.from(prestigeState.prestigeState.upgrades),
             statistics: { ...prestigeState.prestigeState.statistics }
         };
-        localStorage.setItem('networkSimulatorPrestige', JSON.stringify(prestigeData));
+        try {
+            localStorage.setItem('networkSimulatorPrestige', JSON.stringify(prestigeData));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.error('Storage quota exceeded - prestige save failed');
+                eventBus.emit('showNotification', { message: 'Storage full! Prestige save failed.', type: 'error' });
+            } else {
+                console.error('Prestige save failed:', e);
+            }
+        }
     }
 
     /**

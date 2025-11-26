@@ -236,8 +236,6 @@ const SkillTree = {
                 return GameData.FEATURE_FLAGS.DOTS_TO_AVAILABLE_NODES && this.isAvailable(this.nodes[conn.to]);
             });
             
-            console.log(`Spawning dots from node ${nodeId}, found ${outgoingConnections.length} outgoing connections`, outgoingConnections);
-            
             const now = Date.now();
             outgoingConnections.forEach((conn, index) => {
                 this.travelingDots.push({

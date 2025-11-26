@@ -55,7 +55,7 @@ Benefits: Testable handlers, easy to add new effects, DRY (no duplicate code).
 All 95 tests still passing.
 ```
 
-**C4: Refactor LayoutEngine into 3 Classes** ✅ **FIXED**
+**~~C4: Refactor LayoutEngine into 3 Classes~~** ✅ **FIXED**
 ```
 ✅ COMPLETED - Split 250+ line god object into:
 - TreeBuilder: buildTree(), countDescendants(), assignBranches(), averageAngle()
@@ -68,28 +68,32 @@ All 95 tests still passing.
 
 ### 🟡 Minor Issues (Should Fix)
 
-**m1: Debug Console Logs**
+**~~m1: Debug Console Logs~~** ✅ **FIXED**
 ```
-Remove or wrap in DEBUG flag: console.log in LayoutEngine.js:427 and 
-SkillTree.js:239.
-```
-
-**m2: LocalStorage Quota Handling**
-```
-In useSaveLoad.js, wrap localStorage.setItem calls in try-catch to handle 
-QuotaExceededError. Add user notification on quota exceeded.
+✅ COMPLETED - Removed console.log from SkillTree.js:239.
+LayoutEngine.js was already clean.
 ```
 
-**m3: Offline Progress Race Condition**
+**~~m2: LocalStorage Quota Handling~~** ✅ **FIXED**
 ```
-In useSaveLoad.js loadGame(), recalculate automation rates explicitly from 
-saved state before applying offline progress. Don't rely on computed values.
+✅ COMPLETED - Added try-catch with QuotaExceededError handling to both
+saveGame() and savePrestige() in useSaveLoad.js. Emits showNotification
+event on quota exceeded.
 ```
 
-**m4: Missing Input Validation**
+**~~m3: Offline Progress Race Condition~~** ✅ **FIXED**
 ```
-In useNodeManagement.js checkRequirements(), add validation that req.id exists 
-before accessing it. Handle malformed requirement objects gracefully.
+✅ COMPLETED - Created calculateRatesFromSavedState(data) helper in useSaveLoad.js.
+Explicitly calculates rates from saved state (unlockedNodes, nodeLevels, automations)
+before applying offline progress. No longer relies on computed values.
+```
+
+**~~m4: Missing Input Validation~~** ✅ **FIXED**
+```
+✅ COMPLETED - Added validation in checkRequirements() in useNodeManagement.js:
+- Checks node?.requires exists and is array
+- Validates req.id exists for object requirements
+- Logs warning for malformed requirements
 ```
 
 **m5: Magic Numbers**
@@ -227,14 +231,14 @@ Time: 1 hour. Benefit: Testable, mockable, no global state.
 ```
 🔴 Critical Issues: 0 (blocking bugs)
 🟠 Major Issues: 2 (performance at scale)
-🟡 Minor Issues: 9 (quality/robustness)
+🟡 Minor Issues: 5 remaining (was 9, m1-m4 fixed)
 🔴 Clean Code Violations: 14 remaining (was 15, C2 fixed)
 ✅ Positive Notes: 8
 ```
 
 **Breakdown by Category:**
 - Performance (scale): ~~M1~~, M2, M3
-- Robustness: m1-m4, m8
+- Robustness: ~~m1-m4~~, m8
 - Code Quality: m5-m7, m9
 - Clean Code/Architecture: ~~C2~~, C1, C3-C15 (C2 fixed)
 
@@ -333,151 +337,35 @@ function resolveCollisionsOptimized(nodes) {
 
 ### 🟡 MINOR ISSUES
 
-#### **m1: Debug Console Logs in Production**
-**Location:** Multiple files  
+#### **~~m1: Debug Console Logs in Production~~** ✅ **FIXED**
+**Location:** `js/components/SkillTree.js`, line 239  
 **Category:** Code Quality / Security  
 
-**Issue:**
-```javascript
-// js/LayoutEngine.js:427
-console.log('Initializing layout for', Object.keys(gameData.nodes).length, 'nodes');
-
-// js/components/SkillTree.js:239
-console.log(`Spawning dots from node ${nodeId}...`);
-```
-
-**Impact:**
-- Information leakage
-- Minor performance overhead
-- Unprofessional in production
-
-**Fix:**
-```javascript
-// ✅ GOOD - Conditional logging
-const DEBUG = false; // or import from config
-if (DEBUG) console.log('...');
-```
+**Status:** ✅ **RESOLVED** - Removed debug console.log. LayoutEngine.js was already clean.
 
 ---
 
-#### **m2: LocalStorage Quota Not Handled**
+#### **~~m2: LocalStorage Quota Not Handled~~** ✅ **FIXED**
 **Location:** `js/composables/useSaveLoad.js`, lines 21, 94, 125  
 **Category:** Error Handling  
 
-**Issue:**
-```javascript
-// ❌ No quota exceeded handling
-localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
-```
-
-**Impact:**
-- `QuotaExceededError` thrown on some browsers (5-10MB limit)
-- User loses progress silently
-- No fallback strategy
-
-**Fix:**
-```javascript
-// ✅ GOOD - Handle quota errors
-function saveGame() {
-    try {
-        localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
-    } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-            console.error('Storage quota exceeded');
-            // Notify user, compress data, or use IndexedDB
-        } else {
-            console.error('Save failed:', e);
-        }
-    }
-}
-```
+**Status:** ✅ **RESOLVED** - Added try-catch with QuotaExceededError handling to saveGame() and savePrestige(). Emits notification on quota exceeded.
 
 ---
 
-#### **m3: Offline Progress Race Condition**
+#### **~~m3: Offline Progress Race Condition~~** ✅ **FIXED**
 **Location:** `js/composables/useSaveLoad.js`, line 68  
 **Category:** Logic / Data Integrity  
 
-**Issue:**
-```javascript
-const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
-if (offlineTime > 0 && offlineTime < 86400) {
-    const rates = nodeManagement.resourceRates.value; // ⚠️ Computed after load
-    gameState.resources.energy += rates.energy * offlineTime;
-}
-```
-
-**Problem:**
-- `resourceRates` computed value might not reflect loaded state yet
-- Depends on `unlockedNodes`, `automations` being restored first
-- Order-dependent, not enforced
-
-**Impact:**
-- Offline progress calculates with wrong rates
-- User gets incorrect resources
-
-**Fix:**
-```javascript
-// ✅ GOOD - Calculate rates explicitly from saved state
-function calculateOfflineProgress(savedState, offlineTime) {
-    let energyRate = savedState.automations.energy || 0;
-    
-    // Apply multipliers from unlocked nodes
-    savedState.unlockedNodes.forEach(nodeId => {
-        const node = GameData.nodes[nodeId];
-        if (node?.effects?.allRatesMultiplier) {
-            energyRate *= node.effects.allRatesMultiplier;
-        }
-    });
-    
-    return energyRate * offlineTime;
-}
-```
+**Status:** ✅ **RESOLVED** - Created calculateRatesFromSavedState(data) helper that explicitly calculates rates from saved state before applying offline progress.
 
 ---
 
-#### **m4: Missing Input Validation**
+#### **~~m4: Missing Input Validation~~** ✅ **FIXED**
 **Location:** `js/composables/useNodeManagement.js`, line 106  
 **Category:** Robustness  
 
-**Issue:**
-```javascript
-function checkRequirements(node) {
-    return node.requires.every(req => {
-        if (typeof req === 'string') {
-            return gameState.unlockedNodes.value.has(req);
-        } else {
-            const reqId = req.id; // ❌ No validation req.id exists
-            // ...
-        }
-    });
-}
-```
-
-**Impact:**
-- Malformed node data causes undefined behavior
-- Could crash game if data corrupted
-
-**Fix:**
-```javascript
-// ✅ GOOD - Validate input
-function checkRequirements(node) {
-    if (!node?.requires || !Array.isArray(node.requires)) return true;
-    
-    return node.requires.every(req => {
-        if (typeof req === 'string') {
-            return gameState.unlockedNodes.value.has(req);
-        } else if (req && typeof req === 'object' && req.id) {
-            const reqLevel = req.level || 1;
-            const currentLevel = getNodeLevel(req.id);
-            return gameState.unlockedNodes.value.has(req.id) && currentLevel >= reqLevel;
-        } else {
-            console.error('Invalid requirement format:', req);
-            return false;
-        }
-    });
-}
-```
+**Status:** ✅ **RESOLVED** - Added validation for node?.requires array, req.id existence, and malformed requirement handling with warning log.
 
 ---
 
@@ -1224,7 +1112,7 @@ computed: {
 
 **Before Merge (5 min):**
 1. ~~Fix animation frame cleanup (M1)~~ ✅ Done
-2. Remove debug console.logs (m1)
+2. ~~Remove debug console.logs (m1)~~ ✅ Done
 
 **Before Adding More Nodes (8 hours):**
 1. Replace JSON clone with structuredClone (M2)
@@ -1233,8 +1121,8 @@ computed: {
 4. Optimize connection rendering
 
 **Post-Merge Improvements:**
-- Add localStorage quota handling
-- Fix offline progress race condition
+- ~~Add localStorage quota handling~~ ✅ Done
+- ~~Fix offline progress race condition~~ ✅ Done
 - Extract magic numbers to constants
 - Add TypeScript for type safety
 
@@ -1260,8 +1148,8 @@ computed: {
 4. Virtual rendering (4 hours) - **10-20x render improvement**
 
 ### 🔨 Do Soon (Quality + Clean Code)
-5. m1: Remove console.logs (5 min)
-6. m2: LocalStorage quota (30 min)
+5. ~~m1: Remove console.logs (5 min)~~ ✅ Done
+6. ~~m2: LocalStorage quota (30 min)~~ ✅ Done
 7. m5: Extract magic numbers (15 min)
 8. m8: Cycle detection (15 min)
 9. **C1: Decouple composables with event bus (3 hours)** - **Critical for maintainability**
@@ -1269,8 +1157,8 @@ computed: {
 11. **C4: Refactor LayoutEngine into focused classes (4 hours)** - **Testable, modular**
 
 ### 💡 Do Later (Polish)
-12. m3: Offline progress fix (30 min)
-13. m4: Input validation (30 min)
+12. ~~m3: Offline progress fix (30 min)~~ ✅ Done
+13. ~~m4: Input validation (30 min)~~ ✅ Done
 14. m6: Array optimization (10 min)
 15. m7: Save debouncing (20 min)
 16. m9: Type annotations (2 hours)
