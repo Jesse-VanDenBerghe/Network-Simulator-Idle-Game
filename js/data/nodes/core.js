@@ -2,8 +2,8 @@
 // ====================
 
 export const core = {
-    core: {
-        id: 'core',
+    old_shed: {
+        id: 'old_shed',
         name: 'Old Shed',
         icon: '🏠',
         tier: 0,

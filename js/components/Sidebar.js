@@ -12,6 +12,9 @@ const Sidebar = {
         dataPerClick: { type: Number, required: true },
         dataUnlocked: { type: Boolean, default: false },
         canProcessData: { type: Boolean, default: false },
+        dataGeneration: { type: Object, default: null },
+        energyGeneration: { type: Object, default: null },
+        crankDisabled: { type: Boolean, default: false },
         automations: { type: Object, required: true },
         effectiveRates: { type: Object, required: true },
         stats: { type: Object, required: true },
@@ -27,6 +30,37 @@ const Sidebar = {
             return Object.entries(this.effectiveRates)
                 .filter(([_, rate]) => rate > 0)
                 .map(([resource, rate]) => ({ resource, rate }));
+        },
+        dataGenerationProgress() {
+            if (this.dataGeneration && this.dataGeneration.active) {
+                return this.dataGeneration.progress;
+            }
+            return null;
+        },
+        dataButtonValue() {
+            if (this.dataGeneration && this.dataGeneration.active) {
+                const dg = this.dataGeneration;
+                return `+${this.formatNumber(dg.bitsPerTick)} (${dg.energyCost}⚡)`;
+            }
+            return '+1 (1⚡)';
+        },
+        energyGenerationProgress() {
+            if (this.energyGeneration && this.energyGeneration.active) {
+                return this.energyGeneration.progress;
+            }
+            return null;
+        },
+        energyButtonText() {
+            if (this.crankDisabled) {
+                return 'Broken Crank';
+            }
+            return 'Turn Crank';
+        },
+        energyButtonValue() {
+            if (this.energyGeneration && this.energyGeneration.active) {
+                return `+${this.formatNumber(this.energyGeneration.energyPerTick)}/s`;
+            }
+            return '+' + this.formatNumber(this.energyPerClick);
         }
     },
     template: `
@@ -36,20 +70,21 @@ const Sidebar = {
                 <div class="action-wrapper" @click="handleEnergyClick">
                     <ActionButton
                         icon="⚡"
-                        text="Turn Crank"
-                        :value="'+' + formatNumber(energyPerClick)"
+                        :text="energyButtonText"
+                        :value="energyButtonValue"
+                        :locked="crankDisabled"
+                        :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
                 </div>
-                <div class="action-wrapper" @click="handleDataClick">
+                <div class="action-wrapper">
                     <ActionButton
                         icon="📊"
-                        text="Process Data"
-                        :value="'+' + formatNumber(dataPerClick) + ' (costs 5⚡)'"
+                        text="Generating Data"
+                        :value="dataButtonValue"
                         :locked="!dataUnlocked"
-                        :disabled="!canProcessData"
+                        :progress="dataGenerationProgress"
                     />
-                    <ParticleBurst ref="dataParticles" />
                 </div>
             </div>
 
@@ -93,6 +128,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
+            if (this.crankDisabled) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

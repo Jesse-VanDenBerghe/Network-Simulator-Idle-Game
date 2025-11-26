@@ -11,13 +11,25 @@ const InfoPanel = {
         resources: { type: Object, required: true },
         unlockedNodes: { type: Set, required: true },
         ascensionCount: { type: Number, default: 0 },
-        prestigeBonuses: { type: Object, default: null }
+        prestigeBonuses: { type: Object, default: null },
+        nodeLevel: { type: Number, default: 0 },
+        canUpgrade: { type: Boolean, default: false },
+        nodeLevels: { type: Object, default: () => ({}) }
     },
     emits: ['unlock'],
     computed: {
+        maxLevel() {
+            return this.node?.maxLevel || 1;
+        },
+        showLevel() {
+            return this.maxLevel > 1;
+        },
+        isMaxLevel() {
+            return this.nodeLevel >= this.maxLevel;
+        },
         costEntries() {
             if (!this.node || !this.node.cost) return [];
-            const scaledCost = GameData.getScaledNodeCost(this.node, this.ascensionCount, this.prestigeBonuses);
+            const scaledCost = GameData.getScaledNodeCost(this.node, this.ascensionCount, this.prestigeBonuses, this.nodeLevel);
             return Object.entries(scaledCost).map(([resource, amount]) => ({
                 resource,
                 resourceName: resource.charAt(0).toUpperCase() + resource.slice(1),
@@ -28,13 +40,20 @@ const InfoPanel = {
         },
         requirementEntries() {
             if (!this.node || !this.node.requires) return [];
-            return this.node.requires.map(reqId => {
+            return this.node.requires.map(req => {
+                const reqId = typeof req === 'string' ? req : req.id;
+                const reqLevel = typeof req === 'string' ? null : req.level;
                 const reqNode = GameData.nodes[reqId];
+                const currentLevel = this.nodeLevels?.[reqId] || (this.unlockedNodes.has(reqId) ? 1 : 0);
+                const levelMet = reqLevel ? currentLevel >= reqLevel : true;
+                const unlocked = this.unlockedNodes.has(reqId);
                 return {
                     id: reqId,
                     name: reqNode ? reqNode.name : reqId,
                     icon: reqNode ? reqNode.icon : '?',
-                    met: this.unlockedNodes.has(reqId)
+                    met: unlocked && levelMet,
+                    reqLevel,
+                    currentLevel: unlocked ? currentLevel : 0
                 };
             });
         }
@@ -44,7 +63,7 @@ const InfoPanel = {
             return GameData.formatNumber(Math.floor(num));
         },
         unlock() {
-            if (this.node && this.isAvailable && this.canAfford) {
+            if (this.node && ((this.isAvailable && this.canAfford) || (this.canUpgrade && this.canAfford))) {
                 this.$emit('unlock', this.node.id);
             }
         }
@@ -62,7 +81,7 @@ const InfoPanel = {
                         <span class="node-info-icon">{{ node.icon }}</span>
                         <div>
                             <div class="node-info-title">{{ node.name }}</div>
-                            <div class="node-info-tier">Tier {{ node.tier }}</div>
+                            <div class="node-info-tier">Tier {{ node.tier }}<span v-if="showLevel"> • Level {{ nodeLevel }}/{{ maxLevel }}</span></div>
                         </div>
                     </div>
 
@@ -81,7 +100,7 @@ const InfoPanel = {
                         <h3>Requires</h3>
                         <ul class="cost-list">
                             <li v-for="req in requirementEntries" :key="req.id">
-                                <span>{{ req.icon }} {{ req.name }}</span>
+                                <span>{{ req.icon }} {{ req.name }}<template v-if="req.reqLevel"> (Lvl {{ req.currentLevel }}/{{ req.reqLevel }})</template></span>
                                 <span :class="req.met ? 'affordable' : 'not-affordable'">
                                     {{ req.met ? '✓' : '✗' }}
                                 </span>
@@ -89,9 +108,9 @@ const InfoPanel = {
                         </ul>
                     </div>
 
-                    <!-- Cost -->
-                    <div class="node-info-section" v-if="costEntries.length > 0">
-                        <h3>Cost</h3>
+                    <!-- Cost (show for unlock or upgrade) -->
+                    <div class="node-info-section" v-if="costEntries.length > 0 && !isMaxLevel">
+                        <h3>{{ isUnlocked ? 'Upgrade Cost' : 'Cost' }}</h3>
                         <ul class="cost-list">
                             <li v-for="cost in costEntries" :key="cost.resource">
                                 <span>{{ cost.resourceName }}</span>
@@ -103,13 +122,23 @@ const InfoPanel = {
                     </div>
 
                     <!-- Action button -->
-                    <div v-if=\"isUnlocked\" class=\"unlocked-badge\">✓ Unlocked</div>
-                    <div v-else-if=\"isTierLocked\" class=\"locked-badge\">
+                    <div v-if="isUnlocked && isMaxLevel" class="unlocked-badge">✓ Max Level</div>
+                    <div v-else-if="isUnlocked && canUpgrade" class="upgrade-section">
+                        <button 
+                            class="unlock-btn upgrade-btn"
+                            :disabled="!canAfford"
+                            @click="unlock"
+                        >
+                            {{ canAfford ? 'Upgrade' : 'Cannot Afford' }}
+                        </button>
+                    </div>
+                    <div v-else-if="isUnlocked" class="unlocked-badge">✓ Unlocked</div>
+                    <div v-else-if="isTierLocked" class="locked-badge">
                         🔒 Locked: Unlock {{ tierGate.remaining }} more Tier {{ tierGate.requiredTier }} nodes
                     </div>
                     <button 
-                        v-else-if=\"isAvailable\"
-                        class=\"unlock-btn\"
+                        v-else-if="isAvailable"
+                        class="unlock-btn"
                         :disabled="!canAfford"
                         @click="unlock"
                     >

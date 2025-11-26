@@ -9,7 +9,7 @@
 // This file provides backward compatibility by re-exporting everything as GameData
 
 import { allNodes } from './data/nodes/index.js';
-import { TIER_COST_MULTIPLIERS, TIER_GATES, BRANCH_UNLOCK_ORDER} from './data/constants.js';
+import { TIER_COST_MULTIPLIERS, BRANCH_UNLOCK_ORDER } from './data/constants.js';
 import { RESOURCES } from './data/resources.js';
 import { FEATURE_FLAGS } from './data/config.js';
 import { 
@@ -23,7 +23,6 @@ const GameData = {
     // Configuration
     FEATURE_FLAGS,
     TIER_COST_MULTIPLIERS,
-    TIER_GATES,
     BRANCH_UNLOCK_ORDER,
     
     // Data
@@ -50,8 +49,8 @@ const GameData = {
         return scaled.toFixed(decimals) + suffixes[tier];
     },
     
-    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
-        return getScaledNodeCostUtil(node, ascensionCount, prestigeBonuses);
+    getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0) {
+        return getScaledNodeCostUtil(node, ascensionCount, prestigeBonuses, currentLevel);
     },
     
     countUnlockedInTier(tier, unlockedNodeIds) {

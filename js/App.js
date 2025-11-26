@@ -19,6 +19,7 @@ const App = {
         SkillTree,
         InfoPanel,
         NotificationToast,
+        NotificationHistoryPanel,
         AscensionPanel,
         ChangelogModal
     },
@@ -94,7 +95,13 @@ const App = {
             unlockedBranches: gameState.unlockedBranches,
             selectedNodeId: gameState.selectedNodeId,
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
+            dataGeneration: gameState.dataGeneration,
+            energyGeneration: gameState.energyGeneration,
+            crankDisabled: gameState.crankDisabled,
             notifications: gameLoop.notifications,
+            notificationHistory: gameLoop.notificationHistory,
+            showNotificationHistory: gameLoop.showNotificationHistory,
+            narrateOnlyFilter: gameLoop.narrateOnlyFilter,
             
             // Prestige State
             prestigeState: prestigeState.prestigeState,
@@ -118,6 +125,10 @@ const App = {
             canAffordSelectedNode: nodeManagement.canAffordSelectedNode,
             isTierLocked: nodeManagement.isTierLocked,
             tierGateRequirement: nodeManagement.tierGateRequirement,
+            getNodeLevel: nodeManagement.getNodeLevel,
+            getNodeMaxLevel: nodeManagement.getNodeMaxLevel,
+            canUpgradeNode: nodeManagement.canUpgradeNode,
+            nodeLevels: gameState.nodeLevels,
             
             // Methods
             selectNode: gameState.selectNode,
@@ -129,6 +140,8 @@ const App = {
             toggleAscensionPanel: prestigeState.toggleAscensionPanel,
             toggleChangelogModal,
             showChangelogModal,
+            toggleNotificationHistory: gameLoop.toggleNotificationHistory,
+            clearNotificationHistory: gameLoop.clearNotificationHistory,
             resetGame: saveLoad.resetGame,
             
             // Data
@@ -140,6 +153,7 @@ const App = {
             <header id="header">
                 <div class="header-left">
                     <h1>Network Simulator</h1>
+                    <button class="icon-button" @click="toggleNotificationHistory" title="Notification History">🔔</button>
                     <button class="icon-button" @click="toggleChangelogModal" title="View Changelog">📜</button>
                 </div>
                 <div class="prestige-header" v-if="prestigeState.ascensionCount > 0 || prestigeState.quantumCores > 0">
@@ -153,13 +167,13 @@ const App = {
                 <div id="resources">
                     <ResourceBar
                         icon="⚡"
-                        name="Energy"
+                        name="W"
                         :amount="resources.energy"
                         :rate="resourceRates.energy"
                     />
                     <ResourceBar
                         icon="📊"
-                        name="Data"
+                        name="B"
                         :amount="resources.data"
                         :rate="resourceRates.data"
                         :visible="dataUnlocked"
@@ -173,6 +187,9 @@ const App = {
                     :data-per-click="dataPerClickDisplay"
                     :data-unlocked="dataUnlocked"
                     :can-process-data="canProcessData"
+                    :data-generation="dataGeneration"
+                    :energy-generation="energyGeneration"
+                    :crank-disabled="crankDisabled"
                     :automations="automations"
                     :effective-rates="resourceRates"
                     :stats="stats"
@@ -192,6 +209,7 @@ const App = {
                     :ascension-count="prestigeState.ascensionCount"
                     :prestige-bonuses="prestigeBonuses"
                     :last-unlocked-node-id="lastUnlockedNodeId"
+                    :node-levels="nodeLevels"
                     @select-node="selectNode"
                 />
 
@@ -206,11 +224,22 @@ const App = {
                     :unlocked-nodes="unlockedNodes"
                     :ascension-count="prestigeState.ascensionCount"
                     :prestige-bonuses="prestigeBonuses"
+                    :node-level="selectedNode ? getNodeLevel(selectedNode.id) : 0"
+                    :can-upgrade="selectedNode ? canUpgradeNode(selectedNode) : false"
+                    :node-levels="nodeLevels"
                     @unlock="unlockNode"
                 />
             </main>
 
             <NotificationToast :notifications="notifications" />
+            
+            <NotificationHistoryPanel
+                :show="showNotificationHistory"
+                :history="notificationHistory"
+                :narrate-only-filter="narrateOnlyFilter"
+                @close="toggleNotificationHistory"
+                @update:narrate-only-filter="narrateOnlyFilter = $event"
+            />
             
             <AscensionPanel
                 :visible="showAscensionPanel"

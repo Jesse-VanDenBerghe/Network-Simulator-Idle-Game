@@ -10,7 +10,7 @@ export function useNodeManagement(gameState, prestigeState) {
     // ==========================================
     const computedValues = computed(() => {
         let values = {
-            energyPerClick: 1,
+            energyPerClick: 0,
             dataPerClick: 1,
             dataMultiplier: 1,
             allRatesMultiplier: 1
@@ -24,17 +24,20 @@ export function useNodeManagement(gameState, prestigeState) {
             const node = GameData.nodes[nodeId];
             if (!node) return;
 
+            // Get node level (default 1 for backward compatibility)
+            const level = gameState.nodeLevels[nodeId] || 1;
+
             if (node.effects.energyPerClick) {
-                values.energyPerClick += node.effects.energyPerClick;
+                values.energyPerClick += node.effects.energyPerClick * level;
             }
             if (node.effects.dataPerClick) {
-                values.dataPerClick += node.effects.dataPerClick;
+                values.dataPerClick += node.effects.dataPerClick * level;
             }
             if (node.effects.dataMultiplier) {
-                values.dataMultiplier *= node.effects.dataMultiplier;
+                values.dataMultiplier *= Math.pow(node.effects.dataMultiplier, level);
             }
             if (node.effects.allRatesMultiplier) {
-                values.allRatesMultiplier *= node.effects.allRatesMultiplier;
+                values.allRatesMultiplier *= Math.pow(node.effects.allRatesMultiplier, level);
             }
         });
 
@@ -65,10 +68,7 @@ export function useNodeManagement(gameState, prestigeState) {
         if (!selectedNode.value || isSelectedNodeUnlocked.value) return false;
         
         // Check requirements
-        const requirementsMet = selectedNode.value.requires.every(reqId => 
-            gameState.unlockedNodes.value.has(reqId)
-        );
-        if (!requirementsMet) return false;
+        if (!checkRequirements(selectedNode.value)) return false;
 
         // Check tier gate
         return GameData.isTierUnlocked(selectedNode.value.tier, gameState.unlockedNodes.value);
@@ -84,16 +84,7 @@ export function useNodeManagement(gameState, prestigeState) {
     });
 
     const tierGateRequirement = computed(() => {
-        if (!selectedNode.value) return null;
-        const gate = GameData.TIER_GATES[selectedNode.value.tier];
-        if (!gate) return null;
-        
-        const count = GameData.countUnlockedInTier(gate.requiredTier, gameState.unlockedNodes.value);
-        return {
-            ...gate,
-            currentCount: count,
-            remaining: Math.max(0, gate.requiredCount - count)
-        };
+        return null;
     });
 
     // ==========================================
@@ -101,14 +92,59 @@ export function useNodeManagement(gameState, prestigeState) {
     // ==========================================
     
     /**
-     * Check if a node is affordable
+     * Get current level of a node (0 = locked)
      */
-    function checkAffordability(node) {
+    function getNodeLevel(nodeId) {
+        return gameState.nodeLevels[nodeId] || 0;
+    }
+
+    /**
+     * Check if all requirements for a node are met
+     * Supports both string requirements ('node_id') and object requirements ({ id: 'node_id', level: 5 })
+     */
+    function checkRequirements(node) {
+        return node.requires.every(req => {
+            if (typeof req === 'string') {
+                // Simple requirement: just check if unlocked
+                return gameState.unlockedNodes.value.has(req);
+            } else {
+                // Object requirement: check id and level
+                const reqId = req.id;
+                const reqLevel = req.level || 1;
+                if (!gameState.unlockedNodes.value.has(reqId)) return false;
+                return getNodeLevel(reqId) >= reqLevel;
+            }
+        });
+    }
+
+    /**
+     * Get max level for a node (default 1)
+     */
+    function getNodeMaxLevel(node) {
+        return node?.maxLevel || 1;
+    }
+
+    /**
+     * Check if a node can be upgraded (has more levels available)
+     */
+    function canUpgradeNode(node) {
         if (!node) return false;
+        const currentLevel = getNodeLevel(node.id);
+        const maxLevel = getNodeMaxLevel(node);
+        return currentLevel > 0 && currentLevel < maxLevel;
+    }
+
+    /**
+     * Check if a node is affordable at a given level
+     */
+    function checkAffordability(node, level = null) {
+        if (!node) return false;
+        const currentLevel = level !== null ? level : getNodeLevel(node.id);
         const scaledCost = GameData.getScaledNodeCost(
             node,
             prestigeState.prestigeState.ascensionCount,
-            prestigeState.prestigeBonuses.value
+            prestigeState.prestigeBonuses.value,
+            currentLevel
         );
         for (const [resource, amount] of Object.entries(scaledCost)) {
             if (gameState.resources[resource] < amount) return false;
@@ -137,28 +173,35 @@ export function useNodeManagement(gameState, prestigeState) {
     }
 
     /**
-     * Unlock a node
+     * Unlock or upgrade a node
      */
     function unlockNode(nodeId) {
         const node = GameData.nodes[nodeId];
         if (!node) return false;
 
-        // Check requirements
-        const requirementsMet = node.requires.every(reqId => 
-            gameState.unlockedNodes.value.has(reqId)
-        );
-        if (!requirementsMet) return false;
+        const currentLevel = getNodeLevel(nodeId);
+        const maxLevel = getNodeMaxLevel(node);
+        const isUpgrade = currentLevel > 0;
 
-        // Check tier gate
-        if (!GameData.isTierUnlocked(node.tier, gameState.unlockedNodes.value)) return false;
+        // If already at max level, can't unlock/upgrade
+        if (currentLevel >= maxLevel) return false;
+
+        // For initial unlock, check requirements
+        if (!isUpgrade) {
+            if (!checkRequirements(node)) return false;
+
+            // Check tier gate
+            if (!GameData.isTierUnlocked(node.tier, gameState.unlockedNodes.value)) return false;
+        }
 
         // Check cost
-        if (!checkAffordability(node)) return false;
+        if (!checkAffordability(node, currentLevel)) return false;
 
         const scaledCost = GameData.getScaledNodeCost(
             node,
             prestigeState.prestigeState.ascensionCount,
-            prestigeState.prestigeBonuses.value
+            prestigeState.prestigeBonuses.value,
+            currentLevel
         );
 
         // Deduct costs
@@ -166,44 +209,138 @@ export function useNodeManagement(gameState, prestigeState) {
             gameState.resources[resource] -= amount;
         }
 
-        // Add to unlocked nodes (need to create new Set for reactivity)
-        const newUnlocked = new Set(gameState.unlockedNodes.value);
-        newUnlocked.add(nodeId);
-        gameState.unlockedNodes.value = newUnlocked;
+        // Update level
+        gameState.nodeLevels[nodeId] = currentLevel + 1;
+
+        // Add to unlocked nodes if first unlock
+        if (!isUpgrade) {
+            const newUnlocked = new Set(gameState.unlockedNodes.value);
+            newUnlocked.add(nodeId);
+            gameState.unlockedNodes.value = newUnlocked;
+        }
 
         // Apply effects
-        applyNodeEffects(node);
+        applyNodeEffects(node, isUpgrade, currentLevel + 1);
 
-        // Return node for caller to handle effects like toast
-        return node;
+        // Return node and new level for caller to handle effects like toast/narration
+        return { node, newLevel: currentLevel + 1 };
     }
 
     /**
      * Apply node effects (automation, unlocks, etc.)
+     * @param {Object} node - The node object
+     * @param {boolean} isUpgrade - True if this is a level upgrade, not initial unlock
+     * @param {number} newLevel - The new level of the node
      */
-    function applyNodeEffects(node) {
+    function applyNodeEffects(node, isUpgrade = false, newLevel = 1) {
         const effects = node.effects;
 
-        // Add automation
+        // Add automation (applied on each level)
         if (effects.automation) {
             gameState.automations[effects.automation.resource] += effects.automation.rate;
         }
 
-        // Unlock branch
-        if (effects.unlockBranch) {
-            gameState.unlockBranch(effects.unlockBranch);
+        // These effects only apply on initial unlock
+        if (!isUpgrade) {
+            // Unlock branch
+            if (effects.unlockBranch) {
+                gameState.unlockBranch(effects.unlockBranch);
+            }
+
+            // Unlock features (data processing, etc.)
+            if (effects.unlockDataProcessing) {
+                gameState.unlockFeature('dataProcessing');
+            }
+
+            // Unlock data generation (auto-generates bits over time)
+            if (effects.unlockDataGeneration) {
+                gameState.dataGeneration.active = true;
+            }
+
+            // Data generation speed multiplier (reduces interval)
+            if (effects.dataGenSpeedMultiplier) {
+                gameState.dataGeneration.interval /= effects.dataGenSpeedMultiplier;
+            }
+
+            // Data generation amount bonus (adds to bitsPerTick)
+            if (effects.dataGenAmountBonus) {
+                gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
+            }
+
+            // Instant unlock (Zero Day effect)
+            if (effects.instantUnlock) {
+                const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
+                    !gameState.unlockedNodes.value.has(n.id) &&
+                    checkRequirements(n)
+                );
+                if (lockedAvailableNodes.length > 0) {
+                    const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
+                    const newUnlocked = new Set(gameState.unlockedNodes.value);
+                    newUnlocked.add(randomNode.id);
+                    gameState.unlockedNodes.value = newUnlocked;
+                    applyNodeEffects(randomNode);
+                }
+            }
+
+            // Disable crank (manual energy button)
+            if (effects.disableCrank) {
+                gameState.crankDisabled.value = true;
+            }
+
+            // Unlock energy generation (auto-generates energy over time)
+            if (effects.unlockEnergyGeneration) {
+                gameState.energyGeneration.active = true;
+                if (effects.energyGenRate) {
+                    gameState.energyGeneration.energyPerTick = effects.energyGenRate;
+                }
+                if (effects.energyGenInterval) {
+                    gameState.energyGeneration.interval = effects.energyGenInterval;
+                }
+            }
         }
 
-        // Unlock features (data processing, etc.)
-        if (effects.unlockDataProcessing) {
+        if (effects.dataGenAmountBonus) {
+            gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
+        }
+
+        // Apply level-specific effects (only triggers at that exact level)
+        if (effects.levelEffects && effects.levelEffects[newLevel]) {
+            applyEffectSet(effects.levelEffects[newLevel]);
+        }
+    }
+
+    /**
+     * Apply a set of effects (used for both base effects and levelEffects)
+     */
+    function applyEffectSet(effectSet) {
+        if (effectSet.automation) {
+            gameState.automations[effectSet.automation.resource] += effectSet.automation.rate;
+        }
+
+        if (effectSet.unlockBranch) {
+            gameState.unlockBranch(effectSet.unlockBranch);
+        }
+
+        if (effectSet.unlockDataProcessing) {
             gameState.unlockFeature('dataProcessing');
         }
 
-        // Instant unlock (Zero Day effect)
-        if (effects.instantUnlock) {
+        if (effectSet.unlockDataGeneration) {
+            gameState.dataGeneration.active = true;
+        }
+
+        if (effectSet.dataGenSpeedMultiplier) {
+            gameState.dataGeneration.interval /= effectSet.dataGenSpeedMultiplier;
+        }
+
+        if (effectSet.dataGenAmountBonus) {
+            gameState.dataGeneration.bitsPerTick += effectSet.dataGenAmountBonus;
+        }
+
+        if (effectSet.instantUnlock) {
             const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
                 !gameState.unlockedNodes.value.has(n.id) &&
-                n.requires.every(reqId => gameState.unlockedNodes.value.has(reqId))
+                checkRequirements(n)
             );
             if (lockedAvailableNodes.length > 0) {
                 const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
@@ -211,6 +348,20 @@ export function useNodeManagement(gameState, prestigeState) {
                 newUnlocked.add(randomNode.id);
                 gameState.unlockedNodes.value = newUnlocked;
                 applyNodeEffects(randomNode);
+            }
+        }
+
+        if (effectSet.disableCrank) {
+            gameState.crankDisabled.value = true;
+        }
+
+        if (effectSet.unlockEnergyGeneration) {
+            gameState.energyGeneration.active = true;
+            if (effectSet.energyGenRate) {
+                gameState.energyGeneration.energyPerTick = effectSet.energyGenRate;
+            }
+            if (effectSet.energyGenInterval) {
+                gameState.energyGeneration.interval = effectSet.energyGenInterval;
             }
         }
     }
@@ -248,7 +399,7 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects from starting nodes
         newUnlocked.forEach(nodeId => {
             const node = GameData.nodes[nodeId];
-            if (node && node.id !== 'core') {
+            if (node && node.id !== 'old_shed') {
                 applyNodeEffects(node);
             }
         });
@@ -275,6 +426,9 @@ export function useNodeManagement(gameState, prestigeState) {
         processData,
         unlockNode,
         applyNodeEffects,
-        applyStartingBonuses
+        applyStartingBonuses,
+        getNodeLevel,
+        getNodeMaxLevel,
+        canUpgradeNode
     };
 }

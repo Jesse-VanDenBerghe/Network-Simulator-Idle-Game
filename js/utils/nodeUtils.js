@@ -1,22 +1,36 @@
 // Node Utilities
 // ===============
 
-import { TIER_COST_MULTIPLIERS, TIER_GATES } from '../data/constants.js';
+import { TIER_COST_MULTIPLIERS, COST_SHIFT_FOR_RESOURCE } from '../data/constants.js';
 import { ASCENSION_COST_MULTIPLIER } from '../data/config.js';
 
 /**
- * Get the cost of a node scaled by its tier multiplier, ascension count, and prestige bonuses
+ * Get tier multiplier for a resource, shifted by COST_SHIFT_FOR_RESOURCE
+ * e.g. data at tier 3 with shift 2 => uses multiplier for tier 1
+ */
+function getTierMultiplierForResource(tier, resource) {
+    const shift = COST_SHIFT_FOR_RESOURCE[resource] || 0;
+    const effectiveTier = Math.max(0, tier - shift);
+    return TIER_COST_MULTIPLIERS[effectiveTier] || 1;
+}
+
+/**
+ * Get the cost of a node scaled by its tier multiplier, ascension count, prestige bonuses, and level
  * @param {Object} node - The node object
  * @param {number} ascensionCount - Current ascension count (default 0)
  * @param {Object} prestigeBonuses - Prestige bonuses object (optional)
+ * @param {number} currentLevel - Current level of the node (default 0)
  * @returns {Object} The scaled cost object { resource: amount }
  */
-export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null) {
+export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = null, currentLevel = 0) {
     const baseCost = node.cost;
-    const tierMultiplier = TIER_COST_MULTIPLIERS[node.tier] || 1;
     
     // Ascension scaling: each ascension increases costs by ASCENSION_COST_MULTIPLIER (compounds)
     const ascensionMultiplier = Math.pow(ASCENSION_COST_MULTIPLIER, ascensionCount);
+    
+    // Level scaling: apply costScaling multiplier for each level above 0
+    const costScaling = node.costScaling || 1;
+    const levelMultiplier = currentLevel > 0 ? Math.pow(costScaling, currentLevel) : 1;
     
     // Prestige cost reduction
     let costReduction = 1;
@@ -33,7 +47,8 @@ export function getScaledNodeCost(node, ascensionCount = 0, prestigeBonuses = nu
     
     const scaled = {};
     for (const [resource, amount] of Object.entries(baseCost)) {
-        const finalCost = amount * tierMultiplier * ascensionMultiplier * costReduction;
+        const tierMultiplier = getTierMultiplierForResource(node.tier, resource);
+        const finalCost = amount * tierMultiplier * ascensionMultiplier * levelMultiplier * costReduction;
         scaled[resource] = Math.floor(finalCost);
     }
     return scaled;
@@ -58,18 +73,14 @@ export function countUnlockedInTier(tier, unlockedNodeIds, nodesData) {
 }
 
 /**
- * Check if a tier is unlocked based on gate requirements
+ * Check if a tier is unlocked (always returns true now - tier gates removed)
  * @param {number} tier - The tier to check
  * @param {Set<string>} unlockedNodeIds - Set of unlocked node IDs
  * @param {Object} nodesData - All nodes data
  * @returns {boolean} True if the tier is unlocked
  */
 export function isTierUnlocked(tier, unlockedNodeIds, nodesData) {
-    const gate = TIER_GATES[tier];
-    if (!gate) return true;
-    
-    const count = countUnlockedInTier(gate.requiredTier, unlockedNodeIds, nodesData);
-    return count >= gate.requiredCount;
+    return true;
 }
 
 /**
@@ -80,7 +91,8 @@ export function isTierUnlocked(tier, unlockedNodeIds, nodesData) {
 export function getConnections(nodesData) {
     const connections = [];
     Object.values(nodesData).forEach(node => {
-        node.requires.forEach(reqId => {
+        node.requires.forEach(req => {
+            const reqId = typeof req === 'string' ? req : req.id;
             const reqNode = nodesData[reqId];
             if (reqNode) {
                 // Skip connections from tier gates to nodes in a different branch

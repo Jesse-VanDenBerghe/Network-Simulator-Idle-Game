@@ -4,12 +4,17 @@
 
 const { ref, onMounted, onUnmounted } = Vue;
 
+const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
+
 export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) {
     // ==========================================
     // STATE
     // ==========================================
     const lastUpdate = ref(Date.now());
     const notifications = ref([]);
+    const notificationHistory = ref([]);
+    const showNotificationHistory = ref(false);
+    const narrateOnlyFilter = ref(false);
     let notificationId = 0;
     let gameLoopInterval = null;
     let saveInterval = null;
@@ -36,6 +41,50 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
         gameState.totalResources.energy += rates.energy * delta;
         gameState.totalResources.data += rates.data * delta;
         gameState.totalResources.bandwidth += rates.bandwidth * delta;
+
+        // Process auto data generation
+        processDataGeneration(delta);
+        
+        // Process auto energy generation
+        processEnergyGeneration(delta);
+    }
+
+    /**
+     * Auto data generation - fills progress bar and generates bits
+     */
+    function processDataGeneration(delta) {
+        const dg = gameState.dataGeneration;
+        if (!dg.active) return;
+        if (gameState.resources.energy < dg.energyCost) return;
+
+        // Progress = % of interval completed per second
+        const progressPerSecond = 100 / (dg.interval / 1000);
+        dg.progress += progressPerSecond * delta;
+
+        if (dg.progress >= 100) {
+            dg.progress = 0;
+            gameState.resources.energy -= dg.energyCost;
+            gameState.resources.data += dg.bitsPerTick;
+            gameState.totalResources.data += dg.bitsPerTick;
+        }
+    }
+
+    /**
+     * Auto energy generation - fills progress bar and generates energy
+     */
+    function processEnergyGeneration(delta) {
+        const eg = gameState.energyGeneration;
+        if (!eg.active) return;
+
+        // Progress = % of interval completed per second
+        const progressPerSecond = 100 / (eg.interval / 1000);
+        eg.progress += progressPerSecond * delta;
+
+        if (eg.progress >= 100) {
+            eg.progress = 0;
+            gameState.resources.energy += eg.energyPerTick;
+            gameState.totalResources.energy += eg.energyPerTick;
+        }
     }
 
     /**
@@ -43,10 +92,65 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      */
     function showNotification(message, type = 'info', duration = 10_000) {
         const id = ++notificationId;
+        const timestamp = Date.now();
         notifications.value.push({ id, message, type, duration });
+        
+        // Add to history
+        notificationHistory.value.unshift({ id, message, type, timestamp });
+        saveNotificationHistory();
+        
         setTimeout(() => {
             notifications.value = notifications.value.filter(n => n.id !== id);
         }, duration);
+    }
+
+    /**
+     * Show narration(s) from a narrate effect
+     * Supports string, object with text/duration, or array of either
+     */
+    function showNarration(narrate) {
+        const narrations = Array.isArray(narrate) ? narrate : [narrate];
+        narrations.forEach(n => {
+            const text = typeof n === 'string' ? n : n.text;
+            const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
+            setTimeout(() => showNotification(text, 'narration', duration), 500);
+        });
+    }
+
+    /**
+     * Save notification history to localStorage
+     */
+    function saveNotificationHistory() {
+        try {
+            localStorage.setItem(NOTIFICATION_HISTORY_KEY, JSON.stringify(notificationHistory.value));
+        } catch (e) { /* ignore */ }
+    }
+
+    /**
+     * Load notification history from localStorage
+     */
+    function loadNotificationHistory() {
+        try {
+            const saved = localStorage.getItem(NOTIFICATION_HISTORY_KEY);
+            if (saved) {
+                notificationHistory.value = JSON.parse(saved);
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    /**
+     * Clear notification history
+     */
+    function clearNotificationHistory() {
+        notificationHistory.value = [];
+        saveNotificationHistory();
+    }
+
+    /**
+     * Toggle notification history panel
+     */
+    function toggleNotificationHistory() {
+        showNotificationHistory.value = !showNotificationHistory.value;
     }
 
     /**
@@ -121,18 +225,25 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Handle node unlock with notification
      */
     function handleUnlockNode(nodeId) {
-        const node = nodeManagement.unlockNode(nodeId);
-        if (node) {
-            showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+        const result = nodeManagement.unlockNode(nodeId);
+        if (result) {
+            const { node, newLevel } = result;
+            const isUpgrade = newLevel > 1;
             
-            // Show narration message if node has one
-            if (node.effects.narrate) {
-                const narrate = node.effects.narrate;
-                const text = typeof narrate === 'string' ? narrate : narrate.text;
-                const duration = typeof narrate === 'string' ? 5_000 : (narrate.duration || 10_000);
-                setTimeout(() => {
-                    showNotification(text, 'narration', duration);
-                }, 500);
+            if (isUpgrade) {
+                showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, 'success');
+            } else {
+                showNotification(`${node.icon} ${node.name} unlocked!`, 'success');
+            }
+            
+            // Show narration from base effects (on initial unlock only)
+            if (!isUpgrade && node.effects.narrate) {
+                showNarration(node.effects.narrate);
+            }
+            
+            // Show narration from levelEffects
+            if (node.effects.levelEffects?.[newLevel]?.narrate) {
+                showNarration(node.effects.levelEffects[newLevel].narrate);
             }
             
             // Trigger unlock animation
@@ -165,6 +276,7 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
      * Initialize game on mount
      */
     function initialize() {
+        loadNotificationHistory();
         saveLoad.loadPrestige();
         const offlineMessage = saveLoad.loadGame();
         if (offlineMessage) {
@@ -185,10 +297,15 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
     return {
         // State
         notifications,
+        notificationHistory,
+        showNotificationHistory,
+        narrateOnlyFilter,
         
         // Methods
         gameLoop,
         showNotification,
+        toggleNotificationHistory,
+        clearNotificationHistory,
         ascend,
         resetGameState,
         handlePurchaseUpgrade,

@@ -23,11 +23,29 @@ export function useGameState() {
         data: 0
     });
 
-    const unlockedNodes = ref(new Set(['core']));
+    const unlockedNodes = ref(new Set(['old_shed']));
+    const nodeLevels = reactive({}); // Track levels for each node (0=locked, 1+=unlocked)
     const unlockedBranches = ref(new Set(['energy'])); // Explicit branch tracking
     const unlockedFeatures = ref(new Set()); // Features unlocked via effects (dataProcessing, etc.)
     const selectedNodeId = ref(null);
     const lastUnlockedNodeId = ref(null);
+
+    const dataGeneration = reactive({
+        active: false,
+        progress: 0, // 0-100%
+        interval: 20000, // 20 seconds default
+        bitsPerTick: 1,
+        energyCost: 1
+    });
+
+    const energyGeneration = reactive({
+        active: false,
+        progress: 0, // 0-100%
+        interval: 1000, // 1 second default
+        energyPerTick: 1
+    });
+
+    const crankDisabled = ref(false);
 
     // ==========================================
     // COMPUTED
@@ -71,9 +89,23 @@ export function useGameState() {
     }
 
     function resetNodes() {
-        unlockedNodes.value = new Set(['core']);
+        unlockedNodes.value = new Set(['old_shed']);
+        // Reset node levels
+        Object.keys(nodeLevels).forEach(k => delete nodeLevels[k]);
         unlockedBranches.value = new Set(['energy']);
         unlockedFeatures.value = new Set();
+        // Reset data generation
+        dataGeneration.active = false;
+        dataGeneration.progress = 0;
+        dataGeneration.interval = 20000;
+        dataGeneration.bitsPerTick = 1;
+        dataGeneration.energyCost = 1;
+        // Reset energy generation
+        energyGeneration.active = false;
+        energyGeneration.progress = 0;
+        energyGeneration.interval = 1000;
+        energyGeneration.energyPerTick = 1;
+        crankDisabled.value = false;
     }
 
     function unlockBranch(branch) {
@@ -111,10 +143,14 @@ export function useGameState() {
         totalResources,
         automations,
         unlockedNodes,
+        nodeLevels,
         unlockedBranches,
         unlockedFeatures,
         selectedNodeId,
         lastUnlockedNodeId,
+        dataGeneration,
+        energyGeneration,
+        crankDisabled,
         
         // Computed
         dataUnlocked,

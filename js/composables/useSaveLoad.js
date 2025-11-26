@@ -12,8 +12,10 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             totalResources: { ...gameState.totalResources },
             automations: { ...gameState.automations },
             unlockedNodes: Array.from(gameState.unlockedNodes.value),
+            nodeLevels: { ...gameState.nodeLevels },
             unlockedBranches: Array.from(gameState.unlockedBranches.value),
             unlockedFeatures: Array.from(gameState.unlockedFeatures.value),
+            dataGeneration: { ...gameState.dataGeneration },
             lastUpdate: Date.now()
         };
         localStorage.setItem('networkSimulatorSave', JSON.stringify(saveData));
@@ -46,11 +48,17 @@ export function useSaveLoad(gameState, prestigeState, nodeManagement) {
             if (data.unlockedNodes) {
                 gameState.unlockedNodes.value = new Set(data.unlockedNodes);
             }
+            if (data.nodeLevels) {
+                Object.assign(gameState.nodeLevels, data.nodeLevels);
+            }
             if (data.unlockedBranches) {
                 gameState.unlockedBranches.value = new Set(data.unlockedBranches);
             }
             if (data.unlockedFeatures) {
                 gameState.unlockedFeatures.value = new Set(data.unlockedFeatures);
+            }
+            if (data.dataGeneration) {
+                Object.assign(gameState.dataGeneration, data.dataGeneration);
             }
 
             // Calculate offline progress
