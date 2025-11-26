@@ -86,7 +86,7 @@ export const energyBranch = {
         id: 'energy_3_1',
         name: 'Explore Attic',
         icon: '📦',
-        tier: 3,
+        tier: 2,
         branch: 'energy',
         x: 0,
         y: 0,
