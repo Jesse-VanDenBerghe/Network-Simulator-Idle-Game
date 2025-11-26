@@ -137,4 +137,22 @@ export const energyBranch = {
             description: '+10 Energy/second (passive)'
         }
     },
+
+    energy_3_4: {
+        id: 'energy_3_4',
+        name: 'Rat king',
+        icon: '👑',
+        tier: 3,
+        branch: 'energy',
+        description: 'After catching a few rats, one of them seems to be the leader. Maybe if we catch it, the others will follow?',
+        requires: [{ id: 'energy_3_2', level: 5 }],
+        cost: { energy: 100 },
+        effects: {
+            automation: { resource: 'energy', rate: 100 },
+            description: '+100 Energy/second (passive)'
+        }
+    },
+
+    // == Tier 4 Nodes ==
+    
 };

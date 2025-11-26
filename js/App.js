@@ -215,6 +215,7 @@ const App = {
                     :prestige-bonuses="prestigeBonuses"
                     :node-level="selectedNode ? getNodeLevel(selectedNode.id) : 0"
                     :can-upgrade="selectedNode ? canUpgradeNode(selectedNode) : false"
+                    :node-levels="nodeLevels"
                     @unlock="unlockNode"
                 />
             </main>

@@ -1,6 +1,13 @@
 // LayoutEngine - Dynamic node positioning for the skill tree
 // ==========================================================
 
+/**
+ * Extract node ID from a requirement (supports both 'node_id' and { id: 'node_id', level: n })
+ */
+function getReqId(req) {
+    return typeof req === 'string' ? req : req.id;
+}
+
 const LayoutEngine = {
     // Configuration
     config: {
@@ -56,13 +63,14 @@ const LayoutEngine = {
             tree.maxTier = Math.max(tree.maxTier, node.tier);
 
             // Build parent-child relationships
-            tree.parents[node.id] = node.requires || [];
+            tree.parents[node.id] = (node.requires || []).map(getReqId);
             tree.children[node.id] = [];
         });
 
         // Build children list
         Object.values(nodes).forEach(node => {
-            node.requires.forEach(parentId => {
+            node.requires.forEach(req => {
+                const parentId = getReqId(req);
                 if (tree.children[parentId]) {
                     tree.children[parentId].push(node.id);
                 }
@@ -116,7 +124,7 @@ const LayoutEngine = {
             
             tierNodes.forEach(nodeId => {
                 const node = nodes[nodeId];
-                const parents = node.requires.map(pid => nodes[pid]).filter(p => p);
+                const parents = node.requires.map(req => nodes[getReqId(req)]).filter(p => p);
                 
                 if (parents.length === 0) return;
 
@@ -143,7 +151,7 @@ const LayoutEngine = {
         if (node.tier === 1) { cache[nodeId] = { depth: 1, sameTierHops: 0 }; return cache[nodeId]; }
         
         // Find parent with max depth
-        const parents = (node.requires || []).map(pid => nodes[pid]).filter(p => p);
+        const parents = (node.requires || []).map(req => nodes[getReqId(req)]).filter(p => p);
         if (parents.length === 0) {
             cache[nodeId] = { depth: node.tier, sameTierHops: 0 };
             return cache[nodeId];
@@ -289,7 +297,7 @@ const LayoutEngine = {
         nodeIds.forEach(nodeId => {
             const node = nodes[nodeId];
             // Use first parent as the grouping key
-            const parentId = node.requires && node.requires.length > 0 ? node.requires[0] : 'core';
+            const parentId = node.requires && node.requires.length > 0 ? getReqId(node.requires[0]) : 'core';
             
             if (!groups[parentId]) {
                 groups[parentId] = { parentId, nodes: [] };

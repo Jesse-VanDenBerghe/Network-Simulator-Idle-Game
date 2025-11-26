@@ -13,7 +13,8 @@ const InfoPanel = {
         ascensionCount: { type: Number, default: 0 },
         prestigeBonuses: { type: Object, default: null },
         nodeLevel: { type: Number, default: 0 },
-        canUpgrade: { type: Boolean, default: false }
+        canUpgrade: { type: Boolean, default: false },
+        nodeLevels: { type: Object, default: () => ({}) }
     },
     emits: ['unlock'],
     computed: {
@@ -39,13 +40,20 @@ const InfoPanel = {
         },
         requirementEntries() {
             if (!this.node || !this.node.requires) return [];
-            return this.node.requires.map(reqId => {
+            return this.node.requires.map(req => {
+                const reqId = typeof req === 'string' ? req : req.id;
+                const reqLevel = typeof req === 'string' ? null : req.level;
                 const reqNode = GameData.nodes[reqId];
+                const currentLevel = this.nodeLevels?.[reqId] || (this.unlockedNodes.has(reqId) ? 1 : 0);
+                const levelMet = reqLevel ? currentLevel >= reqLevel : true;
+                const unlocked = this.unlockedNodes.has(reqId);
                 return {
                     id: reqId,
                     name: reqNode ? reqNode.name : reqId,
                     icon: reqNode ? reqNode.icon : '?',
-                    met: this.unlockedNodes.has(reqId)
+                    met: unlocked && levelMet,
+                    reqLevel,
+                    currentLevel: unlocked ? currentLevel : 0
                 };
             });
         }
@@ -92,7 +100,7 @@ const InfoPanel = {
                         <h3>Requires</h3>
                         <ul class="cost-list">
                             <li v-for="req in requirementEntries" :key="req.id">
-                                <span>{{ req.icon }} {{ req.name }}</span>
+                                <span>{{ req.icon }} {{ req.name }}<template v-if="req.reqLevel"> (Lvl {{ req.currentLevel }}/{{ req.reqLevel }})</template></span>
                                 <span :class="req.met ? 'affordable' : 'not-affordable'">
                                     {{ req.met ? '✓' : '✗' }}
                                 </span>

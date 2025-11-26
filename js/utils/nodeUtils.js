@@ -91,7 +91,8 @@ export function isTierUnlocked(tier, unlockedNodeIds, nodesData) {
 export function getConnections(nodesData) {
     const connections = [];
     Object.values(nodesData).forEach(node => {
-        node.requires.forEach(reqId => {
+        node.requires.forEach(req => {
+            const reqId = typeof req === 'string' ? req : req.id;
             const reqNode = nodesData[reqId];
             if (reqNode) {
                 // Skip connections from tier gates to nodes in a different branch

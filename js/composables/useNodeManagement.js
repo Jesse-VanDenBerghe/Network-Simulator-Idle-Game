@@ -68,10 +68,7 @@ export function useNodeManagement(gameState, prestigeState) {
         if (!selectedNode.value || isSelectedNodeUnlocked.value) return false;
         
         // Check requirements
-        const requirementsMet = selectedNode.value.requires.every(reqId => 
-            gameState.unlockedNodes.value.has(reqId)
-        );
-        if (!requirementsMet) return false;
+        if (!checkRequirements(selectedNode.value)) return false;
 
         // Check tier gate
         return GameData.isTierUnlocked(selectedNode.value.tier, gameState.unlockedNodes.value);
@@ -99,6 +96,25 @@ export function useNodeManagement(gameState, prestigeState) {
      */
     function getNodeLevel(nodeId) {
         return gameState.nodeLevels[nodeId] || 0;
+    }
+
+    /**
+     * Check if all requirements for a node are met
+     * Supports both string requirements ('node_id') and object requirements ({ id: 'node_id', level: 5 })
+     */
+    function checkRequirements(node) {
+        return node.requires.every(req => {
+            if (typeof req === 'string') {
+                // Simple requirement: just check if unlocked
+                return gameState.unlockedNodes.value.has(req);
+            } else {
+                // Object requirement: check id and level
+                const reqId = req.id;
+                const reqLevel = req.level || 1;
+                if (!gameState.unlockedNodes.value.has(reqId)) return false;
+                return getNodeLevel(reqId) >= reqLevel;
+            }
+        });
     }
 
     /**
@@ -172,10 +188,7 @@ export function useNodeManagement(gameState, prestigeState) {
 
         // For initial unlock, check requirements
         if (!isUpgrade) {
-            const requirementsMet = node.requires.every(reqId => 
-                gameState.unlockedNodes.value.has(reqId)
-            );
-            if (!requirementsMet) return false;
+            if (!checkRequirements(node)) return false;
 
             // Check tier gate
             if (!GameData.isTierUnlocked(node.tier, gameState.unlockedNodes.value)) return false;
@@ -247,7 +260,7 @@ export function useNodeManagement(gameState, prestigeState) {
             if (effects.instantUnlock) {
                 const lockedAvailableNodes = Object.values(GameData.nodes).filter(n =>
                     !gameState.unlockedNodes.value.has(n.id) &&
-                    n.requires.every(reqId => gameState.unlockedNodes.value.has(reqId))
+                    checkRequirements(n)
                 );
                 if (lockedAvailableNodes.length > 0) {
                     const randomNode = lockedAvailableNodes[Math.floor(Math.random() * lockedAvailableNodes.length)];
