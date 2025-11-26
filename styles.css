@@ -733,7 +733,9 @@ body {
     border: 1px solid var(--accent-primary);
     padding: 1rem 1.5rem;
     border-radius: 8px;
-    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    animation-name: slideIn, fadeOut;
+    animation-fill-mode: none, forwards;
+    animation-timing-function: ease, ease;
     box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
 }
 
@@ -1220,6 +1222,14 @@ body {
     border-color: #6a11cb;
     background: linear-gradient(135deg, rgba(106, 17, 203, 0.3) 0%, rgba(37, 117, 252, 0.3) 100%);
     box-shadow: 0 0 30px rgba(106, 17, 203, 0.5);
+}
+
+/* Narration notification */
+.notification.narration {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.15) 100%);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    font-style: italic;
 }
 
 /* ============================================= */

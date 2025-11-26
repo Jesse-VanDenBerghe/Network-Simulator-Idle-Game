@@ -71,7 +71,7 @@ const InfoPanel = {
                         <p>{{ node.description }}</p>
                     </div>
 
-                    <div class="node-info-section">
+                    <div class="node-info-section" v-if="node.effects.description">
                         <h3>Effects</h3>
                         <p>{{ node.effects.description }}</p>
                     </div>

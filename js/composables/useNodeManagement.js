@@ -174,7 +174,8 @@ export function useNodeManagement(gameState, prestigeState) {
         // Apply effects
         applyNodeEffects(node);
 
-        return true;
+        // Return node for caller to handle effects like toast
+        return node;
     }
 
     /**

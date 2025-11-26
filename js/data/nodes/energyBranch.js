@@ -17,7 +17,11 @@ export const energyBranch = {
         cost: { energy: 0 },
         effects: {
             energyPerClick: 1,
-            description: '+1 Energy per click'
+            narrate: {
+                text: 'When you turn the crank, you hear a faint humming sound...',
+                duration: 8000
+            },
+            description: '+1 Energy per crank'
         }
     },
 
@@ -35,7 +39,7 @@ export const energyBranch = {
         cost: { energy: 5 },
         effects: {
             energyPerClick: 1,
-            description: '+1 Energy per click'
+            description: '+1 Energy per crank'
         }
     },
 
@@ -51,7 +55,11 @@ export const energyBranch = {
         requires: ['energy_2_1', 'energy_2_3'],
         cost: { energy: 25 },
         effects: {
-            description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.'
+            description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.',
+            narrate: {
+                text: 'When you turn on the light, the room is illuminated. The shed is empty, but there\'s an attic hatch above you that wasn\'t visible before.',
+                duration: 10000
+            }
         }
     },
 
@@ -87,7 +95,10 @@ export const energyBranch = {
         cost: { energy: 5 },
         effects: {
             unlockBranch: 'computer',
-            description: 'You found an old computer up in the attic! Lets see if it still works...'
+            narrate: {
+                text: 'You found an old computer up in the attic! Lets see if it still works...',
+                duration: 10000
+            }
         }
     },
 };
