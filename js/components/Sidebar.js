@@ -13,6 +13,8 @@ const Sidebar = {
         dataUnlocked: { type: Boolean, default: false },
         canProcessData: { type: Boolean, default: false },
         dataGeneration: { type: Object, default: null },
+        energyGeneration: { type: Object, default: null },
+        crankDisabled: { type: Boolean, default: false },
         automations: { type: Object, required: true },
         effectiveRates: { type: Object, required: true },
         stats: { type: Object, required: true },
@@ -41,6 +43,24 @@ const Sidebar = {
                 return `+${this.formatNumber(dg.bitsPerTick)} (${dg.energyCost}⚡)`;
             }
             return '+1 (1⚡)';
+        },
+        energyGenerationProgress() {
+            if (this.energyGeneration && this.energyGeneration.active) {
+                return this.energyGeneration.progress;
+            }
+            return null;
+        },
+        energyButtonText() {
+            if (this.crankDisabled) {
+                return 'Broken Crank';
+            }
+            return 'Turn Crank';
+        },
+        energyButtonValue() {
+            if (this.energyGeneration && this.energyGeneration.active) {
+                return `+${this.formatNumber(this.energyGeneration.energyPerTick)}/s`;
+            }
+            return '+' + this.formatNumber(this.energyPerClick);
         }
     },
     template: `
@@ -50,8 +70,10 @@ const Sidebar = {
                 <div class="action-wrapper" @click="handleEnergyClick">
                     <ActionButton
                         icon="⚡"
-                        text="Turn Crank"
-                        :value="'+' + formatNumber(energyPerClick)"
+                        :text="energyButtonText"
+                        :value="energyButtonValue"
+                        :locked="crankDisabled"
+                        :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
                 </div>
@@ -106,6 +128,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
+            if (this.crankDisabled) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

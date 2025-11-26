@@ -220,7 +220,7 @@ export function useNodeManagement(gameState, prestigeState) {
         }
 
         // Apply effects
-        applyNodeEffects(node, isUpgrade);
+        applyNodeEffects(node, isUpgrade, currentLevel + 1);
 
         // Return node and new level for caller to handle effects like toast/narration
         return { node, newLevel: currentLevel + 1 };
@@ -230,8 +230,9 @@ export function useNodeManagement(gameState, prestigeState) {
      * Apply node effects (automation, unlocks, etc.)
      * @param {Object} node - The node object
      * @param {boolean} isUpgrade - True if this is a level upgrade, not initial unlock
+     * @param {number} newLevel - The new level of the node
      */
-    function applyNodeEffects(node, isUpgrade = false) {
+    function applyNodeEffects(node, isUpgrade = false, newLevel = 1) {
         const effects = node.effects;
 
         // Add automation (applied on each level)
@@ -280,10 +281,45 @@ export function useNodeManagement(gameState, prestigeState) {
                     applyNodeEffects(randomNode);
                 }
             }
+
+            // Disable crank (manual energy button)
+            if (effects.disableCrank) {
+                gameState.crankDisabled.value = true;
+            }
+
+            // Unlock energy generation (auto-generates energy over time)
+            if (effects.unlockEnergyGeneration) {
+                gameState.energyGeneration.active = true;
+                if (effects.energyGenRate) {
+                    gameState.energyGeneration.energyPerTick = effects.energyGenRate;
+                }
+                if (effects.energyGenInterval) {
+                    gameState.energyGeneration.interval = effects.energyGenInterval;
+                }
+            }
         }
 
         if (effects.dataGenAmountBonus) {
             gameState.dataGeneration.bitsPerTick += effects.dataGenAmountBonus;
+        }
+
+        // Apply level-specific effects
+        if (effects.levelEffects && effects.levelEffects[newLevel]) {
+            const levelEffect = effects.levelEffects[newLevel];
+            
+            if (levelEffect.disableCrank) {
+                gameState.crankDisabled.value = true;
+            }
+            
+            if (levelEffect.unlockEnergyGeneration) {
+                gameState.energyGeneration.active = true;
+                if (levelEffect.energyGenRate) {
+                    gameState.energyGeneration.energyPerTick = levelEffect.energyGenRate;
+                }
+                if (levelEffect.energyGenInterval) {
+                    gameState.energyGeneration.interval = levelEffect.energyGenInterval;
+                }
+            }
         }
     }
 

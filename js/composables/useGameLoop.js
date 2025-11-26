@@ -44,6 +44,9 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
 
         // Process auto data generation
         processDataGeneration(delta);
+        
+        // Process auto energy generation
+        processEnergyGeneration(delta);
     }
 
     /**
@@ -63,6 +66,24 @@ export function useGameLoop(gameState, prestigeState, nodeManagement, saveLoad) 
             gameState.resources.energy -= dg.energyCost;
             gameState.resources.data += dg.bitsPerTick;
             gameState.totalResources.data += dg.bitsPerTick;
+        }
+    }
+
+    /**
+     * Auto energy generation - fills progress bar and generates energy
+     */
+    function processEnergyGeneration(delta) {
+        const eg = gameState.energyGeneration;
+        if (!eg.active) return;
+
+        // Progress = % of interval completed per second
+        const progressPerSecond = 100 / (eg.interval / 1000);
+        eg.progress += progressPerSecond * delta;
+
+        if (eg.progress >= 100) {
+            eg.progress = 0;
+            gameState.resources.energy += eg.energyPerTick;
+            gameState.totalResources.energy += eg.energyPerTick;
         }
     }
 

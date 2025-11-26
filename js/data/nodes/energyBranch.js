@@ -121,7 +121,12 @@ export const energyBranch = {
                     duration: 8000,
                     level: 10
                 }
-            ]
+            ],
+            levelEffects: {
+                10: {
+                    disableCrank: true
+                }
+            }
         }
     },
 

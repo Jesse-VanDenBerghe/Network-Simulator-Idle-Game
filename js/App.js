@@ -96,6 +96,8 @@ const App = {
             selectedNodeId: gameState.selectedNodeId,
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             dataGeneration: gameState.dataGeneration,
+            energyGeneration: gameState.energyGeneration,
+            crankDisabled: gameState.crankDisabled,
             notifications: gameLoop.notifications,
             notificationHistory: gameLoop.notificationHistory,
             showNotificationHistory: gameLoop.showNotificationHistory,
@@ -186,6 +188,8 @@ const App = {
                     :data-unlocked="dataUnlocked"
                     :can-process-data="canProcessData"
                     :data-generation="dataGeneration"
+                    :energy-generation="energyGeneration"
+                    :crank-disabled="crankDisabled"
                     :automations="automations"
                     :effective-rates="resourceRates"
                     :stats="stats"

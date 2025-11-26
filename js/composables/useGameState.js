@@ -38,6 +38,15 @@ export function useGameState() {
         energyCost: 1
     });
 
+    const energyGeneration = reactive({
+        active: false,
+        progress: 0, // 0-100%
+        interval: 1000, // 1 second default
+        energyPerTick: 1
+    });
+
+    const crankDisabled = ref(false);
+
     // ==========================================
     // COMPUTED
     // ==========================================
@@ -91,6 +100,12 @@ export function useGameState() {
         dataGeneration.interval = 20000;
         dataGeneration.bitsPerTick = 1;
         dataGeneration.energyCost = 1;
+        // Reset energy generation
+        energyGeneration.active = false;
+        energyGeneration.progress = 0;
+        energyGeneration.interval = 1000;
+        energyGeneration.energyPerTick = 1;
+        crankDisabled.value = false;
     }
 
     function unlockBranch(branch) {
@@ -134,6 +149,8 @@ export function useGameState() {
         selectedNodeId,
         lastUnlockedNodeId,
         dataGeneration,
+        energyGeneration,
+        crankDisabled,
         
         // Computed
         dataUnlocked,
