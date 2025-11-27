@@ -140,19 +140,6 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     }
 
     /**
-     * Show narration(s) from a narrate effect
-     * Supports string, object with text/duration, or array of either
-     */
-    function showNarration(narrate) {
-        const narrations = Array.isArray(narrate) ? narrate : [narrate];
-        narrations.forEach(n => {
-            const text = typeof n === 'string' ? n : n.text;
-            const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
-            setTimeout(() => showNotification(text, NotificationType.NARRATION, duration), 500);
-        });
-    }
-
-    /**
      * Save notification history to localStorage
      */
     function saveNotificationHistory() {
@@ -290,15 +277,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
             showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.NODE_UNLOCK);
         }
         
-        // Show narration from base effects (on initial unlock only)
-        if (!isUpgrade && node.effects.narrate) {
-            showNarration(node.effects.narrate);
-        }
-        
-        // Show narration from levelEffects
-        if (node.effects.levelEffects?.[newLevel]?.narrate) {
-            showNarration(node.effects.levelEffects[newLevel].narrate);
-        }
+        // Note: Narrations are now handled by useNotificationEngine via event subscription
         
         // Trigger unlock animation
         gameState.setLastUnlockedNode(node.id);

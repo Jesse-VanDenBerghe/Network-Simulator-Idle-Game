@@ -451,18 +451,18 @@ function markShown(id) {
 ### Nodes to migrate (narrate → data file)
 
 **energyBranch.js:**
-- [ ] `hand_crank` — base narrate
-- [ ] `hamster_wheel` — base narrate
-- [ ] `lightbulb` — base narrate
-- [ ] `attic` — base narrate
-- [ ] `crank_harder` — base narrate + levelEffects 5, 10
-- [ ] `catch_rat` — base narrate
+- [x] `hand_crank` — base narrate
+- [x] `hamster_wheel` — base narrate
+- [x] `lightbulb` — base narrate
+- [x] `attic` — base narrate
+- [x] `crank_harder` — base narrate + levelEffects 5, 10
+- [x] `catch_rat` — base narrate
 
 **computerBranch.js:**
-- [ ] All nodes with `narrate` effects (scan file)
+- [x] All nodes with `narrate` effects (scan file)
 
 **core.js:**
-- [ ] `old_shed` if has narrate
+- [x] `old_shed` if has narrate (N/A - no narrate)
 
 ---
 
@@ -488,21 +488,12 @@ function markShown(id) {
 
 ---
 
-## Estimated Effort
+## Implementation Status
 
-| Phase | Complexity | Estimate |
-|-------|------------|----------|
-| 1: Core Engine | Medium | 2-3 hrs |
-| 2: Data Migration | Low | 1-2 hrs |
-| 3: Resource Triggers | Medium | 2 hrs |
-| 4: Hints & Types | Low | 1 hr |
-| 5: Ascension Config | Low | 1 hr |
-| 6: Polish & Tests | Medium | 2 hrs |
-| **Total** | | **9-11 hrs** |
-
----
-
-## Next Steps
-1. Review & approve this plan
-2. Begin Phase 1: Core Engine Foundation
-3. Iterate based on feedback
+All phases complete:
+- ✅ Phase 1: Core Engine Foundation
+- ✅ Phase 2: Data Migration
+- ✅ Phase 3: Resource & Milestone Triggers
+- ✅ Phase 4: Hints & Other Notification Types
+- ✅ Phase 5: Ascension & Persistence Configuration
+- ✅ Phase 6: Polish & Testing (41 unit tests)

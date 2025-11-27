@@ -235,3 +235,60 @@ When adding new nodes with narration:
 - **When to narrate:** Discoveries, milestones, story beats—not routine upgrades
 - **Multi-level nodes:** Add narration at key levels (1, 5, max) to mark progression
 - **Duration:** 8000ms for standard, 10000ms for major discoveries
+
+---
+
+## Notification Engine
+
+All narrations are now managed by a centralized notification engine (`useNotificationEngine.js`). Narrations are defined in data files, not inline in node definitions.
+
+### Data File Location
+```
+js/data/notifications/
+├── narration/
+│   ├── mainStory.js      # Core storyline
+│   ├── energySide.js     # Energy branch side stories
+│   └── computerSide.js   # Computer branch narrations
+└── hints/
+    └── gameplay.js       # Idle hints and tips
+```
+
+### Adding New Narrations
+
+Define narrations in the appropriate data file:
+
+```javascript
+{
+    id: 'unique_id',                    // Unique identifier
+    type: NotificationType.NARRATION,   // NARRATION, HINT, ACHIEVEMENT
+    trigger: {
+        type: TriggerType.ON_NODE_UNLOCKED,
+        nodeId: 'node_id'
+    },
+    message: 'Your narration text here...',
+    duration: NotificationDurations.NARRATION_MEDIUM,
+    persistAcrossAscension: false,      // Reset on ascension?
+    priority: 10                        // Higher = shows first
+}
+```
+
+### Trigger Types
+
+| Trigger | When it fires |
+|---------|---------------|
+| `onFirstLaunch` | First game load ever |
+| `onNodeUnlocked` | Node first purchased |
+| `onNodeLevelReached` | Node reaches specific level |
+| `onResourceAmountReached` | Resource crosses threshold |
+| `onBranchUnlocked` | New branch becomes available |
+| `onTierReached` | First node of tier X unlocked |
+| `onIdleTime` | Player idle for X seconds |
+| `onAscension` | After ascension completes |
+
+### Debug Tools
+
+Reset narrations for testing:
+```javascript
+window.__resetNarrations(false)  // Reset non-persistent only
+window.__resetNarrations(true)   // Reset all narrations
+```

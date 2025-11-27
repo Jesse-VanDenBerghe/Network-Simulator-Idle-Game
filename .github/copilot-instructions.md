@@ -15,8 +15,38 @@ Vue 3 composables communicate via **event bus**, not direct imports:
 - `useGameLoop` - 100ms ticks, notifications, passive generation
 - `useSaveLoad` - LocalStorage persistence, offline progress
 - `useEventBus` - Pub/sub for decoupled communication
+- `useNotificationEngine` - Event-driven narration/hints (see below)
 
 When adding interactions between composables, emit/subscribe to events rather than importing one into another.
+
+### Notification Engine (`js/composables/useNotificationEngine.js`)
+Centralized system for triggering narrations, hints, and achievements based on game events.
+
+**Key features:**
+- Event-driven via `useEventBus` — subscribes to `nodeUnlocked`, `branchUnlocked`, etc.
+- O(1) indexed lookups for performance
+- Persists "shown" state to localStorage with debounced saves
+- Configurable `persistAcrossAscension` per notification
+
+**Data files:** `js/data/notifications/`
+```javascript
+{
+    id: 'unique_id',
+    type: NotificationType.NARRATION,  // or HINT, ACHIEVEMENT
+    trigger: {
+        type: TriggerType.ON_NODE_UNLOCKED,
+        nodeId: 'hand_crank'
+    },
+    message: 'Your narration text...',
+    duration: 8000,
+    persistAcrossAscension: false,
+    priority: 10
+}
+```
+
+**Trigger types:** `onFirstLaunch`, `onNodeUnlocked`, `onNodeLevelReached`, `onResourceAmountReached`, `onBranchUnlocked`, `onTierReached`, `onIdleTime`, `onAscension`
+
+**Adding narrations:** Add to appropriate file in `js/data/notifications/narration/` — do NOT add inline `narrate` effects to nodes.
 
 ### Node System (`js/data/nodes/`)
 Nodes are the progression mechanic. Each unlock reveals story and gameplay:
@@ -40,7 +70,7 @@ Nodes are the progression mechanic. Each unlock reveals story and gameplay:
 ```
 
 ### Narration Guidelines
-Narration drives the story. When adding nodes with `narrate` effects:
+Narration drives the story. Narrations are defined in `js/data/notifications/narration/`:
 - Write in second person, present tense ("You discover...", "The room illuminates...")
 - Keep it atmospheric—describe what the player sees/hears/feels
 - Use narration for discoveries and milestones, not routine upgrades
