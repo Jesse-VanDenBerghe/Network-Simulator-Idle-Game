@@ -5,7 +5,8 @@ const Sidebar = {
         ActionButton,
         AutomationItem,
         AscensionButton,
-        ParticleBurst
+        ParticleBurst,
+        TerminalProgressButton
     },
     props: {
         resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, stats }
@@ -69,9 +70,8 @@ const Sidebar = {
                     <ParticleBurst ref="energyParticles" />
                 </div>
                 <div class="action-wrapper">
-                    <ActionButton
-                        icon="📊"
-                        text="Generating Data"
+                    <TerminalProgressButton
+                        label="data"
                         :value="dataButtonValue"
                         :locked="!gameStats.isDataUnlocked"
                         :progress="dataGenerationProgress"
