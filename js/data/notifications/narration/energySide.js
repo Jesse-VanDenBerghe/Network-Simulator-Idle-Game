@@ -2,7 +2,7 @@
 // ===========================
 // Side narrations for energy branch (catch_rat, crank_harder levelEffects, etc.)
 
-import { NotificationType } from '../../constants.js';
+import { NotificationType } from '../constants.js';
 import { NotificationDurations } from '../constants.js';
 import { TriggerType } from '../types.js';
 

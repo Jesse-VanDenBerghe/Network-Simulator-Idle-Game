@@ -3,7 +3,8 @@
 // Handles saving and loading game and prestige data
 // Uses event bus for decoupled communication
 
-import { MAX_OFFLINE_TIME_S, NotificationType } from '../data/constants.js';
+import { MAX_OFFLINE_TIME_S } from '../data/constants.js';
+import { NotificationType } from '../data/notifications/constants.js';
 
 export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**

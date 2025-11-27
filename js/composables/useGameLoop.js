@@ -4,7 +4,8 @@
 // Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
-import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType, DisabledNotificationTypes } from '../data/constants.js';
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS } from '../data/constants.js';
+import { NotificationType, DisabledNotificationTypes } from '../data/notifications/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -65,6 +66,12 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         
         // Process auto energy generation
         processEnergyGeneration(delta);
+        
+        // Emit tick for notification engine (throttled checks happen there)
+        eventBus.emit('gameTick', { 
+            resources: gameState.resources,
+            now 
+        });
     }
 
     /**

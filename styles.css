@@ -1327,6 +1327,23 @@ body {
     font-style: italic;
 }
 
+/* Hint notification */
+.notification.hint {
+    border-color: #87ceeb;
+    background: linear-gradient(135deg, rgba(135, 206, 235, 0.15) 0%, rgba(70, 130, 180, 0.15) 100%);
+    box-shadow: 0 0 15px rgba(135, 206, 235, 0.3);
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+/* Achievement notification */
+.notification.achievement {
+    border-color: #9b59b6;
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(142, 68, 173, 0.2) 100%);
+    box-shadow: 0 0 25px rgba(155, 89, 182, 0.4);
+    font-weight: 500;
+}
+
 /* ============================================= */
 /* CHANGELOG PANEL */
 /* ============================================= */
@@ -1613,6 +1630,16 @@ body {
 #notification-history-panel .history-item.narration {
     border-left-color: #ffd700;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%);
+}
+
+#notification-history-panel .history-item.hint {
+    border-left-color: #87ceeb;
+    background: linear-gradient(135deg, rgba(135, 206, 235, 0.1) 0%, rgba(70, 130, 180, 0.05) 100%);
+}
+
+#notification-history-panel .history-item.achievement {
+    border-left-color: #9b59b6;
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.05) 100%);
 }
 
 #notification-history-panel .history-icon {

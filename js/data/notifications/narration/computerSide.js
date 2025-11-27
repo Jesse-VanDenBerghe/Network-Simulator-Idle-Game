@@ -2,7 +2,7 @@
 // =============================
 // Side narrations for computer branch
 
-import { NotificationType } from '../../constants.js';
+import { NotificationType } from '../constants.js';
 import { NotificationDurations } from '../constants.js';
 import { TriggerType } from '../types.js';
 

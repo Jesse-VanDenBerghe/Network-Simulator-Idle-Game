@@ -5,11 +5,12 @@
 
 import { TriggerType, ComparisonOperator, NotificationDefaults } from '../data/notifications/types.js';
 import { getAllNotifications } from '../data/notifications/index.js';
-import { NotificationType } from '../data/constants.js';
+import { NotificationType } from '../data/notifications/constants.js';
 
 const SHOWN_NOTIFICATIONS_KEY = 'networkSimShownNotifications';
 const NOTIFICATION_QUEUE_DELAY_MS = 500;
 const SAVE_DEBOUNCE_MS = 1000;
+const TICK_THROTTLE_MS = 500;  // Check resource/idle thresholds every 500ms
 
 /**
  * Build indexed notification maps for O(1) lookups
@@ -118,6 +119,11 @@ function buildNotificationIndex(notifications) {
         (a, b) => a.trigger.idleSeconds - b.trigger.idleSeconds
     );
     
+    // Sort offline return triggers
+    index[TriggerType.ON_OFFLINE_RETURN].sort(
+        (a, b) => (a.trigger.offlineSeconds || 0) - (b.trigger.offlineSeconds || 0)
+    );
+    
     return index;
 }
 
@@ -170,6 +176,9 @@ export function useNotificationEngine(eventBus) {
     
     // Debounce save timer
     let saveTimeout = null;
+    
+    // Tick throttling
+    let lastTickCheck = 0;
     
     // Tier tracking (for onTierReached)
     const triggeredTiers = new Set();
@@ -438,8 +447,9 @@ export function useNotificationEngine(eventBus) {
         
         const notifications = notificationIndex[TriggerType.ON_OFFLINE_RETURN];
         for (const n of notifications) {
-            // Filter by minimum offline time if specified
-            if (!n.trigger.minSeconds || offlineSeconds >= n.trigger.minSeconds) {
+            // Filter by minimum offline time
+            const minSeconds = n.trigger.offlineSeconds || 0;
+            if (offlineSeconds >= minSeconds) {
                 queueNotification(n);
             }
         }
@@ -507,6 +517,19 @@ export function useNotificationEngine(eventBus) {
         }
     }
     
+    /**
+     * Handle game tick event (throttled resource/idle checks)
+     * @param {Object} data - { resources, now }
+     */
+    function onGameTick({ resources, now }) {
+        // Throttle checks to every TICK_THROTTLE_MS
+        if (now - lastTickCheck < TICK_THROTTLE_MS) return;
+        lastTickCheck = now;
+        
+        checkResourceThresholds(resources);
+        checkIdleThresholds();
+    }
+    
     // ==========================================
     // INITIALIZATION
     // ==========================================
@@ -530,6 +553,7 @@ export function useNotificationEngine(eventBus) {
         eventBus.on('ascensionComplete', onAscensionComplete);
         eventBus.on('offlineReturn', onOfflineReturn);
         eventBus.on('userInteraction', recordInteraction);
+        eventBus.on('gameTick', onGameTick);
         
         // Debug helper
         if (typeof window !== 'undefined') {

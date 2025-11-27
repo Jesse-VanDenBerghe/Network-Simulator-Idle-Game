@@ -3,7 +3,7 @@
 // Core storyline narrations (hand_crank, lightbulb, attic, etc.)
 // These drive the main plot forward
 
-import { NotificationType } from '../../constants.js';
+import { NotificationType } from '../constants.js';
 import { NotificationDurations } from '../constants.js';
 import { TriggerType } from '../types.js';
 
