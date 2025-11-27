@@ -831,7 +831,7 @@ body {
     animation-fill-mode: none, forwards;
     animation-timing-function: ease, ease;
     box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
-    max-width: 400px;
+    max-width: 600px;
 }
 
 .notification.success {
@@ -1344,6 +1344,16 @@ body {
     font-weight: 500;
 }
 
+/* Terminal notification */
+.notification.terminal {
+    border-color: #00ff00;
+    background: linear-gradient(135deg, rgba(0, 40, 0, 0.9) 0%, rgba(0, 20, 0, 0.95) 100%);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    font-family: 'Courier New', Consolas, monospace;
+    color: #00ff00;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
 /* ============================================= */
 /* CHANGELOG PANEL */
 /* ============================================= */
@@ -1640,6 +1650,13 @@ body {
 #notification-history-panel .history-item.achievement {
     border-left-color: #9b59b6;
     background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.05) 100%);
+}
+
+#notification-history-panel .history-item.terminal {
+    border-left-color: #00ff00;
+    background: linear-gradient(135deg, rgba(0, 40, 0, 0.3) 0%, rgba(0, 20, 0, 0.2) 100%);
+    font-family: 'Courier New', Consolas, monospace;
+    color: #00ff00;
 }
 
 #notification-history-panel .history-icon {

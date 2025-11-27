@@ -8,7 +8,8 @@ export const NotificationType = Object.freeze({
     NARRATION: 'narration',
     NODE_UNLOCK: 'node_unlock',
     HINT: 'hint',
-    ACHIEVEMENT: 'achievement'
+    ACHIEVEMENT: 'achievement',
+    TERMINAL: 'terminal'
 });
 
 export const DisabledNotificationTypes = new Set([

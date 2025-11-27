@@ -69,6 +69,33 @@ export const mainStoryNarrations = [
         persistAcrossAscension: false,
         priority: 10
     },
+    // terminal unlock
+    {
+        id: 'gpa_old_pc_unlock_terminal',
+        type: NotificationType.TERMINAL,
+        trigger: {
+            type: TriggerType.ON_FIRST_LAUNCH,
+            nodeId: 'gpa_old_pc'
+        },
+        message: '...Booting up...\n\n\nGood to see you again Anton!\n\nType /help for a list of commands.',
+        duration: NotificationDurations.NARRATION_LONG,
+        persistAcrossAscension: false,
+        priority: 9
+    },
+    // gpa_old_pc unlock
+    {
+        id: 'gpa_old_pc_unlock',
+        type: NotificationType.NARRATION,
+        trigger: {
+            type: TriggerType.ON_FIRST_LAUNCH,
+            nodeId: 'gpa_old_pc'
+        },
+        message: 'Wow, this old computer still works! It even calls my grandfather by name!',
+        duration: NotificationDurations.NARRATION_LONG,
+        persistAcrossAscension: false,
+        priority: 8
+    },
+
     // command_help unlock
     {
         id: 'command_help_unlock',

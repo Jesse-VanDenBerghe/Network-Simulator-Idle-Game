@@ -57,7 +57,7 @@ const NotificationHistoryPanel = {
                     >
                         <span class="history-icon">{{ getTypeIcon(notification.type) }}</span>
                         <div class="history-content">
-                            <span class="history-message">{{ notification.message }}</span>
+                            <span class="history-message" style="white-space: pre-line">{{ notification.message }}</span>
                             <span class="history-time">{{ formatTime(notification.timestamp) }}</span>
                         </div>
                     </div>
