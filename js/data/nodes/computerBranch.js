@@ -15,11 +15,7 @@ export const computerBranch = {
         requires: ['old_shed'],
         cost: { energy: 15 },
         effects: {
-            description: 'Unlock computer systems and the Computer branch',
-            narrate: {
-                text: 'You power on the old PC. The screen flickers to life, displaying a command prompt. It seems functional, albeit slow.',
-                duration: 8000
-            }
+            description: 'Unlock computer systems and the Computer branch'
         }
     },
 
@@ -34,10 +30,7 @@ export const computerBranch = {
         requires: ['gpa_old_pc'],
         cost: { energy: 30 },
         effects: {
-            narrate: {
-                text: 'You type /help into the command prompt. \nAvailable commands:\n- /generate: Generate data, but at what cost?.',
-                duration: 8000
-            }
+            description: 'Display available commands'
         }
     },
 
@@ -53,10 +46,6 @@ export const computerBranch = {
         effects: {
             unlockDataGeneration: true,
             unlockDataProcessing: true,
-            narrate: {
-                text: 'You execute /generate. On the screen appears a single progressbar that slowly fills up. VEEEERY SLOW. After a while, it completes you see: "Data generation complete. 1 bit created."',
-                duration: 10000
-            },
             description: 'Unlock data processing capabilities'
         }
     },
@@ -91,11 +80,7 @@ export const computerBranch = {
         cost: { energy: 60, data: 1028 },
         effects: {
             maxDataCapacityBonus: 1028 * 16,
-            description: 'Increase max data capacity by 16 KB',
-            narrate: {
-                text: 'You plug in the USB stick. The computer recognizes it immediately, expanding its available storage. You can now store much more data than before!',
-                duration: 8000
-            }
+            description: 'Increase max data capacity by 16 KB'
         }
     },
 
@@ -112,27 +97,7 @@ export const computerBranch = {
         costScaling: 1.5,
         effects: {
             dataGenAmountBonus: 1,
-            description: 'Generate +1 additional bit of data per tick',
-            levelEffects: {
-                2: {
-                    narrate: {
-                        text: 'You carefully adjust the system settings to overclock the CPU. The computer hums louder as it works harder, but data generation speeds up noticeably.',
-                        duration: 8000
-                    }
-                },
-                5: {
-                    narrate: {
-                        text: 'The overclocking is really paying off now! The computer is pushing its limits, and data is flowing in at an impressive rate.',
-                        duration: 8000
-                    }
-                },
-                10: {
-                    narrate: {
-                        text: 'As you see steam start to rise from the computer, you realize you might have pushed it a bit too far. I guess this is the most this old machine can handle!',
-                        duration: 8000
-                    }
-                }
-            }
+            description: 'Generate +1 additional bit of data per tick'
         }
     },
 };
