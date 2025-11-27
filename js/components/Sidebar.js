@@ -69,11 +69,10 @@ const Sidebar = {
                     />
                     <ParticleBurst ref="energyParticles" />
                 </div>
-                <div class="action-wrapper">
+                <div class="action-wrapper" v-if="gameStats.isDataUnlocked">
                     <TerminalProgressButton
                         label="data"
                         :value="dataButtonValue"
-                        :locked="!gameStats.isDataUnlocked"
                         :progress="dataGenerationProgress"
                     />
                 </div>

@@ -8,7 +8,7 @@ const TerminalProgressButton = {
         disabled: { type: Boolean, default: false },
         locked: { type: Boolean, default: false },
         progress: { type: Number, default: null }, // 0-100, null = no progress bar
-        barWidth: { type: Number, default: 20 } // Number of characters in progress bar
+        barWidth: { type: Number, default: 24 } // Number of characters in progress bar
     },
     emits: ['click'],
     computed: {
