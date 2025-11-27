@@ -321,9 +321,9 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
-        disableCrank: (effects) => {
-            if (effects.disableCrank) {
-                gameState.isCrankDisabled.value = true;
+        breakCrank: (effects) => {
+            if (effects.breakCrank) {
+                gameState.isCrankBroken.value = true;
             }
         },
 
@@ -360,7 +360,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             EffectRegistry.dataGenAmountBonus(effects);
             EffectRegistry.maxDataCapacityBonus(effects);
             EffectRegistry.instantUnlock(effects);
-            EffectRegistry.disableCrank(effects);
+            EffectRegistry.breakCrank(effects);
             EffectRegistry.unlockEnergyGeneration(effects);
         } else {
             // On upgrade, still apply bonus effects

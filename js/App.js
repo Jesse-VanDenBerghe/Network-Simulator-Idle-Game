@@ -110,7 +110,7 @@ const App = {
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             dataGeneration: gameState.dataGeneration,
             energyGeneration: gameState.energyGeneration,
-            isCrankDisabled: gameState.isCrankDisabled,
+            isCrankBroken: gameState.isCrankBroken,
             notifications: gameLoop.notifications,
             notificationHistory: gameLoop.notificationHistory,
             showNotificationHistory: gameLoop.showNotificationHistory,
@@ -197,7 +197,7 @@ const App = {
             <main id="main-content">
                 <Sidebar
                     :resource-stats="{ energyPerClick: computedValues.energyPerClick, dataPerClick: dataPerClickDisplay, stats: stats }"
-                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, isCrankDisabled: isCrankDisabled }"
+                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, isCrankBroken: isCrankBroken }"
                     :game-stats="{ automations: automations, effectiveRates: resourceRates, coresEarned: coresEarned, highestTierReached: highestTierReached, isDataUnlocked: isDataUnlocked, canProcessData: canProcessData }"
                     @generate-energy="generateEnergy"
                     @process-data="processData"

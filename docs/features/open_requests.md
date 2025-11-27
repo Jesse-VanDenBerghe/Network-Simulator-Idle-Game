@@ -1,4 +1,3 @@
 - reverse the order of the notification history so the user last notification is at the bottom and the user starts at the bottom and needs to scroll up to see older notifications
-- update the ui of the Turn Crank button to look like a crank you are turning
 - move the notification history to the bottom right corner
 - remove the MANUAL ACTIONS header text

@@ -5,12 +5,13 @@ const Sidebar = {
         ActionButton,
         AutomationItem,
         AscensionButton,
+        CrankButton,
         ParticleBurst,
         TerminalProgressButton
     },
     props: {
         resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, stats }
-        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankDisabled }
+        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankBroken }
         gameStats: { type: Object, required: true } // { automations, effectiveRates, coresEarned, highestTierReached, isDataUnlocked, canProcessData }
     },
     emits: ['generate-energy', 'process-data', 'ascend'],
@@ -43,7 +44,7 @@ const Sidebar = {
             return null;
         },
         energyButtonText() {
-            if (this.generationState.isCrankDisabled) {
+            if (this.generationState.isCrankBroken) {
                 return 'Broken Crank';
             }
             return 'Turn Crank';
@@ -60,11 +61,9 @@ const Sidebar = {
             <div id="manual-actions">
                 <h2>Manual Actions</h2>
                 <div class="action-wrapper" @click="handleEnergyClick">
-                    <ActionButton
-                        icon="⚡"
-                        :text="energyButtonText"
+                    <CrankButton
                         :value="energyButtonValue"
-                        :locked="generationState.isCrankDisabled"
+                        :broken="generationState.isCrankBroken"
                         :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
@@ -118,7 +117,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
-            if (this.generationState.isCrankDisabled) return;
+            if (this.generationState.isCrankBroken) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

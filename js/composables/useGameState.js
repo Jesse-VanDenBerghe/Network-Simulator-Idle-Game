@@ -47,7 +47,7 @@ export function useGameState() {
         energyPerTick: 1
     });
 
-    const isCrankDisabled = ref(false);
+    const isCrankBroken = ref(false);
 
     // ==========================================
     // COMPUTED
@@ -124,7 +124,7 @@ export function useGameState() {
         energyGeneration.progress = 0;
         energyGeneration.interval = 1000;
         energyGeneration.energyPerTick = 1;
-        isCrankDisabled.value = false;
+        isCrankBroken.value = false;
     }
 
     /**
@@ -181,7 +181,7 @@ export function useGameState() {
         lastUnlockedNodeId,
         dataGeneration,
         energyGeneration,
-        isCrankDisabled,
+        isCrankBroken,
         
         // Computed
         isDataUnlocked,

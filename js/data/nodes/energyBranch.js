@@ -95,7 +95,7 @@ export const energyBranch = {
             description: '+2 Energy per crank',
             levelEffects: {
                 10: {
-                    disableCrank: true
+                    breakCrank: true
                 }
             }
         }
