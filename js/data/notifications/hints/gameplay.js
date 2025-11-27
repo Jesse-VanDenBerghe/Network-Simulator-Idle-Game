@@ -6,45 +6,6 @@ import { NotificationType } from '../constants.js';
 import { TriggerType } from '../types.js';
 
 export const gameplayHints = [
-    // =====================
-    // IDLE TIME HINTS
-    // =====================
-    {
-        id: 'hint_idle_crank',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_IDLE_TIME,
-            idleSeconds: 60
-        },
-        message: 'The hand crank sits motionless. Perhaps another turn?',
-        duration: 6000,
-        persistAcrossAscension: false,
-        priority: 2
-    },
-    {
-        id: 'hint_idle_long',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_IDLE_TIME,
-            idleSeconds: 180
-        },
-        message: 'The shed grows quiet. Your grandfather\'s contraptions await your return.',
-        duration: 6000,
-        persistAcrossAscension: false,
-        priority: 2
-    },
-    {
-        id: 'hint_idle_automation',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_IDLE_TIME,
-            idleSeconds: 300
-        },
-        message: 'Consider unlocking automations—they generate resources even while you\'re away.',
-        duration: 8000,
-        persistAcrossAscension: false,
-        priority: 3
-    },
     
     // =====================
     // RESOURCE THRESHOLD TIPS

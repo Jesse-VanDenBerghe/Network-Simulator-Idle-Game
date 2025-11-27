@@ -1,0 +1,2 @@
+- The skilltree looks like it now is a zooming wrapper inside a zooming wrapper (2 scrollbars)
+- It looks like the game resets after a few seconds after a force reload (F5)

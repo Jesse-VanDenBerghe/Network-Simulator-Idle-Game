@@ -316,18 +316,24 @@ export function useNotificationEngine(eventBus) {
         // Mark as shown
         markShown(notification.id);
         
-        // Emit to gameLoop for display
-        eventBus.emit('showNotification', {
-            message: notification.message,
-            type: notification.type || NotificationType.NARRATION,
-            duration: notification.duration || NotificationDefaults.duration
-        });
+        // Calculate display delay (notification.delay or 0)
+        const displayDelay = notification.delay || 0;
         
-        // Process next after delay
+        // Show notification after optional delay
+        setTimeout(() => {
+            // Emit to gameLoop for display
+            eventBus.emit('showNotification', {
+                message: notification.message,
+                type: notification.type || NotificationType.NARRATION,
+                duration: notification.duration || NotificationDefaults.duration
+            });
+        }, displayDelay);
+        
+        // Process next after delay + queue delay
         setTimeout(() => {
             isProcessingQueue = false;
             processQueue();
-        }, NOTIFICATION_QUEUE_DELAY_MS);
+        }, displayDelay + NOTIFICATION_QUEUE_DELAY_MS);
     }
     
     // ==========================================
