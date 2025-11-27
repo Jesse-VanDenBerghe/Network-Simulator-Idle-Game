@@ -297,6 +297,12 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
+        maxDataCapacityMultiplier: (effects) => {
+            if (effects.maxDataCapacityMultiplier) {
+                gameState.dataGeneration.capacityBonus *= effects.maxDataCapacityMultiplier;
+            }
+        },
+
         instantUnlock: (effects) => {
             if (effects.instantUnlock) {
                 const lockedAvailableNodes = Object.values(nodes).filter(n =>
@@ -356,7 +362,9 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             EffectRegistry.unlockEnergyGeneration(effects);
         } else {
             // On upgrade, still apply bonus effects
+            EffectRegistry.dataGenSpeedMultiplier(effects);
             EffectRegistry.dataGenAmountBonus(effects);
+            EffectRegistry.maxDataCapacityBonus(effects);
         }
 
         // Apply level-specific effects (only triggers at that exact level)

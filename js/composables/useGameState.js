@@ -36,7 +36,7 @@ export function useGameState() {
         interval: 20000, // 20 seconds default
         bitsPerTick: 1,
         energyCost: 1,
-        baseCapacity: 100, // Base max data capacity
+        baseCapacity: 1028, // Base max data capacity
         capacityBonus: 0   // Bonus from upgrades
     });
 
