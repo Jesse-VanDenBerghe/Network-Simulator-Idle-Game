@@ -72,6 +72,8 @@ export const computerBranch = {
         description: 'A ram stick is loose, better adjust it to improve processing speed.',
         requires: ['command_generate'],
         cost: { energy: 40, data: 10 },
+        maxLevel: 4,
+        costScaling: 1.5,
         effects: {
             dataGenSpeedMultiplier: 1.5,
             description: 'Data generates 50% faster'
@@ -114,4 +116,19 @@ export const computerBranch = {
             }
         }
     },
+
+    storage_upgrade: {
+        id: 'storage_upgrade',
+        name: 'Storage Upgrade',
+        icon: '🗄️',
+        tier: 3,
+        branch: 'computer',
+        description: 'Upgrading the storage capacity of the computer to hold more data.',
+        requires: ['command_generate'],
+        cost: { energy: 60, data: 20 },
+        effects: {
+            maxDataCapacityBonus: 100,
+            description: 'Increase maximum data capacity by 100 bits'
+        }
+    }
 };
