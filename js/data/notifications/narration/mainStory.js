@@ -131,37 +131,11 @@ export const mainStoryNarrations = [
             type: TriggerType.ON_NODE_UNLOCKED,
             nodeId: 'command_generate'
         },
-        message: '/generate\n\n[           ] 0%',
+        message: '/generate\n\nData generation initiaded...',
         duration: NotificationDurations.NARRATION_LONG,
         persistAcrossAscension: false,
         priority: 10,
         delay: 1_000
-    },
-    {
-        id: 'command_generate_unlock_terminal_10_percent',
-        type: NotificationType.TERMINAL,
-        trigger: {
-            type: TriggerType.ON_NODE_UNLOCKED,
-            nodeId: 'command_generate'
-        },
-        message: '[#_________] 10%',
-        duration: NotificationDurations.NARRATION_LONG,
-        persistAcrossAscension: false,
-        priority: 10,
-        delay: 2_000
-    },
-    {
-        id: 'command_generate_unlock_terminal_50_percent',
-        type: NotificationType.TERMINAL,
-        trigger: {
-            type: TriggerType.ON_NODE_UNLOCKED,
-            nodeId: 'command_generate'
-        },
-        message: '[######_____] 50%',
-        duration: NotificationDurations.NARRATION_LONG,
-        persistAcrossAscension: false,
-        priority: 10,
-        delay: 8_000
     },
     {
         id: 'command_generate_unlock_terminal_100_percent',
@@ -172,7 +146,7 @@ export const mainStoryNarrations = [
             threshold: 1,
             comparison: '>='
         },
-        message: '[##########] 100% \n\nData generation complete. 1 byte generated.',
+        message: 'Data generation complete. 1 byte generated.',
         duration: NotificationDurations.NARRATION_LONG,
         persistAcrossAscension: false,
         priority: 10

@@ -1,3 +1,7 @@
 - reverse the order of the notification history so the user last notification is at the bottom and the user starts at the bottom and needs to scroll up to see older notifications
 - move the notification history to the bottom right corner
 - remove the MANUAL ACTIONS header text
+- Make sure having more data generation, also uses the equal amount of energy per byte generated
+- Remove the automation part of in the sidebar
+- Split up monster css files into smaller files for better maintainability
+- Change up the theme to better match the overall aesthetic of the game.
