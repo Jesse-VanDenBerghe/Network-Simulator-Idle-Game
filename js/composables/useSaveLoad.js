@@ -75,6 +75,8 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             unlockedBranches: Array.from(gameState.unlockedBranches.value),
             unlockedFeatures: Array.from(gameState.unlockedFeatures.value),
             dataGeneration: { ...gameState.dataGeneration },
+            isCrankBroken: gameState.isCrankBroken.value,
+            isCrankAutomated: gameState.isCrankAutomated.value,
             lastUpdate: Date.now()
         };
         try {
@@ -129,6 +131,12 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             }
             if (data.dataGeneration) {
                 Object.assign(gameState.dataGeneration, data.dataGeneration);
+            }
+            if (data.isCrankBroken !== undefined) {
+                gameState.isCrankBroken.value = data.isCrankBroken;
+            }
+            if (data.isCrankAutomated !== undefined) {
+                gameState.isCrankAutomated.value = data.isCrankAutomated;
             }
 
             // Notify that game is loaded (so rates can be calculated)

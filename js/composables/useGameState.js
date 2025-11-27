@@ -48,6 +48,7 @@ export function useGameState() {
     });
 
     const isCrankBroken = ref(false);
+    const isCrankAutomated = ref(false);
 
     // ==========================================
     // COMPUTED
@@ -125,6 +126,7 @@ export function useGameState() {
         energyGeneration.interval = 1000;
         energyGeneration.energyPerTick = 1;
         isCrankBroken.value = false;
+        isCrankAutomated.value = false;
     }
 
     /**
@@ -182,6 +184,7 @@ export function useGameState() {
         dataGeneration,
         energyGeneration,
         isCrankBroken,
+        isCrankAutomated,
         
         // Computed
         isDataUnlocked,

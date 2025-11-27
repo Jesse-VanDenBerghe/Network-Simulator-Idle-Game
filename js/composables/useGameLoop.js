@@ -25,6 +25,8 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     
     // Cached resource rates (updated via events)
     let cachedResourceRates = { energy: 0, data: 0, bandwidth: 0 };
+    let cachedEnergyPerClick = 0;
+    let autoCrankAccumulator = 0; // Tracks time for auto-crank;
 
     // ==========================================
     // METHODS
@@ -66,6 +68,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         
         // Process auto energy generation
         processEnergyGeneration(delta);
+        
+        // Process auto crank
+        processAutoCrank(delta);
         
         // Emit tick for notification engine (throttled checks happen there)
         eventBus.emit('gameTick', { 
@@ -114,6 +119,21 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
             eg.progress = 0;
             gameState.resources.energy += eg.energyPerTick;
             gameState.totalResources.energy += eg.energyPerTick;
+        }
+    }
+
+    /**
+     * Auto crank - adds energyPerClick every second when automated
+     */
+    function processAutoCrank(delta) {
+        if (!gameState.isCrankAutomated.value) return;
+        if (cachedEnergyPerClick <= 0) return;
+
+        autoCrankAccumulator += delta;
+        while (autoCrankAccumulator >= 1) {
+            autoCrankAccumulator -= 1;
+            gameState.resources.energy += cachedEnergyPerClick;
+            gameState.totalResources.energy += cachedEnergyPerClick;
         }
     }
 
@@ -270,6 +290,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     function onNodeUnlocked({ node, newLevel, isUpgrade, rates }) {
         // Update cached rates
         cachedResourceRates = rates;
+        cachedEnergyPerClick = rates.energyPerClick || 0;
         
         if (isUpgrade) {
             showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.NODE_UNLOCK);
@@ -314,6 +335,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         eventBus.on('nodeUnlocked', onNodeUnlocked);
         eventBus.on('resourceRatesChanged', (rates) => {
             cachedResourceRates = rates;
+            cachedEnergyPerClick = rates.energyPerClick || 0;
         });
         eventBus.on('offlineProgressCalculated', (message) => {
             if (message) {

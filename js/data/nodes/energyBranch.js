@@ -150,4 +150,18 @@ export const energyBranch = {
 
     // == Tier 4 Nodes ==
     
+    autocrank: {
+        id: 'autocrank',
+        name: 'AutoCrank',
+        icon: '⚙️',
+        tier: 4,
+        branch: 'energy',
+        description: 'TODO',
+        requires: [{ id: 'crank_harder', level: 10 }],
+        cost: { energy: 10 , data: 100},
+        effects: {
+            automateCrank: true,
+            description: 'Automatically crank the handle every second.'
+        }
+    },
 };

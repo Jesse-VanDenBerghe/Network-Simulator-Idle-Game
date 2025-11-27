@@ -11,7 +11,7 @@ const Sidebar = {
     },
     props: {
         resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, stats }
-        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankBroken }
+        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankBroken, isCrankAutomated }
         gameStats: { type: Object, required: true } // { automations, effectiveRates, coresEarned, highestTierReached, isDataUnlocked, canProcessData }
     },
     emits: ['generate-energy', 'process-data', 'ascend'],
@@ -64,6 +64,7 @@ const Sidebar = {
                     <CrankButton
                         :value="energyButtonValue"
                         :broken="generationState.isCrankBroken"
+                        :automated="generationState.isCrankAutomated"
                         :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
@@ -117,7 +118,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
-            if (this.generationState.isCrankBroken) return;
+            if (this.generationState.isCrankBroken || this.generationState.isCrankAutomated) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

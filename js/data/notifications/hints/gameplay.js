@@ -8,52 +8,6 @@ import { TriggerType } from '../types.js';
 export const gameplayHints = [
     
     // =====================
-    // RESOURCE THRESHOLD TIPS
-    // =====================
-    {
-        id: 'hint_energy_first_50',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_RESOURCE_AMOUNT_REACHED,
-            resource: 'energy',
-            threshold: 50,
-            comparison: '>='
-        },
-        message: 'You\'ve gathered some energy! Check the skill tree for upgrades.',
-        duration: 6000,
-        persistAcrossAscension: false,
-        priority: 3
-    },
-    {
-        id: 'hint_energy_attic_available',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_RESOURCE_AMOUNT_REACHED,
-            resource: 'energy',
-            threshold: 500,
-            comparison: '>='
-        },
-        message: 'With this much energy, you might be able to explore the attic...',
-        duration: 7000,
-        persistAcrossAscension: false,
-        priority: 4
-    },
-    {
-        id: 'hint_data_first_50',
-        type: NotificationType.HINT,
-        trigger: {
-            type: TriggerType.ON_RESOURCE_AMOUNT_REACHED,
-            resource: 'data',
-            threshold: 50,
-            comparison: '>='
-        },
-        message: 'Data accumulates. The computer branch holds many secrets.',
-        duration: 6000,
-        persistAcrossAscension: false,
-        priority: 3
-    },
-    
-    // =====================
     // PROGRESSION HINTS
     // =====================
     {

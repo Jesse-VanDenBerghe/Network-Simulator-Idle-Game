@@ -54,7 +54,8 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
         const bonuses = prestigeState.prestigeBonuses.value;
         return {
             energy: gameState.automations.energy * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier,
-            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier
+            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier,
+            energyPerClick: computedValues.value.energyPerClick
         };
     });
 
@@ -327,6 +328,13 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
+        automateCrank: (effects) => {
+            if (effects.automateCrank) {
+                gameState.isCrankBroken.value = false; // Repairs the crank
+                gameState.isCrankAutomated.value = true;
+            }
+        },
+
         unlockEnergyGeneration: (effects) => {
             if (effects.unlockEnergyGeneration) {
                 gameState.energyGeneration.active = true;
@@ -361,6 +369,7 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             EffectRegistry.maxDataCapacityBonus(effects);
             EffectRegistry.instantUnlock(effects);
             EffectRegistry.breakCrank(effects);
+            EffectRegistry.automateCrank(effects);
             EffectRegistry.unlockEnergyGeneration(effects);
         } else {
             // On upgrade, still apply bonus effects

@@ -463,6 +463,99 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
+/* Automated crank state - keeps wooden feel */
+.crank-btn.automated {
+    cursor: default;
+}
+
+.crank-btn.automated .crank-text {
+    color: #8b7355;
+}
+
+.crank-btn.automated .crank-value {
+    color: #a0826d;
+}
+
+/* Cog gear behind crank - brass/bronze feel */
+.crank-cog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    background: radial-gradient(circle at 50% 50%, #c9a227 0%, #8b6914 100%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: cog-rotate 4s linear infinite;
+    box-shadow: inset 0 2px 4px rgba(255, 215, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Cog teeth */
+.crank-cog::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 52px;
+    height: 52px;
+    transform: translate(-50%, -50%);
+    background: 
+        conic-gradient(
+            from 0deg,
+            transparent 0deg, transparent 15deg,
+            #b8860b 15deg, #b8860b 30deg,
+            transparent 30deg, transparent 45deg,
+            #b8860b 45deg, #b8860b 60deg,
+            transparent 60deg, transparent 75deg,
+            #b8860b 75deg, #b8860b 90deg,
+            transparent 90deg, transparent 105deg,
+            #b8860b 105deg, #b8860b 120deg,
+            transparent 120deg, transparent 135deg,
+            #b8860b 135deg, #b8860b 150deg,
+            transparent 150deg, transparent 165deg,
+            #b8860b 165deg, #b8860b 180deg,
+            transparent 180deg, transparent 195deg,
+            #b8860b 195deg, #b8860b 210deg,
+            transparent 210deg, transparent 225deg,
+            #b8860b 225deg, #b8860b 240deg,
+            transparent 240deg, transparent 255deg,
+            #b8860b 255deg, #b8860b 270deg,
+            transparent 270deg, transparent 285deg,
+            #b8860b 285deg, #b8860b 300deg,
+            transparent 300deg, transparent 315deg,
+            #b8860b 315deg, #b8860b 330deg,
+            transparent 330deg, transparent 345deg,
+            #b8860b 345deg, #b8860b 360deg
+        );
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* Center hole of cog */
+.crank-cog::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: #2d1810;
+    border-radius: 50%;
+    border: 2px solid #8b6914;
+}
+
+@keyframes cog-rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Auto-rotating crank arm */
+.crank-arm.auto-rotating {
+    transition: transform 0.8s linear;
+}
+
 /* Terminal Progress Button */
 .terminal-progress-btn {
     width: 100%;
