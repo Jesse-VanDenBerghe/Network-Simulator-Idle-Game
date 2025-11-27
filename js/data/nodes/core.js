@@ -12,7 +12,12 @@ export const core = {
         requires: [],
         cost: {},
         effects: {
-            description: 'Starting node - unlocked by default'
+            description: 'Starting node - unlocked by default',
+            narrate: {
+                text: 'You step into the old shed. Dust particles dance in the sunlight filtering through the cracks. It smells of aged wood and memories.' + 
+                'The shed is dark... but you can make out a few objects: a hand crank mounted on the wall covered in cobwebs. It looks like it hasn\'t been used in years.',
+                duration: 8000
+            }
         }
     }
 };
