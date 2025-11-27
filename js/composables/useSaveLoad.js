@@ -97,7 +97,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         if (!saveData) {
             // No game save, request starting bonuses via event
             eventBus.emit('requestStartingBonuses');
-            eventBus.emit('gameLoaded');
+            eventBus.emit('gameLoaded', { isFirstLaunch: true });
             return;
         }
 
@@ -131,7 +131,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             }
 
             // Notify that game is loaded (so rates can be calculated)
-            eventBus.emit('gameLoaded');
+            eventBus.emit('gameLoaded', { isFirstLaunch: false });
 
             // Calculate offline progress using explicit rate calculation from saved state
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
@@ -143,6 +143,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
 
                 if (offlineTime > 60) {
                     eventBus.emit('offlineProgressCalculated', 'Welcome back! Earned resources while away.');
+                    eventBus.emit('offlineReturn', { offlineSeconds: offlineTime });
                 }
             }
         } catch (e) {

@@ -11,6 +11,7 @@ import { useNodeManagement } from './composables/useNodeManagement.js';
 import { useSaveLoad } from './composables/useSaveLoad.js';
 import { useGameLoop } from './composables/useGameLoop.js';
 import { useEventBus } from './composables/useEventBus.js';
+import { useNotificationEngine } from './composables/useNotificationEngine.js';
 
 const App = {
     name: 'App',
@@ -40,6 +41,10 @@ const App = {
         const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus, GameData.nodes);
         const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
         const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
+        
+        // Notification engine - subscribes to events, triggers narrations
+        const notificationEngine = useNotificationEngine(eventBus);
+        notificationEngine.initialize();
 
         // ==========================================
         // COMPUTED (for ascension)

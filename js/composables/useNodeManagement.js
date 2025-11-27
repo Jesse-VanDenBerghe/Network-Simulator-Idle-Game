@@ -264,12 +264,14 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
         unlockBranch: (effects) => {
             if (effects.unlockBranch) {
                 gameState.unlockBranch(effects.unlockBranch);
+                eventBus.emit('branchUnlocked', { branch: effects.unlockBranch });
             }
         },
 
         unlockDataProcessing: (effects) => {
             if (effects.unlockDataProcessing) {
                 gameState.unlockFeature('dataProcessing');
+                eventBus.emit('featureUnlocked', { feature: 'dataProcessing' });
             }
         },
 

@@ -225,6 +225,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         // Request prestige save via event
         eventBus.emit('requestSavePrestige');
         
+        // Emit ascension complete for notification engine
+        eventBus.emit('ascensionComplete', { count: prestigeState.prestigeState.ascensionCount });
+        
         showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, NotificationType.SUCCESS);
     }
 
@@ -334,6 +337,11 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         eventBus.on('gameLoaded', () => {
             // Game state has been restored, request current rates
             eventBus.emit('requestResourceRates');
+        });
+        
+        // Listen for showNotification events from notification engine
+        eventBus.on('showNotification', ({ message, type, duration }) => {
+            showNotification(message, type, duration);
         });
         
         // Request initial load
