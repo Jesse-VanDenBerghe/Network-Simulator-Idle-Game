@@ -177,10 +177,16 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
      */
     function processData() {
         if (!gameState.canProcessData.value) return;
+        // Don't process if at capacity
+        if (gameState.resources.data >= gameState.maxDataCapacity.value) return;
         gameState.resources.energy -= 5;
         const dataGain = Math.floor(computedValues.value.dataPerClick * computedValues.value.dataMultiplier);
         gameState.resources.data += dataGain;
         gameState.totalResources.data += dataGain;
+        // Cap at max capacity
+        if (gameState.resources.data > gameState.maxDataCapacity.value) {
+            gameState.resources.data = gameState.maxDataCapacity.value;
+        }
     }
 
     /**
@@ -285,6 +291,18 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
+        maxDataCapacityBonus: (effects) => {
+            if (effects.maxDataCapacityBonus) {
+                gameState.dataGeneration.capacityBonus += effects.maxDataCapacityBonus;
+            }
+        },
+
+        maxDataCapacityMultiplier: (effects) => {
+            if (effects.maxDataCapacityMultiplier) {
+                gameState.dataGeneration.capacityBonus *= effects.maxDataCapacityMultiplier;
+            }
+        },
+
         instantUnlock: (effects) => {
             if (effects.instantUnlock) {
                 const lockedAvailableNodes = Object.values(nodes).filter(n =>
@@ -338,12 +356,15 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             EffectRegistry.unlockDataGeneration(effects);
             EffectRegistry.dataGenSpeedMultiplier(effects);
             EffectRegistry.dataGenAmountBonus(effects);
+            EffectRegistry.maxDataCapacityBonus(effects);
             EffectRegistry.instantUnlock(effects);
             EffectRegistry.disableCrank(effects);
             EffectRegistry.unlockEnergyGeneration(effects);
         } else {
             // On upgrade, still apply bonus effects
+            EffectRegistry.dataGenSpeedMultiplier(effects);
             EffectRegistry.dataGenAmountBonus(effects);
+            EffectRegistry.maxDataCapacityBonus(effects);
         }
 
         // Apply level-specific effects (only triggers at that exact level)

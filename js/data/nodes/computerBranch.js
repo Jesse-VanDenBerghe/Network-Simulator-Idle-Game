@@ -72,9 +72,30 @@ export const computerBranch = {
         description: 'A ram stick is loose, better adjust it to improve processing speed.',
         requires: ['command_generate'],
         cost: { energy: 40, data: 10 },
+        maxLevel: 4,
+        costScaling: 1.5,
         effects: {
             dataGenSpeedMultiplier: 1.5,
             description: 'Data generates 50% faster'
+        }
+    },
+
+    usb_stick: {
+        id: 'usb_stick',
+        name: 'USB Stick',
+        icon: '📀',
+        tier: 3,
+        branch: 'computer',
+        description: 'You remember this old USB stick you had in your pocket. Because who doesn\'t carry around a USB stick in 2025? Let\'s plug it in to increase our data storage capacity.',
+        requires: ['command_generate'],
+        cost: { energy: 60, data: 1028 },
+        effects: {
+            maxDataCapacityBonus: 1028 * 16,
+            description: 'Increase max data capacity by 16 KB',
+            narrate: {
+                text: 'You plug in the USB stick. The computer recognizes it immediately, expanding its available storage. You can now store much more data than before!',
+                duration: 8000
+            }
         }
     },
 

@@ -35,7 +35,9 @@ export function useGameState() {
         progress: 0, // 0-100%
         interval: 20000, // 20 seconds default
         bitsPerTick: 1,
-        energyCost: 1
+        energyCost: 1,
+        baseCapacity: 1028, // Base max data capacity
+        capacityBonus: 0   // Bonus from upgrades
     });
 
     const energyGeneration = reactive({
@@ -50,6 +52,10 @@ export function useGameState() {
     // ==========================================
     // COMPUTED
     // ==========================================
+    const maxDataCapacity = computed(() => {
+        return dataGeneration.baseCapacity + dataGeneration.capacityBonus;
+    });
+
     const isDataUnlocked = computed(() => {
         return unlockedFeatures.value.has('dataProcessing');
     });
@@ -111,6 +117,8 @@ export function useGameState() {
         dataGeneration.interval = 20000;
         dataGeneration.bitsPerTick = 1;
         dataGeneration.energyCost = 1;
+        dataGeneration.baseCapacity = 100;
+        dataGeneration.capacityBonus = 0;
         // Reset energy generation
         energyGeneration.active = false;
         energyGeneration.progress = 0;
@@ -179,6 +187,7 @@ export function useGameState() {
         isDataUnlocked,
         canProcessData,
         highestTierReached,
+        maxDataCapacity,
         stats,
         
         // Methods

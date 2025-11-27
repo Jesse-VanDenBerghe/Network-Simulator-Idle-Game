@@ -41,5 +41,10 @@ export const NotificationType = Object.freeze({
     INFO: 'info',
     ERROR: 'error',
     SUCCESS: 'success',
-    NARRATION: 'narration'
+    NARRATION: 'narration',
+    NODE_UNLOCK: 'node_unlock'
 });
+
+export const DisabledNotificationTypes = new Set([
+    NotificationType.NODE_UNLOCK
+]);

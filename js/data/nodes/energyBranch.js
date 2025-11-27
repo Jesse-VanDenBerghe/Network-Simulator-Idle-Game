@@ -63,12 +63,16 @@ export const energyBranch = {
         icon: '🐹',
         tier: 2,
         branch: 'energy',
-        description: ' My hamster loves running in this thing, and it generates energy too!',
+        description: ' My hamster Lucy loves running in this thing, and it generates energy too!',
         requires: ['hand_crank'],
         cost: { energy: 25},
         effects: {
             automation: { resource: 'energy', rate: 0.5 },
-            description: '+0.5 Energy/second (passive)'
+            description: '+0.5 Energy/second (passive)',
+            narrate: {
+                text: 'You set up the hamster wheel next to the crank. Lucy hops in and starts running. Look at her go!!! The humming sound indicates energy is being generated for you automatically.',
+                duration: 8000
+            }
         }
     },
     
