@@ -4,7 +4,7 @@
 // Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
-import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType } from '../data/constants.js';
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType, DisabledNotificationTypes } from '../data/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -114,6 +114,8 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
      * Show a notification toast
      */
     function showNotification(message, type = 'info', duration = 10_000) {
+        if (DisabledNotificationTypes.has(type)) return;
+
         const id = ++notificationId;
         const timestamp = Date.now();
         notifications.value.push({ id, message, type, duration });
@@ -273,9 +275,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         cachedResourceRates = rates;
         
         if (isUpgrade) {
-            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.SUCCESS);
+            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.NODE_UNLOCK);
         } else {
-            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.SUCCESS);
+            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.NODE_UNLOCK);
         }
         
         // Show narration from base effects (on initial unlock only)
