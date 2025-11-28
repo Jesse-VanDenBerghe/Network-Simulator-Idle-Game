@@ -1,4 +1,3 @@
-- reverse the order of the notification history so the user last notification is at the bottom and the user starts at the bottom and needs to scroll up to see older notifications
 - move the notification history button to the bottom right corner
 - Make sure having more data generation, also uses the equal amount of energy per byte generated
 - Split up monster css files into smaller files for better maintainability
