@@ -1,6 +1,6 @@
 // Entry List Component
 // =====================
-// Scrollable list of narration entries with edit actions
+// Scrollable list of narration entries with edit actions and drag-reorder
 
 const { watch, ref, nextTick } = Vue;
 
@@ -24,9 +24,11 @@ const EntryList = {
             default: () => new Set()
         }
     },
-    emits: ['select', 'add', 'moveUp', 'moveDown', 'delete'],
-    setup(props) {
+    emits: ['select', 'add', 'moveUp', 'moveDown', 'delete', 'reorder'],
+    setup(props, { emit }) {
         const listRef = ref(null);
+        const draggedIndex = ref(null);
+        const dragOverIndex = ref(null);
 
         // Auto-scroll to current entry when index changes
         watch(() => props.currentIndex, async (newIndex) => {
@@ -39,7 +41,60 @@ const EntryList = {
             }
         });
 
-        return { listRef };
+        // Drag handlers
+        function onDragStart(e, index) {
+            if (!props.editMode) return;
+            draggedIndex.value = index;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+            // Add dragging class after a tick for visual feedback
+            requestAnimationFrame(() => {
+                e.target.classList.add('dragging');
+            });
+        }
+
+        function onDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedIndex.value = null;
+            dragOverIndex.value = null;
+        }
+
+        function onDragOver(e, index) {
+            if (!props.editMode || draggedIndex.value === null) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            dragOverIndex.value = index;
+        }
+
+        function onDragLeave(e) {
+            // Only clear if leaving the item entirely
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+                dragOverIndex.value = null;
+            }
+        }
+
+        function onDrop(e, targetIndex) {
+            e.preventDefault();
+            const fromIndex = draggedIndex.value;
+            
+            if (fromIndex !== null && fromIndex !== targetIndex) {
+                emit('reorder', fromIndex, targetIndex);
+            }
+            
+            draggedIndex.value = null;
+            dragOverIndex.value = null;
+        }
+
+        return { 
+            listRef, 
+            draggedIndex, 
+            dragOverIndex,
+            onDragStart,
+            onDragEnd,
+            onDragOver,
+            onDragLeave,
+            onDrop
+        };
     },
     methods: {
         getTypeIcon(type) {
@@ -54,6 +109,12 @@ const EntryList = {
         },
         isModified(entry) {
             return this.modifiedIds.has(entry.id);
+        },
+        getDragClass(index) {
+            if (!this.editMode) return '';
+            if (this.draggedIndex === index) return 'drag-source';
+            if (this.dragOverIndex === index) return 'drag-over';
+            return '';
         }
     },
     template: `
@@ -68,12 +129,21 @@ const EntryList = {
             <div class="entry-list" ref="listRef">
                 <div v-for="(entry, i) in entries" :key="entry.id"
                      class="entry-item"
-                     :class="{ 
+                     :class="[{ 
                          current: i === currentIndex, 
                          played: !editMode && i < currentIndex,
                          modified: isModified(entry)
-                     }"
-                     @click="$emit('select', i)">
+                     }, getDragClass(i)]"
+                     :draggable="editMode"
+                     @click="$emit('select', i)"
+                     @dragstart="onDragStart($event, i)"
+                     @dragend="onDragEnd"
+                     @dragover="onDragOver($event, i)"
+                     @dragleave="onDragLeave"
+                     @drop="onDrop($event, i)">
+                    
+                    <!-- Drag handle (edit mode) -->
+                    <span v-if="editMode" class="drag-handle" title="Drag to reorder">⋮⋮</span>
                     
                     <!-- Edit mode: action buttons -->
                     <div v-if="editMode" class="entry-actions">
@@ -122,7 +192,7 @@ const EntryList = {
             
             <div class="legend">
                 Legend: 📖=narration 💻=terminal ℹ️=info 💡=hint 🏆=achievement
-                <span v-if="editMode"> | ●=modified</span>
+                <span v-if="editMode"> | ●=modified | ⋮⋮=drag</span>
             </div>
         </div>
     `

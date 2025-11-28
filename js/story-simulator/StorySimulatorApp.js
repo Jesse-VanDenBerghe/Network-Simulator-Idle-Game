@@ -202,6 +202,15 @@ const app = createApp({
             }
         });
 
+        // Unsaved changes warning
+        function handleBeforeUnload(e) {
+            if (editor.hasDirtyFiles.value) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        }
+
         // Load file list on mount
         onMounted(async () => {
             if (github.isConnected.value) {
@@ -211,10 +220,12 @@ const app = createApp({
                 await loadLocalFiles();
             }
             window.addEventListener('keydown', handleKeydown);
+            window.addEventListener('beforeunload', handleBeforeUnload);
         });
 
         onUnmounted(() => {
             window.removeEventListener('keydown', handleKeydown);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         });
 
         // Handle file change
@@ -272,6 +283,10 @@ const app = createApp({
 
         function handleMoveDown(index) {
             editor.moveDown(index);
+        }
+
+        function handleReorder(fromIndex, toIndex) {
+            editor.reorderEntry(fromIndex, toIndex);
         }
 
         function handleRevertAll() {
@@ -403,6 +418,7 @@ const app = createApp({
             handleRevertEntry,
             handleMoveUp,
             handleMoveDown,
+            handleReorder,
             handleRevertAll,
             // PR Modal
             showPRModal,
@@ -499,6 +515,7 @@ const app = createApp({
                     @add="handleAddEntry"
                     @move-up="handleMoveUp"
                     @move-down="handleMoveDown"
+                    @reorder="handleReorder"
                     @delete="handleDeleteEntry"
                 />
             </div>
@@ -514,6 +531,7 @@ const app = createApp({
                     :entry="editor.selectedEntry.value"
                     :index="editor.selectedIndex.value"
                     :is-modified="modifiedEntryIds.has(editor.selectedEntry.value?.id)"
+                    :all-entry-ids="displayEntries.map(e => e.id)"
                     @update="handleUpdateEntry"
                     @delete="handleDeleteEntry"
                     @duplicate="handleDuplicateEntry"

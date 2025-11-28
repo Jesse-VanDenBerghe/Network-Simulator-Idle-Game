@@ -978,6 +978,91 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* ============ Phase 5: Polish Styles ============ */
+
+        /* Validation Styles */
+        .validation-summary {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 1rem;
+            color: #f44336;
+            font-size: 0.85rem;
+        }
+
+        .field-row.has-error input,
+        .field-row.has-error textarea,
+        .field-row.has-error select {
+            border-color: #f44336;
+        }
+
+        input.invalid,
+        textarea.invalid,
+        select.invalid {
+            border-color: #f44336 !important;
+            background: rgba(244, 67, 54, 0.05);
+        }
+
+        .field-error {
+            display: block;
+            color: #f44336;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Drag & Drop Styles */
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-secondary, #666);
+            padding: 0 0.25rem;
+            margin-right: 0.25rem;
+            user-select: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .entry-item[draggable="true"] {
+            cursor: grab;
+        }
+
+        .entry-item.dragging {
+            opacity: 0.5;
+            background: var(--bg-hover, #3a3a5a);
+        }
+
+        .entry-item.drag-source {
+            opacity: 0.4;
+        }
+
+        .entry-item.drag-over {
+            border-top: 2px solid var(--accent-color, #4a9eff);
+            margin-top: -2px;
+        }
+
+        /* Offline Indicator Styles */
+        .status-text.offline {
+            color: #f44336;
+        }
+
+        .status-indicator.offline {
+            color: #f44336;
+        }
+
+        .offline-warning {
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 4px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .offline-text {
+            color: #f44336;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>

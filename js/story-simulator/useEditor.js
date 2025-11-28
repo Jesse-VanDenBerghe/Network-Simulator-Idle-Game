@@ -311,6 +311,25 @@ function useEditor() {
     }
 
     /**
+     * Reorder entry via drag-drop
+     * @param {number} fromIndex - source index
+     * @param {number} toIndex - target index
+     */
+    function reorderEntry(fromIndex, toIndex) {
+        if (!state.currentFile) return;
+        const file = state.files[state.currentFile.filename];
+        if (!file) return;
+        if (fromIndex < 0 || fromIndex >= file.entries.length) return;
+        if (toIndex < 0 || toIndex >= file.entries.length) return;
+        if (fromIndex === toIndex) return;
+        
+        const [item] = file.entries.splice(fromIndex, 1);
+        file.entries.splice(toIndex, 0, item);
+        
+        state.selectedIndex = toIndex;
+    }
+
+    /**
      * Revert current file to original
      */
     function revertCurrentFile() {
@@ -690,6 +709,7 @@ export const ${exportName} = [\n`;
         // Reorder
         moveUp,
         moveDown,
+        reorderEntry,
         
         // Revert
         revertEntry,

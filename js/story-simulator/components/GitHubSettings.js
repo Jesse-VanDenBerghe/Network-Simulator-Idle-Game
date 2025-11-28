@@ -1,6 +1,8 @@
 // GitHub Settings Component
 // ==========================
-// Auth and repo configuration panel
+// Auth and repo configuration panel with offline indicator
+
+const { ref, onMounted, onUnmounted } = Vue;
 
 const GitHubSettings = {
     name: 'GitHubSettings',
@@ -22,6 +24,28 @@ const GitHubSettings = {
         'connect',
         'disconnect'
     ],
+    setup() {
+        const isOnline = ref(navigator.onLine);
+        
+        function handleOnline() {
+            isOnline.value = true;
+        }
+        function handleOffline() {
+            isOnline.value = false;
+        }
+        
+        onMounted(() => {
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+        });
+        
+        onUnmounted(() => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        });
+        
+        return { isOnline };
+    },
     data() {
         return {
             isExpanded: true,
@@ -36,11 +60,13 @@ const GitHubSettings = {
             return '';
         },
         statusText() {
+            if (!this.isOnline) return 'Offline';
             if (this.isLoading) return 'Connecting...';
             if (this.isConnected) return 'Connected';
             return 'Not connected';
         },
         statusClass() {
+            if (!this.isOnline) return 'offline';
             if (this.isLoading) return 'loading';
             if (this.isConnected) return 'connected';
             return 'disconnected';
@@ -117,7 +143,8 @@ const GitHubSettings = {
                         v-if="!isConnected"
                         class="connect-btn"
                         @click="$emit('connect')"
-                        :disabled="isLoading || !repoValue"
+                        :disabled="isLoading || !repoValue || !isOnline"
+                        :title="!isOnline ? 'Cannot connect while offline' : ''"
                     >
                         {{ isLoading ? 'Connecting...' : 'Connect' }}
                     </button>
@@ -128,6 +155,11 @@ const GitHubSettings = {
                     >
                         Disconnect
                     </button>
+                </div>
+                
+                <!-- Offline warning -->
+                <div v-if="!isOnline" class="setting-row offline-warning">
+                    <span class="offline-text">📡 No internet connection</span>
                 </div>
                 
                 <div class="setting-row status">

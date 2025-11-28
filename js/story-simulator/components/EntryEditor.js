@@ -16,6 +16,10 @@ const EntryEditor = {
         isModified: {
             type: Boolean,
             default: false
+        },
+        allEntryIds: {
+            type: Array,
+            default: () => []
         }
     },
     emits: ['update', 'delete', 'duplicate', 'revert'],
@@ -58,6 +62,57 @@ const EntryEditor = {
         },
         triggerFields() {
             return this.currentTriggerType?.fields || [];
+        },
+        // Validation computed properties
+        validationErrors() {
+            const errors = {};
+            if (!this.entry) return errors;
+            
+            // ID is required
+            if (!this.entry.id || !this.entry.id.trim()) {
+                errors.id = 'ID is required';
+            } else if (this.isDuplicateId) {
+                errors.id = 'ID must be unique';
+            } else if (!/^[a-z_][a-z0-9_]*$/i.test(this.entry.id)) {
+                errors.id = 'ID must be alphanumeric with underscores';
+            }
+            
+            // Message is required
+            if (!this.entry.message || !this.entry.message.trim()) {
+                errors.message = 'Message is required';
+            }
+            
+            // Duration must be positive
+            if (!this.entry.duration || this.entry.duration < 1000) {
+                errors.duration = 'Min 1000ms';
+            }
+            
+            // Trigger-specific validation
+            const trigger = this.entry.trigger;
+            if (trigger) {
+                if (this.triggerFields.includes('nodeId') && (!trigger.nodeId || !trigger.nodeId.trim())) {
+                    errors.nodeId = 'Node ID is required';
+                }
+                if (this.triggerFields.includes('branch') && (!trigger.branch || !trigger.branch.trim())) {
+                    errors.branch = 'Branch is required';
+                }
+                if (this.triggerFields.includes('feature') && (!trigger.feature || !trigger.feature.trim())) {
+                    errors.feature = 'Feature is required';
+                }
+                if (this.triggerFields.includes('resource') && (!trigger.resource || !trigger.resource.trim())) {
+                    errors.resource = 'Resource is required';
+                }
+            }
+            
+            return errors;
+        },
+        isDuplicateId() {
+            if (!this.entry || !this.entry.id) return false;
+            // Check if this ID exists in other entries (excluding current)
+            return this.allEntryIds.filter(id => id === this.entry.id).length > 1;
+        },
+        hasErrors() {
+            return Object.keys(this.validationErrors).length > 0;
         }
     },
     methods: {
@@ -96,15 +151,22 @@ const EntryEditor = {
             </div>
             
             <div class="editor-body">
+                <!-- Validation summary -->
+                <div v-if="hasErrors" class="validation-summary">
+                    ⚠️ {{ Object.keys(validationErrors).length }} validation error(s)
+                </div>
+                
                 <!-- ID -->
-                <div class="field-row">
+                <div class="field-row" :class="{ 'has-error': validationErrors.id }">
                     <label>ID:</label>
                     <input 
                         type="text" 
                         :value="entry.id"
                         @input="updateField('id', $event.target.value)"
                         placeholder="unique_entry_id"
+                        :class="{ invalid: validationErrors.id }"
                     />
+                    <span v-if="validationErrors.id" class="field-error">{{ validationErrors.id }}</span>
                 </div>
                 
                 <!-- Type -->
@@ -121,19 +183,21 @@ const EntryEditor = {
                 </div>
                 
                 <!-- Message -->
-                <div class="field-row field-full">
+                <div class="field-row field-full" :class="{ 'has-error': validationErrors.message }">
                     <label>Message:</label>
                     <textarea 
                         :value="entry.message"
                         @input="updateField('message', $event.target.value)"
                         placeholder="Your narration text..."
                         rows="4"
+                        :class="{ invalid: validationErrors.message }"
                     ></textarea>
+                    <span v-if="validationErrors.message" class="field-error">{{ validationErrors.message }}</span>
                 </div>
                 
                 <!-- Duration / Priority row -->
                 <div class="field-row-group">
-                    <div class="field-row">
+                    <div class="field-row" :class="{ 'has-error': validationErrors.duration }">
                         <label>Duration (ms):</label>
                         <input 
                             type="number" 
@@ -141,7 +205,9 @@ const EntryEditor = {
                             @input="updateField('duration', parseInt($event.target.value) || 8000)"
                             min="1000"
                             step="1000"
+                            :class="{ invalid: validationErrors.duration }"
                         />
+                        <span v-if="validationErrors.duration" class="field-error">{{ validationErrors.duration }}</span>
                     </div>
                     <div class="field-row">
                         <label>Priority:</label>
@@ -184,14 +250,16 @@ const EntryEditor = {
                     </div>
                     
                     <!-- Dynamic trigger fields -->
-                    <div v-if="triggerFields.includes('nodeId')" class="field-row">
+                    <div v-if="triggerFields.includes('nodeId')" class="field-row" :class="{ 'has-error': validationErrors.nodeId }">
                         <label>Node ID:</label>
                         <input 
                             type="text" 
                             :value="entry.trigger?.nodeId"
                             @input="updateField('trigger.nodeId', $event.target.value)"
                             placeholder="e.g., hand_crank"
+                            :class="{ invalid: validationErrors.nodeId }"
                         />
+                        <span v-if="validationErrors.nodeId" class="field-error">{{ validationErrors.nodeId }}</span>
                     </div>
                     
                     <div v-if="triggerFields.includes('level')" class="field-row">
@@ -204,24 +272,28 @@ const EntryEditor = {
                         />
                     </div>
                     
-                    <div v-if="triggerFields.includes('branch')" class="field-row">
+                    <div v-if="triggerFields.includes('branch')" class="field-row" :class="{ 'has-error': validationErrors.branch }">
                         <label>Branch:</label>
                         <input 
                             type="text" 
                             :value="entry.trigger?.branch"
                             @input="updateField('trigger.branch', $event.target.value)"
                             placeholder="e.g., computer"
+                            :class="{ invalid: validationErrors.branch }"
                         />
+                        <span v-if="validationErrors.branch" class="field-error">{{ validationErrors.branch }}</span>
                     </div>
                     
-                    <div v-if="triggerFields.includes('feature')" class="field-row">
+                    <div v-if="triggerFields.includes('feature')" class="field-row" :class="{ 'has-error': validationErrors.feature }">
                         <label>Feature:</label>
                         <input 
                             type="text" 
                             :value="entry.trigger?.feature"
                             @input="updateField('trigger.feature', $event.target.value)"
                             placeholder="e.g., dataProcessing"
+                            :class="{ invalid: validationErrors.feature }"
                         />
+                        <span v-if="validationErrors.feature" class="field-error">{{ validationErrors.feature }}</span>
                     </div>
                     
                     <div v-if="triggerFields.includes('tier')" class="field-row">
@@ -235,14 +307,16 @@ const EntryEditor = {
                         />
                     </div>
                     
-                    <div v-if="triggerFields.includes('resource')" class="field-row">
+                    <div v-if="triggerFields.includes('resource')" class="field-row" :class="{ 'has-error': validationErrors.resource }">
                         <label>Resource:</label>
                         <input 
                             type="text" 
                             :value="entry.trigger?.resource"
                             @input="updateField('trigger.resource', $event.target.value)"
                             placeholder="e.g., energy"
+                            :class="{ invalid: validationErrors.resource }"
                         />
+                        <span v-if="validationErrors.resource" class="field-error">{{ validationErrors.resource }}</span>
                     </div>
                     
                     <div v-if="triggerFields.includes('threshold')" class="field-row-group">

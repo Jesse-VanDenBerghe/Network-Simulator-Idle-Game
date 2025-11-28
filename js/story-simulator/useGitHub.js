@@ -59,6 +59,56 @@ function useGitHub() {
         state.error = null;
     }
 
+    /**
+     * Parse GitHub API error for user-friendly message
+     * @param {Error} error
+     * @returns {string}
+     */
+    function formatError(error) {
+        // Network error (offline, DNS, etc.)
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            return 'Network error. Check your internet connection.';
+        }
+        
+        // Rate limiting
+        if (error.status === 403 && error.data?.message?.includes('rate limit')) {
+            const resetTime = error.data?.reset 
+                ? new Date(error.data.reset * 1000).toLocaleTimeString() 
+                : 'later';
+            return `Rate limit exceeded. Try again at ${resetTime}`;
+        }
+        
+        // Auth errors
+        if (error.status === 401) {
+            return 'Invalid token. Check your GitHub personal access token.';
+        }
+        
+        // Forbidden (no repo access)
+        if (error.status === 403) {
+            return 'Access denied. Check token permissions or repo access.';
+        }
+        
+        // Not found
+        if (error.status === 404) {
+            return 'Repository not found. Check owner/repo name.';
+        }
+        
+        // Conflict (PR branch already exists, etc.)
+        if (error.status === 422) {
+            if (error.data?.message?.includes('already exists')) {
+                return 'Branch already exists. Choose a different name.';
+            }
+            return error.data?.message || 'Validation failed';
+        }
+        
+        // Generic server error
+        if (error.status >= 500) {
+            return 'GitHub server error. Try again later.';
+        }
+        
+        return error.message || 'Unknown error occurred';
+    }
+
     // API request helper
     async function api(path, options = {}) {
         const url = `https://api.github.com${path}`;
@@ -76,11 +126,20 @@ function useGitHub() {
             headers['Content-Type'] = 'application/json';
         }
 
-        const response = await fetch(url, { ...options, headers });
+        let response;
+        try {
+            response = await fetch(url, { ...options, headers });
+        } catch (fetchError) {
+            // Network errors (offline, CORS, etc.)
+            const error = new Error(formatError(fetchError));
+            error.status = 0;
+            error.isNetworkError = true;
+            throw error;
+        }
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            const error = new Error(errorData.message || `GitHub API error: ${response.status}`);
+            const error = new Error(formatError({ status: response.status, data: errorData, message: errorData.message }));
             error.status = response.status;
             error.data = errorData;
             throw error;
@@ -165,8 +224,8 @@ function useGitHub() {
 
         const data = await api(`/repos/${state.owner}/${state.repo}/contents/${path}?ref=${state.baseBranch}`);
 
-        // Decode base64 content
-        const content = atob(data.content.replace(/\n/g, ''));
+        // Decode base64 content with proper UTF-8 handling
+        const content = decodeBase64UTF8(data.content.replace(/\n/g, ''));
 
         // Parse JS to extract entries array
         const entries = parseNarrationFile(content);
@@ -176,6 +235,30 @@ function useGitHub() {
             sha: data.sha,
             entries
         };
+    }
+
+    /**
+     * Decode base64 string to UTF-8 text
+     * Handles multi-byte characters like ellipsis (…), em-dash, etc.
+     * @param {string} base64 - base64 encoded string
+     * @returns {string} decoded UTF-8 string
+     */
+    function decodeBase64UTF8(base64) {
+        const binaryStr = atob(base64);
+        const bytes = Uint8Array.from(binaryStr, c => c.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
+    }
+
+    /**
+     * Encode UTF-8 string to base64
+     * Handles multi-byte characters like ellipsis (…), em-dash, etc.
+     * @param {string} str - UTF-8 string
+     * @returns {string} base64 encoded string
+     */
+    function encodeBase64UTF8(str) {
+        const bytes = new TextEncoder().encode(str);
+        const binaryStr = String.fromCharCode(...bytes);
+        return btoa(binaryStr);
     }
 
     /**
@@ -315,7 +398,7 @@ function useGitHub() {
     async function updateFile(path, content, message, branch, sha = null) {
         const body = {
             message,
-            content: btoa(content),
+            content: encodeBase64UTF8(content),
             branch
         };
 
