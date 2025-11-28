@@ -443,7 +443,7 @@ function useEditor() {
 
 import { NotificationType } from '../constants.js';
 import { NotificationDurations } from '../constants.js';
-import { TriggerType } from '../types.js';
+import { TriggerType, ComparisonOperator } from '../types.js';
 
 export const ${exportName} = [\n`;
 
