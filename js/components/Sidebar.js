@@ -3,7 +3,6 @@ const Sidebar = {
     name: 'Sidebar',
     components: {
         ActionButton,
-        AutomationItem,
         AscensionButton,
         CrankButton,
         ParticleBurst,
@@ -16,14 +15,6 @@ const Sidebar = {
     },
     emits: ['generate-energy', 'process-data', 'ascend'],
     computed: {
-        hasAutomations() {
-            return Object.values(this.gameStats.automations).some(rate => rate > 0);
-        },
-        automationList() {
-            return Object.entries(this.gameStats.effectiveRates)
-                .filter(([_, rate]) => rate > 0)
-                .map(([resource, rate]) => ({ resource, rate }));
-        },
         dataGenerationProgress() {
             if (this.generationState.dataGeneration && this.generationState.dataGeneration.active) {
                 return this.generationState.dataGeneration.progress;
@@ -74,18 +65,6 @@ const Sidebar = {
                         label="data"
                         :value="dataButtonValue"
                         :progress="dataGenerationProgress"
-                    />
-                </div>
-            </div>
-
-            <div id="automations" v-if="hasAutomations">
-                <h2>Automations</h2>
-                <div id="automation-list">
-                    <AutomationItem
-                        v-for="auto in automationList"
-                        :key="auto.resource"
-                        :resource="auto.resource"
-                        :rate="auto.rate"
                     />
                 </div>
             </div>
