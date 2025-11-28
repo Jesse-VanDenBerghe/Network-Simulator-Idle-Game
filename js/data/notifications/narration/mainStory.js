@@ -579,7 +579,7 @@ export const mainStoryNarrations = [
             nodeId: 'forbidden_archive'
         },
         message:
-            'ACCESSING: Forbidden Archive\nWARNING: Unauthorized Retrieval Attempt\n\n"Jesse… I didn\'t build 4NT0N to remember.\nI built it to hide."\n\n"What I feared… is still out there."',
+            'ACCESSING: Forbidden Archive\nWARNING: Unauthorized Retrieval Attempt',
         duration: NotificationDurations.NARRATION_LONG,
         persistAcrossAscension: true,
         priority: 10

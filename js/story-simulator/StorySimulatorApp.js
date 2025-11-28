@@ -3,10 +3,18 @@
 // Main Vue app for story simulator - preview narrations
 
 import { useStoryPlayback, getFileList } from './useStoryPlayback.js';
+import { FileSelector } from './components/FileSelector.js';
+import { EntryList } from './components/EntryList.js';
+import { NotificationPreview } from './components/NotificationPreview.js';
 
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, watch } = Vue;
 
 const app = createApp({
+    components: {
+        FileSelector,
+        EntryList,
+        NotificationPreview
+    },
     setup() {
         const {
             state,
@@ -37,8 +45,7 @@ const app = createApp({
         });
 
         // Handle file change
-        async function onFileChange(event) {
-            const filename = event.target.value;
+        async function onFileChange(filename) {
             selectedFile.value = filename;
             await loadFile(filename);
         }
@@ -50,18 +57,6 @@ const app = createApp({
             } else {
                 play();
             }
-        }
-
-        // Type icon helper
-        function getTypeIcon(type) {
-            const icons = {
-                narration: '📖',
-                terminal: '💻',
-                info: 'ℹ️',
-                hint: '💡',
-                achievement: '🏆'
-            };
-            return icons[type] || '📝';
         }
 
         // Format trigger for display
@@ -82,18 +77,14 @@ const app = createApp({
             totalEntries,
             progress,
             hasNext,
-            hasPrev,
             fileList,
             selectedFile,
             onFileChange,
             togglePlay,
-            play,
-            pause,
             skip,
             reset,
             goTo,
             setSpeed,
-            getTypeIcon,
             formatTrigger
         };
     },
@@ -106,14 +97,11 @@ const app = createApp({
                     <h1>📖 Story Simulator</h1>
                     
                     <!-- File Selector -->
-                    <div class="file-selector">
-                        <label>Select File:</label>
-                        <select :value="selectedFile" @change="onFileChange">
-                            <option v-for="file in fileList" :key="file.filename" :value="file.filename">
-                                {{ file.label }} ({{ file.count }})
-                            </option>
-                        </select>
-                    </div>
+                    <FileSelector 
+                        :files="fileList" 
+                        :model-value="selectedFile"
+                        @update:model-value="onFileChange"
+                    />
 
                     <!-- Playback Controls -->
                     <div class="playback-controls">
@@ -145,39 +133,17 @@ const app = createApp({
                 </div>
 
                 <!-- Entry List -->
-                <div class="entry-list-container">
-                    <div class="entry-list">
-                        <div v-for="(entry, i) in state.entries" :key="entry.id"
-                             class="entry-item"
-                             :class="{ current: i === state.currentIndex, played: i < state.currentIndex }"
-                             @click="goTo(i)">
-                            <span class="entry-index">{{ i + 1 }}.</span>
-                            <span class="entry-id">{{ entry.id }}</span>
-                            <span class="entry-status">
-                                <span v-if="i < state.currentIndex">✓</span>
-                                <span v-else-if="i === state.currentIndex">▶</span>
-                            </span>
-                            <span class="entry-type">{{ getTypeIcon(entry.type) }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="legend">
-                        Legend: 📖=narration 💻=terminal ℹ️=info 💡=hint 🏆=achievement
-                    </div>
-                </div>
+                <EntryList 
+                    :entries="state.entries" 
+                    :current-index="state.currentIndex"
+                    @select="goTo"
+                />
             </div>
 
             <!-- Right Panel -->
             <div class="right-panel">
                 <!-- Preview -->
-                <div class="preview-section">
-                    <div v-if="currentEntry" class="notification" :class="currentEntry.type">
-                        {{ currentEntry.message }}
-                    </div>
-                    <div v-else class="empty-state">
-                        Select a narration file to preview
-                    </div>
-                </div>
+                <NotificationPreview :entry="currentEntry" />
 
                 <!-- Metadata -->
                 <div class="metadata-section" v-if="currentEntry">
