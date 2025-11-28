@@ -3,13 +3,15 @@
 // Main Vue app for story simulator - preview narrations
 
 import { useStoryPlayback, getFileList } from './useStoryPlayback.js';
+import { useGitHub } from './useGitHub.js';
 import { FileSelector } from './components/FileSelector.js';
 import { EntryList } from './components/EntryList.js';
 import { NotificationPreview } from './components/NotificationPreview.js';
 import { MetadataPanel } from './components/MetadataPanel.js';
 import { PlaybackControls } from './components/PlaybackControls.js';
+import { GitHubSettings } from './components/GitHubSettings.js';
 
-const { createApp, ref, onMounted, onUnmounted } = Vue;
+const { createApp, ref, onMounted, onUnmounted, watch } = Vue;
 
 const app = createApp({
     components: {
@@ -17,7 +19,8 @@ const app = createApp({
         EntryList,
         NotificationPreview,
         MetadataPanel,
-        PlaybackControls
+        PlaybackControls,
+        GitHubSettings
     },
     setup() {
         const {
@@ -32,8 +35,13 @@ const app = createApp({
             reset,
             goTo,
             setSpeed,
-            loadFile
+            loadFile,
+            loadEntries
         } = useStoryPlayback();
+
+        // GitHub integration
+        const github = useGitHub();
+        const useGitHubSource = ref(false);
 
         const fileList = ref([]);
         const selectedFile = ref(null);
@@ -54,12 +62,75 @@ const app = createApp({
             }
         }
 
-        // Load file list on mount
-        onMounted(async () => {
+        // Load files from local (static imports)
+        async function loadLocalFiles() {
             fileList.value = await getFileList();
             if (fileList.value.length > 0) {
                 selectedFile.value = fileList.value[0].filename;
                 await loadFile(selectedFile.value);
+            }
+        }
+
+        // Load files from GitHub
+        async function loadGitHubFiles() {
+            try {
+                const files = await github.listFiles('js/data/notifications/narration');
+                const results = [];
+
+                for (const file of files) {
+                    try {
+                        const data = await github.readFile(file.path);
+                        results.push({
+                            filename: file.name,
+                            path: file.path,
+                            sha: data.sha,
+                            label: file.name.replace('.js', ''),
+                            count: data.entries.length,
+                            entries: data.entries
+                        });
+                    } catch (e) {
+                        console.warn(`Failed to load ${file.name}:`, e);
+                        results.push({
+                            filename: file.name,
+                            path: file.path,
+                            label: file.name.replace('.js', ''),
+                            count: 0,
+                            entries: []
+                        });
+                    }
+                }
+
+                fileList.value = results;
+
+                if (results.length > 0) {
+                    selectedFile.value = results[0].filename;
+                    // Load entries directly from cached data
+                    loadEntries(results[0].entries);
+                }
+            } catch (e) {
+                console.error('Failed to load GitHub files:', e);
+            }
+        }
+
+        // Watch for GitHub connection changes
+        watch(() => github.isConnected.value, async (connected) => {
+            if (connected) {
+                useGitHubSource.value = true;
+                await loadGitHubFiles();
+            } else {
+                useGitHubSource.value = false;
+                await loadLocalFiles();
+            }
+        });
+
+        // Load file list on mount
+        onMounted(async () => {
+            // If already connected (from localStorage), use GitHub
+            if (github.isConnected.value) {
+                useGitHubSource.value = true;
+                await loadGitHubFiles();
+            } else {
+                await loadLocalFiles();
             }
             window.addEventListener('keydown', handleKeydown);
         });
@@ -71,7 +142,25 @@ const app = createApp({
         // Handle file change
         async function onFileChange(filename) {
             selectedFile.value = filename;
-            await loadFile(filename);
+
+            if (useGitHubSource.value) {
+                // Find cached file data
+                const fileData = fileList.value.find(f => f.filename === filename);
+                if (fileData && fileData.entries) {
+                    loadEntries(fileData.entries);
+                }
+            } else {
+                await loadFile(filename);
+            }
+        }
+
+        // GitHub actions
+        async function handleConnect() {
+            await github.connect();
+        }
+
+        function handleDisconnect() {
+            github.disconnect();
         }
 
         return {
@@ -87,7 +176,12 @@ const app = createApp({
             skip,
             reset,
             goTo,
-            setSpeed
+            setSpeed,
+            // GitHub
+            github,
+            useGitHubSource,
+            handleConnect,
+            handleDisconnect
         };
     },
 
@@ -97,6 +191,24 @@ const app = createApp({
             <div class="left-panel">
                 <div class="left-panel-header">
                     <h1>📖 Story Simulator</h1>
+                    
+                    <!-- GitHub Settings -->
+                    <GitHubSettings
+                        :token="github.token.value"
+                        :owner="github.owner.value"
+                        :repo="github.repo.value"
+                        :base-branch="github.baseBranch.value"
+                        :branches="github.branches.value"
+                        :is-connected="github.isConnected.value"
+                        :is-loading="github.isLoading.value"
+                        :error="github.error.value"
+                        @update:token="github.setToken"
+                        @update:owner="github.setOwner"
+                        @update:repo="github.setRepo"
+                        @update:base-branch="github.setBaseBranch"
+                        @connect="handleConnect"
+                        @disconnect="handleDisconnect"
+                    />
                     
                     <!-- File Selector -->
                     <FileSelector 

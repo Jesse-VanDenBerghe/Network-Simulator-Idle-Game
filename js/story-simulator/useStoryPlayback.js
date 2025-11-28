@@ -160,6 +160,16 @@ function useStoryPlayback() {
         state.currentIndex = 0;
     }
 
+    /**
+     * Load entries directly (for GitHub-fetched data)
+     * @param {Array} entries
+     */
+    function loadEntries(entries) {
+        pause();
+        state.entries = entries || [];
+        state.currentIndex = 0;
+    }
+
     return {
         state,
         currentEntry,
@@ -174,6 +184,7 @@ function useStoryPlayback() {
         goTo,
         setSpeed,
         loadFile,
+        loadEntries,
         getFileList
     };
 }

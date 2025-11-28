@@ -284,6 +284,195 @@
             opacity: 0;
             transform: translateY(30px);
         }
+
+        /* GitHub Settings Panel */
+        .github-settings {
+            background: var(--bg-secondary, #252540);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .github-settings.collapsed {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            gap: 0.5rem;
+            user-select: none;
+        }
+
+        .settings-header:hover {
+            background: var(--bg-hover, #3a3a5a);
+        }
+
+        .settings-icon {
+            font-size: 1rem;
+        }
+
+        .settings-title {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            font-size: 0.75rem;
+        }
+
+        .status-indicator.connected {
+            color: #4caf50;
+        }
+
+        .status-indicator.disconnected {
+            color: #888;
+        }
+
+        .status-indicator.loading {
+            color: #ff9800;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .expand-icon {
+            font-size: 0.7rem;
+            color: var(--text-secondary, #999);
+        }
+
+        .settings-body {
+            padding: 0 0.75rem 0.75rem;
+        }
+
+        .setting-row {
+            margin-bottom: 0.5rem;
+        }
+
+        .setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-row label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary, #999);
+        }
+
+        .setting-row input,
+        .setting-row select {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            background: var(--bg-dark, #1a1a2e);
+            color: var(--text-primary, #e0e0e0);
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .setting-row input:disabled,
+        .setting-row select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .token-input {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .token-input input {
+            flex: 1;
+        }
+
+        .token-input .toggle-visibility {
+            padding: 0.4rem 0.5rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            background: var(--bg-dark, #1a1a2e);
+            color: var(--text-primary, #e0e0e0);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .setting-row.actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .connect-btn,
+        .disconnect-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .connect-btn {
+            background: var(--accent-color, #4a9eff);
+            border-color: var(--accent-color, #4a9eff);
+            color: white;
+        }
+
+        .connect-btn:hover:not(:disabled) {
+            background: #3a8eef;
+        }
+
+        .connect-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .disconnect-btn {
+            background: var(--bg-dark, #1a1a2e);
+            color: var(--text-secondary, #999);
+        }
+
+        .disconnect-btn:hover {
+            background: var(--bg-hover, #3a3a5a);
+        }
+
+        .setting-row.status {
+            text-align: center;
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+        }
+
+        .status-text.connected {
+            color: #4caf50;
+        }
+
+        .status-text.disconnected {
+            color: var(--text-secondary, #999);
+        }
+
+        .status-text.loading {
+            color: #ff9800;
+        }
+
+        .setting-row.error {
+            margin-top: 0.5rem;
+        }
+
+        .error-text {
+            color: #f44336;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
