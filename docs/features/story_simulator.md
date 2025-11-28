@@ -1,5 +1,7 @@
 # Story Simulator - Feature Specification
 
+**Status: ✅ IMPLEMENTED** (2025-11-28)
+
 ## Purpose
 Dev tool for previewing/writing narrations. Standalone from main game. Plays notifications sequentially, ignoring triggers.
 
@@ -19,7 +21,7 @@ Dev tool for previewing/writing narrations. Standalone from main game. Plays not
 | 4 | Editing? | **Read-only** — preview only |
 | 5 | Filter by type? | **No** — show all |
 | 6 | Show trigger metadata? | **Yes** — in metadata panel on click |
-| 7 | Keyboard shortcuts? | **No** — not needed |
+| 7 | Keyboard shortcuts? | **Yes** — Arrow Up/Down to navigate |
 
 ---
 
