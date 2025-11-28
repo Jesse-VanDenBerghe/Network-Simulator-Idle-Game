@@ -723,6 +723,261 @@
             font-size: 0.9rem;
             color: var(--text-secondary, #999);
         }
+
+        /* Create PR Button */
+        .create-pr-btn {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid var(--accent-color, #4a9eff);
+            border-radius: 4px;
+            background: var(--accent-color, #4a9eff);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .create-pr-btn:hover {
+            background: #3a8eef;
+        }
+
+        /* PR Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pr-modal {
+            background: var(--bg-secondary, #252540);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pr-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+
+        .pr-modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .pr-modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary, #999);
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .pr-modal-header .close-btn:hover {
+            color: var(--text-primary, #e0e0e0);
+        }
+
+        .pr-modal-body {
+            padding: 1.25rem;
+            overflow-y: auto;
+        }
+
+        .pr-modal-success {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .pr-modal-success p {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .pr-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-dark, #1a1a2e);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            color: var(--accent-color, #4a9eff);
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .pr-link:hover {
+            background: var(--bg-hover, #3a3a5a);
+        }
+
+        .pr-modal .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .pr-modal .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary, #999);
+        }
+
+        .pr-modal input[type="text"],
+        .pr-modal textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            background: var(--bg-dark, #1a1a2e);
+            color: var(--text-primary, #e0e0e0);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .pr-modal textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .file-changes-list {
+            background: var(--bg-dark, #1a1a2e);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .file-change-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+
+        .file-change-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-name {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .change-stats {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .change-stats .stat {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .change-stats .stat.added { color: #4caf50; }
+        .change-stats .stat.deleted { color: #f44336; }
+        .change-stats .stat.modified { color: #ff9800; }
+
+        .conflict-warning {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #ff9800;
+            border-radius: 4px;
+        }
+
+        .conflict-warning h4 {
+            margin: 0 0 0.5rem 0;
+            color: #ff9800;
+            font-size: 0.95rem;
+        }
+
+        .conflict-warning p {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .conflict-warning ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .conflict-warning li {
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .conflict-note {
+            font-style: italic;
+            color: var(--text-secondary, #999);
+        }
+
+        .error-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            border-radius: 4px;
+            color: #f44336;
+            font-size: 0.9rem;
+        }
+
+        .pr-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color, #333);
+        }
+
+        .secondary-btn {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            background: var(--bg-dark, #1a1a2e);
+            color: var(--text-primary, #e0e0e0);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .secondary-btn:hover:not(:disabled) {
+            background: var(--bg-hover, #3a3a5a);
+        }
+
+        .primary-btn {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--accent-color, #4a9eff);
+            border-radius: 4px;
+            background: var(--accent-color, #4a9eff);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background: #3a8eef;
+        }
+
+        .primary-btn:disabled,
+        .secondary-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>

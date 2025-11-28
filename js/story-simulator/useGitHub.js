@@ -30,9 +30,9 @@ function useGitHub() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                state.token = parsed.token || '';
-                state.owner = parsed.owner || DEFAULT_OWNER;
-                state.repo = parsed.repo || DEFAULT_REPO;
+                state.token = (parsed.token || '').trim();
+                state.owner = (parsed.owner || DEFAULT_OWNER).trim();
+                state.repo = (parsed.repo || DEFAULT_REPO).trim();
                 state.baseBranch = parsed.baseBranch || 'main';
             }
         } catch (e) {
@@ -44,9 +44,9 @@ function useGitHub() {
     function saveSettings() {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                token: state.token,
-                owner: state.owner,
-                repo: state.repo,
+                token: state.token.trim(),
+                owner: state.owner.trim(),
+                repo: state.repo.trim(),
                 baseBranch: state.baseBranch
             }));
         } catch (e) {
@@ -68,7 +68,12 @@ function useGitHub() {
         };
 
         if (state.token) {
-            headers['Authorization'] = `token ${state.token}`;
+            headers['Authorization'] = `Bearer ${state.token}`;
+        }
+
+        // Add Content-Type for requests with body
+        if (options.body) {
+            headers['Content-Type'] = 'application/json';
         }
 
         const response = await fetch(url, { ...options, headers });

@@ -12,6 +12,7 @@ import { MetadataPanel } from './components/MetadataPanel.js';
 import { PlaybackControls } from './components/PlaybackControls.js';
 import { GitHubSettings } from './components/GitHubSettings.js';
 import { EntryEditor } from './components/EntryEditor.js';
+import { PRModal } from './components/PRModal.js';
 
 const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
@@ -23,7 +24,8 @@ const app = createApp({
         MetadataPanel,
         PlaybackControls,
         GitHubSettings,
-        EntryEditor
+        EntryEditor,
+        PRModal
     },
     setup() {
         const {
@@ -51,6 +53,13 @@ const app = createApp({
 
         const fileList = ref([]);
         const selectedFile = ref(null);
+
+        // PR Modal state
+        const showPRModal = ref(false);
+        const prLoading = ref(false);
+        const prError = ref(null);
+        const prConflicts = ref([]);
+        const createdPR = ref(null);
 
         // Computed: entries to display (editor entries in edit mode, playback otherwise)
         const displayEntries = computed(() => {
@@ -285,6 +294,81 @@ const app = createApp({
             github.disconnect();
         }
 
+        // PR Modal actions
+        function openPRModal() {
+            prError.value = null;
+            prConflicts.value = [];
+            createdPR.value = null;
+            showPRModal.value = true;
+        }
+
+        function closePRModal() {
+            showPRModal.value = false;
+            prError.value = null;
+            prConflicts.value = [];
+            // If PR was created, reload files to update SHAs
+            if (createdPR.value) {
+                createdPR.value = null;
+                loadGitHubFiles();
+            }
+        }
+
+        async function checkConflicts() {
+            prConflicts.value = [];
+            const dirty = editor.dirtyFiles.value;
+            
+            for (const file of dirty) {
+                try {
+                    const hasConflict = await github.hasFileChanged(file.path, file.sha);
+                    prConflicts.value.push({ filename: file.filename, hasConflict });
+                } catch (e) {
+                    console.warn(`Failed to check ${file.filename}:`, e);
+                    prConflicts.value.push({ filename: file.filename, hasConflict: false });
+                }
+            }
+        }
+
+        async function handleCreatePR({ branchName, title, description }) {
+            prLoading.value = true;
+            prError.value = null;
+
+            try {
+                // 1. Create branch
+                await github.createBranch(branchName);
+
+                // 2. Commit each dirty file
+                const dirty = editor.dirtyFiles.value;
+                for (const file of dirty) {
+                    const content = editor.serializeEntriesToJS(file.filename, file.entries);
+                    const message = `Update ${file.filename}`;
+                    const result = await github.updateFile(
+                        file.path,
+                        content,
+                        message,
+                        branchName,
+                        file.sha
+                    );
+                    // Update SHA in editor
+                    editor.markFileSaved(file.filename, result.sha);
+                }
+
+                // 3. Create PR
+                const pr = await github.createPullRequest({
+                    title,
+                    body: description,
+                    head: branchName,
+                    base: github.baseBranch.value
+                });
+
+                createdPR.value = pr;
+            } catch (e) {
+                console.error('Failed to create PR:', e);
+                prError.value = e.message || 'Failed to create pull request';
+            } finally {
+                prLoading.value = false;
+            }
+        }
+
         return {
             state,
             currentEntry,
@@ -319,7 +403,17 @@ const app = createApp({
             handleRevertEntry,
             handleMoveUp,
             handleMoveDown,
-            handleRevertAll
+            handleRevertAll,
+            // PR Modal
+            showPRModal,
+            prLoading,
+            prError,
+            prConflicts,
+            createdPR,
+            openPRModal,
+            closePRModal,
+            checkConflicts,
+            handleCreatePR
         };
     },
 
@@ -373,6 +467,9 @@ const app = createApp({
                             <button class="revert-btn" @click="handleRevertAll">
                                 ↩ Revert
                             </button>
+                            <button class="create-pr-btn" @click="openPRModal">
+                                📤 Create PR
+                            </button>
                         </template>
                     </div>
 
@@ -424,6 +521,19 @@ const app = createApp({
                 />
                 <MetadataPanel v-else :entry="displayEntry" />
             </div>
+
+            <!-- PR Modal -->
+            <PRModal
+                :show="showPRModal"
+                :dirty-files="editor.dirtyFiles.value"
+                :is-loading="prLoading"
+                :error="prError"
+                :conflicts="prConflicts"
+                :created-p-r="createdPR"
+                @close="closePRModal"
+                @submit="handleCreatePR"
+                @check-conflicts="checkConflicts"
+            />
         </div>
     `
 });
