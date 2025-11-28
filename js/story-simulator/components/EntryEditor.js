@@ -195,7 +195,7 @@ const EntryEditor = {
                     <span v-if="validationErrors.message" class="field-error">{{ validationErrors.message }}</span>
                 </div>
                 
-                <!-- Duration / Priority row -->
+                <!-- Duration / Delay / Priority row -->
                 <div class="field-row-group">
                     <div class="field-row" :class="{ 'has-error': validationErrors.duration }">
                         <label>Duration (ms):</label>
@@ -208,6 +208,16 @@ const EntryEditor = {
                             :class="{ invalid: validationErrors.duration }"
                         />
                         <span v-if="validationErrors.duration" class="field-error">{{ validationErrors.duration }}</span>
+                    </div>
+                    <div class="field-row">
+                        <label>Delay (ms):</label>
+                        <input 
+                            type="number" 
+                            :value="entry.delay || 0"
+                            @input="updateField('delay', parseInt($event.target.value) || 0)"
+                            min="0"
+                            step="500"
+                        />
                     </div>
                     <div class="field-row">
                         <label>Priority:</label>

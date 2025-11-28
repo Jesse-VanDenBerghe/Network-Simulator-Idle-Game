@@ -12,6 +12,7 @@ const DEFAULT_ENTRY = {
     type: 'narration',
     message: '',
     duration: 8000,
+    delay: 0,
     priority: 5,
     persistAcrossAscension: false,
     trigger: {
