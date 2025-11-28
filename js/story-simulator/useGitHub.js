@@ -207,10 +207,59 @@ function useGitHub() {
             const arrayStr = content.slice(startIdx, endIdx);
 
             // Convert to valid JSON-ish format for eval
-            // Replace NotificationType.X and TriggerType.X with strings
+            // Replace all constant references with their actual string values
             let normalized = arrayStr
-                .replace(/NotificationType\.(\w+)/g, '"$1"')
-                .replace(/TriggerType\.(\w+)/g, '"$1"');
+                .replace(/NotificationType\.(\w+)/g, (_, name) => {
+                    // Map enum names to actual values
+                    const types = {
+                        INFO: '"info"',
+                        ERROR: '"error"',
+                        SUCCESS: '"success"',
+                        NARRATION: '"narration"',
+                        NODE_UNLOCK: '"node_unlock"',
+                        HINT: '"hint"',
+                        ACHIEVEMENT: '"achievement"',
+                        TERMINAL: '"terminal"'
+                    };
+                    return types[name] || `"${name.toLowerCase()}"`;
+                })
+                .replace(/TriggerType\.(\w+)/g, (_, name) => {
+                    // Map enum names to actual values
+                    const triggers = {
+                        ON_FIRST_LAUNCH: '"onFirstLaunch"',
+                        ON_NODE_UNLOCKED: '"onNodeUnlocked"',
+                        ON_NODE_LEVEL_REACHED: '"onNodeLevelReached"',
+                        ON_RESOURCE_AMOUNT_REACHED: '"onResourceAmountReached"',
+                        ON_BRANCH_UNLOCKED: '"onBranchUnlocked"',
+                        ON_FEATURE_UNLOCKED: '"onFeatureUnlocked"',
+                        ON_TIER_REACHED: '"onTierReached"',
+                        ON_ASCENSION: '"onAscension"',
+                        ON_OFFLINE_RETURN: '"onOfflineReturn"',
+                        ON_IDLE_TIME: '"onIdleTime"'
+                    };
+                    return triggers[name] || `"${name}"`;
+                })
+                .replace(/NotificationDurations\.(\w+)/g, (_, name) => {
+                    // Map known duration constants to values
+                    const durations = {
+                        NARRATION_SHORT: 6000,
+                        NARRATION_MEDIUM: 10000,
+                        NARRATION_LONG: 15000,
+                        HINT_SHORT: 5000,
+                        HINT_MEDIUM: 8000
+                    };
+                    return durations[name] || 8000;
+                })
+                .replace(/ComparisonOperator\.(\w+)/g, (_, name) => {
+                    const ops = {
+                        GREATER_EQUAL: '">="',
+                        LESS_EQUAL: '"<="',
+                        EQUAL: '"=="',
+                        GREATER: '">"',
+                        LESS: '"<"'
+                    };
+                    return ops[name] || '">="';
+                });
 
             // Use Function constructor to safely evaluate (no global access)
             const entries = new Function(`return ${normalized}`)();

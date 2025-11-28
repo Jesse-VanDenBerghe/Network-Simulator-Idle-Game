@@ -1,17 +1,19 @@
 // Story Simulator App
 // ====================
-// Main Vue app for story simulator - preview narrations
+// Main Vue app for story simulator - preview and edit narrations
 
 import { useStoryPlayback, getFileList } from './useStoryPlayback.js';
 import { useGitHub } from './useGitHub.js';
+import { useEditor } from './useEditor.js';
 import { FileSelector } from './components/FileSelector.js';
 import { EntryList } from './components/EntryList.js';
 import { NotificationPreview } from './components/NotificationPreview.js';
 import { MetadataPanel } from './components/MetadataPanel.js';
 import { PlaybackControls } from './components/PlaybackControls.js';
 import { GitHubSettings } from './components/GitHubSettings.js';
+import { EntryEditor } from './components/EntryEditor.js';
 
-const { createApp, ref, onMounted, onUnmounted, watch } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
 const app = createApp({
     components: {
@@ -20,7 +22,8 @@ const app = createApp({
         NotificationPreview,
         MetadataPanel,
         PlaybackControls,
-        GitHubSettings
+        GitHubSettings,
+        EntryEditor
     },
     setup() {
         const {
@@ -43,21 +46,84 @@ const app = createApp({
         const github = useGitHub();
         const useGitHubSource = ref(false);
 
+        // Editor integration
+        const editor = useEditor();
+
         const fileList = ref([]);
         const selectedFile = ref(null);
 
+        // Computed: entries to display (editor entries in edit mode, playback otherwise)
+        const displayEntries = computed(() => {
+            if (editor.editMode.value && useGitHubSource.value) {
+                return editor.entries.value;
+            }
+            return state.entries;
+        });
+
+        // Computed: current index (editor selected in edit mode)
+        const displayIndex = computed(() => {
+            if (editor.editMode.value && useGitHubSource.value) {
+                return editor.selectedIndex.value;
+            }
+            return state.currentIndex;
+        });
+
+        // Computed: current entry for preview
+        const displayEntry = computed(() => {
+            if (editor.editMode.value && useGitHubSource.value) {
+                return editor.selectedEntry.value;
+            }
+            return currentEntry.value;
+        });
+
+        // Computed: set of modified entry IDs for current file
+        const modifiedEntryIds = computed(() => {
+            // Depend on entries to trigger reactivity on changes
+            const currentEntries = editor.entries.value;
+            
+            if (!editor.editMode.value || !editor.currentFile.value) {
+                return new Set();
+            }
+            const filename = editor.currentFile.value.filename;
+            const fileData = editor.getFileData(filename);
+            if (!fileData) return new Set();
+            
+            const origMap = new Map(fileData.originalEntries.map(e => [e.id, JSON.stringify(e)]));
+            const modified = new Set();
+            
+            for (const entry of currentEntries) {
+                const origStr = origMap.get(entry.id);
+                if (!origStr || origStr !== JSON.stringify(entry)) {
+                    modified.add(entry.id);
+                }
+            }
+            return modified;
+        });
+
         // Keyboard navigation
         function handleKeydown(e) {
-            if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+            if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             
             switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
-                    if (hasNext.value) goTo(state.currentIndex + 1);
+                    if (editor.editMode.value) {
+                        if (editor.selectedIndex.value < editor.entries.value.length - 1) {
+                            editor.selectEntry(editor.selectedIndex.value + 1);
+                        }
+                    } else if (hasNext.value) {
+                        goTo(state.currentIndex + 1);
+                    }
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
-                    if (hasPrev.value) goTo(state.currentIndex - 1);
+                    if (editor.editMode.value) {
+                        if (editor.selectedIndex.value > 0) {
+                            editor.selectEntry(editor.selectedIndex.value - 1);
+                        }
+                    } else if (hasPrev.value) {
+                        goTo(state.currentIndex - 1);
+                    }
                     break;
             }
         }
@@ -80,14 +146,18 @@ const app = createApp({
                 for (const file of files) {
                     try {
                         const data = await github.readFile(file.path);
-                        results.push({
+                        const fileData = {
                             filename: file.name,
                             path: file.path,
                             sha: data.sha,
                             label: file.name.replace('.js', ''),
                             count: data.entries.length,
                             entries: data.entries
-                        });
+                        };
+                        results.push(fileData);
+                        
+                        // Load into editor
+                        editor.loadFile(fileData);
                     } catch (e) {
                         console.warn(`Failed to load ${file.name}:`, e);
                         results.push({
@@ -104,7 +174,6 @@ const app = createApp({
 
                 if (results.length > 0) {
                     selectedFile.value = results[0].filename;
-                    // Load entries directly from cached data
                     loadEntries(results[0].entries);
                 }
             } catch (e) {
@@ -119,13 +188,13 @@ const app = createApp({
                 await loadGitHubFiles();
             } else {
                 useGitHubSource.value = false;
+                editor.setEditMode(false);
                 await loadLocalFiles();
             }
         });
 
         // Load file list on mount
         onMounted(async () => {
-            // If already connected (from localStorage), use GitHub
             if (github.isConnected.value) {
                 useGitHubSource.value = true;
                 await loadGitHubFiles();
@@ -144,14 +213,67 @@ const app = createApp({
             selectedFile.value = filename;
 
             if (useGitHubSource.value) {
-                // Find cached file data
                 const fileData = fileList.value.find(f => f.filename === filename);
                 if (fileData && fileData.entries) {
                     loadEntries(fileData.entries);
+                    editor.switchFile(filename);
                 }
             } else {
                 await loadFile(filename);
             }
+        }
+
+        // Handle entry selection
+        function onSelectEntry(index) {
+            if (editor.editMode.value) {
+                editor.selectEntry(index);
+            } else {
+                goTo(index);
+            }
+        }
+
+        // Editor actions
+        function handleUpdateEntry(index, path, value) {
+            editor.modifyEntry(index, path, value);
+        }
+
+        function handleAddEntry(afterIndex) {
+            editor.addEntry(afterIndex);
+        }
+
+        function handleDeleteEntry(index) {
+            if (confirm('Delete this entry?')) {
+                editor.deleteEntry(index);
+            }
+        }
+
+        function handleDuplicateEntry(index) {
+            editor.duplicateEntry(index);
+        }
+
+        function handleRevertEntry(index) {
+            if (confirm('Revert this entry to original?')) {
+                editor.revertEntry(index);
+            }
+        }
+
+        function handleMoveUp(index) {
+            editor.moveUp(index);
+        }
+
+        function handleMoveDown(index) {
+            editor.moveDown(index);
+        }
+
+        function handleRevertAll() {
+            if (confirm('Revert all changes?')) {
+                editor.revertAll();
+            }
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            editor.setEditMode(!editor.editMode.value);
         }
 
         // GitHub actions
@@ -171,6 +293,7 @@ const app = createApp({
             fileList,
             selectedFile,
             onFileChange,
+            onSelectEntry,
             play,
             pause,
             skip,
@@ -181,7 +304,22 @@ const app = createApp({
             github,
             useGitHubSource,
             handleConnect,
-            handleDisconnect
+            handleDisconnect,
+            // Editor
+            editor,
+            displayEntries,
+            displayIndex,
+            displayEntry,
+            modifiedEntryIds,
+            toggleEditMode,
+            handleUpdateEntry,
+            handleAddEntry,
+            handleDeleteEntry,
+            handleDuplicateEntry,
+            handleRevertEntry,
+            handleMoveUp,
+            handleMoveDown,
+            handleRevertAll
         };
     },
 
@@ -217,8 +355,30 @@ const app = createApp({
                         @update:model-value="onFileChange"
                     />
 
-                    <!-- Playback Controls -->
+                    <!-- Mode Toggle & Toolbar -->
+                    <div class="mode-toolbar">
+                        <button 
+                            v-if="useGitHubSource"
+                            class="mode-toggle-btn"
+                            :class="{ active: editor.editMode.value }"
+                            @click="toggleEditMode"
+                        >
+                            {{ editor.editMode.value ? '📝 Editing' : '▶️ Playback' }}
+                        </button>
+                        
+                        <template v-if="editor.editMode.value && editor.hasDirtyFiles.value">
+                            <span class="dirty-indicator">
+                                {{ editor.dirtyFiles.value.length }} file(s) modified
+                            </span>
+                            <button class="revert-btn" @click="handleRevertAll">
+                                ↩ Revert
+                            </button>
+                        </template>
+                    </div>
+
+                    <!-- Playback Controls (non-edit mode) -->
                     <PlaybackControls
+                        v-if="!editor.editMode.value"
                         :is-playing="state.isPlaying"
                         :has-next="hasNext"
                         :speed="state.speed"
@@ -234,19 +394,35 @@ const app = createApp({
 
                 <!-- Entry List -->
                 <EntryList 
-                    :entries="state.entries" 
-                    :current-index="state.currentIndex"
-                    @select="goTo"
+                    :entries="displayEntries" 
+                    :current-index="displayIndex"
+                    :edit-mode="editor.editMode.value"
+                    :modified-ids="modifiedEntryIds"
+                    @select="onSelectEntry"
+                    @add="handleAddEntry"
+                    @move-up="handleMoveUp"
+                    @move-down="handleMoveDown"
+                    @delete="handleDeleteEntry"
                 />
             </div>
 
             <!-- Right Panel -->
             <div class="right-panel">
                 <!-- Preview -->
-                <NotificationPreview :entry="currentEntry" :direction="state.direction" />
+                <NotificationPreview :entry="displayEntry" :direction="state.direction" />
 
-                <!-- Metadata -->
-                <MetadataPanel :entry="currentEntry" />
+                <!-- Entry Editor (edit mode) or Metadata (playback mode) -->
+                <EntryEditor
+                    v-if="editor.editMode.value"
+                    :entry="editor.selectedEntry.value"
+                    :index="editor.selectedIndex.value"
+                    :is-modified="modifiedEntryIds.has(editor.selectedEntry.value?.id)"
+                    @update="handleUpdateEntry"
+                    @delete="handleDeleteEntry"
+                    @duplicate="handleDuplicateEntry"
+                    @revert="handleRevertEntry"
+                />
+                <MetadataPanel v-else :entry="displayEntry" />
             </div>
         </div>
     `

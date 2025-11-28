@@ -1,6 +1,6 @@
 // Entry List Component
 // =====================
-// Scrollable list of narration entries with click-to-select
+// Scrollable list of narration entries with edit actions
 
 const { watch, ref, nextTick } = Vue;
 
@@ -14,9 +14,17 @@ const EntryList = {
         currentIndex: {
             type: Number,
             default: 0
+        },
+        editMode: {
+            type: Boolean,
+            default: false
+        },
+        modifiedIds: {
+            type: Set,
+            default: () => new Set()
         }
     },
-    emits: ['select'],
+    emits: ['select', 'add', 'moveUp', 'moveDown', 'delete'],
     setup(props) {
         const listRef = ref(null);
 
@@ -43,27 +51,78 @@ const EntryList = {
                 achievement: '🏆'
             };
             return icons[type] || '📝';
+        },
+        isModified(entry) {
+            return this.modifiedIds.has(entry.id);
         }
     },
     template: `
         <div class="entry-list-container">
+            <!-- Add Entry button (edit mode) -->
+            <div v-if="editMode" class="entry-list-header">
+                <button class="btn-add-entry" @click="$emit('add', -1)">
+                    + New Entry
+                </button>
+            </div>
+            
             <div class="entry-list" ref="listRef">
                 <div v-for="(entry, i) in entries" :key="entry.id"
                      class="entry-item"
-                     :class="{ current: i === currentIndex, played: i < currentIndex }"
+                     :class="{ 
+                         current: i === currentIndex, 
+                         played: !editMode && i < currentIndex,
+                         modified: isModified(entry)
+                     }"
                      @click="$emit('select', i)">
+                    
+                    <!-- Edit mode: action buttons -->
+                    <div v-if="editMode" class="entry-actions">
+                        <button 
+                            class="btn-mini" 
+                            @click.stop="$emit('moveUp', i)"
+                            :disabled="i === 0"
+                            title="Move up"
+                        >↑</button>
+                        <button 
+                            class="btn-mini" 
+                            @click.stop="$emit('moveDown', i)"
+                            :disabled="i === entries.length - 1"
+                            title="Move down"
+                        >↓</button>
+                        <button 
+                            class="btn-mini btn-insert" 
+                            @click.stop="$emit('add', i)"
+                            title="Insert after"
+                        >+</button>
+                    </div>
+                    
                     <span class="entry-index">{{ i + 1 }}.</span>
                     <span class="entry-id">{{ entry.id }}</span>
-                    <span class="entry-status">
+                    
+                    <!-- Modified indicator -->
+                    <span v-if="isModified(entry)" class="entry-modified" title="Modified">●</span>
+                    
+                    <!-- Playback status (non-edit mode) -->
+                    <span v-if="!editMode" class="entry-status">
                         <span v-if="i < currentIndex">✓</span>
                         <span v-else-if="i === currentIndex">▶</span>
                     </span>
+                    
                     <span class="entry-type">{{ getTypeIcon(entry.type) }}</span>
+                    
+                    <!-- Delete button (edit mode) -->
+                    <button 
+                        v-if="editMode"
+                        class="btn-mini btn-delete" 
+                        @click.stop="$emit('delete', i)"
+                        title="Delete"
+                    >×</button>
                 </div>
             </div>
             
             <div class="legend">
                 Legend: 📖=narration 💻=terminal ℹ️=info 💡=hint 🏆=achievement
+                <span v-if="editMode"> | ●=modified</span>
             </div>
         </div>
     `
