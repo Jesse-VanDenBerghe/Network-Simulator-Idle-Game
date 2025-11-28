@@ -452,6 +452,17 @@ function useGitHub() {
         }
     }
 
+    /**
+     * Auto-connect if saved token exists
+     * @returns {Promise<boolean>}
+     */
+    async function autoConnect() {
+        if (state.token && state.owner && state.repo && !state.isConnected) {
+            return await connect();
+        }
+        return false;
+    }
+
     // Initialize
     loadSettings();
 
@@ -467,6 +478,7 @@ function useGitHub() {
 
         // Actions
         connect,
+        autoConnect,
         disconnect,
         clearError,
         saveSettings,

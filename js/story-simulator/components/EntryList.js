@@ -86,7 +86,8 @@ const EntryList = {
         }
 
         return { 
-            listRef, 
+            listRef,
+            containerRef: ref(null),
             draggedIndex, 
             dragOverIndex,
             onDragStart,
@@ -115,14 +116,19 @@ const EntryList = {
             if (this.draggedIndex === index) return 'drag-source';
             if (this.dragOverIndex === index) return 'drag-over';
             return '';
+        },
+        scrollToBottom() {
+            if (this.containerRef) {
+                this.containerRef.scrollTop = this.containerRef.scrollHeight;
+            }
         }
     },
     template: `
-        <div class="entry-list-container">
-            <!-- Add Entry button (edit mode) -->
+        <div class="entry-list-container" ref="containerRef">
+            <!-- Jump to bottom button (edit mode) -->
             <div v-if="editMode" class="entry-list-header">
-                <button class="btn-add-entry" @click="$emit('add', -1)">
-                    + New Entry
+                <button class="btn-jump-bottom" @click="scrollToBottom" title="Jump to bottom">
+                    ⬇ Bottom
                 </button>
             </div>
             
@@ -188,6 +194,13 @@ const EntryList = {
                         title="Delete"
                     >×</button>
                 </div>
+            </div>
+            
+            <!-- Add Entry button at bottom (edit mode) -->
+            <div v-if="editMode" class="entry-list-footer">
+                <button class="btn-add-entry" @click="$emit('add', entries.length - 1)">
+                    + New Entry
+                </button>
             </div>
             
             <div class="legend">

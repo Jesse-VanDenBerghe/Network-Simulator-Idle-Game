@@ -61,6 +61,16 @@ const app = createApp({
         const prConflicts = ref([]);
         const createdPR = ref(null);
 
+        // Editor navigation direction for transitions
+        const editorDirection = ref('forward');
+        let lastEditorIndex = 0;
+
+        // Track editor index changes for direction
+        watch(() => editor.selectedIndex.value, (newIdx) => {
+            editorDirection.value = newIdx >= lastEditorIndex ? 'forward' : 'backward';
+            lastEditorIndex = newIdx;
+        });
+
         // Computed: entries to display (editor entries in edit mode, playback otherwise)
         const displayEntries = computed(() => {
             if (editor.editMode.value && useGitHubSource.value) {
@@ -75,6 +85,14 @@ const app = createApp({
                 return editor.selectedIndex.value;
             }
             return state.currentIndex;
+        });
+
+        // Computed: direction for preview transitions
+        const displayDirection = computed(() => {
+            if (editor.editMode.value && useGitHubSource.value) {
+                return editorDirection.value;
+            }
+            return state.direction;
         });
 
         // Computed: current entry for preview
@@ -213,7 +231,10 @@ const app = createApp({
 
         // Load file list on mount
         onMounted(async () => {
-            if (github.isConnected.value) {
+            // Try auto-connect if token saved
+            const autoConnected = await github.autoConnect();
+            
+            if (autoConnected || github.isConnected.value) {
                 useGitHubSource.value = true;
                 await loadGitHubFiles();
             } else {
@@ -297,7 +318,13 @@ const app = createApp({
 
         // Toggle edit mode
         function toggleEditMode() {
-            editor.setEditMode(!editor.editMode.value);
+            const newEditMode = !editor.editMode.value;
+            editor.setEditMode(newEditMode);
+            
+            // Sync editor to current selected file when entering edit mode
+            if (newEditMode && selectedFile.value) {
+                editor.switchFile(selectedFile.value);
+            }
         }
 
         // GitHub actions
@@ -409,6 +436,7 @@ const app = createApp({
             displayEntries,
             displayIndex,
             displayEntry,
+            displayDirection,
             modifiedEntryIds,
             toggleEditMode,
             handleUpdateEntry,
@@ -523,7 +551,7 @@ const app = createApp({
             <!-- Right Panel -->
             <div class="right-panel">
                 <!-- Preview -->
-                <NotificationPreview :entry="displayEntry" :direction="state.direction" />
+                <NotificationPreview :entry="displayEntry" :direction="displayDirection" />
 
                 <!-- Entry Editor (edit mode) or Metadata (playback mode) -->
                 <EntryEditor

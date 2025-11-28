@@ -525,6 +525,27 @@
             border-bottom: 1px solid var(--border-color, #333);
         }
 
+        .entry-list-footer {
+            padding: 0.5rem;
+            border-top: 1px solid var(--border-color, #333);
+        }
+
+        .btn-jump-bottom {
+            width: 100%;
+            padding: 0.4rem;
+            border: 1px solid var(--border-color, #333);
+            border-radius: 4px;
+            background: var(--bg-secondary, #252540);
+            color: var(--text-secondary, #999);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-jump-bottom:hover {
+            background: var(--bg-hover, #3a3a5a);
+            color: var(--text-primary, #e0e0e0);
+        }
+
         .btn-add-entry {
             width: 100%;
             padding: 0.5rem;
@@ -655,7 +676,7 @@
 
         .editor-body {
             padding: 1rem;
-            max-height: 400px;
+            max-height: calc(100vh - 350px);
             overflow-y: auto;
         }
 

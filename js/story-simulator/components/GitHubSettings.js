@@ -48,9 +48,17 @@ const GitHubSettings = {
     },
     data() {
         return {
-            isExpanded: true,
+            isExpanded: !this.isConnected,
             showToken: false
         };
+    },
+    watch: {
+        // Auto-collapse when connected (e.g., after auto-connect)
+        isConnected(connected) {
+            if (connected) {
+                this.isExpanded = false;
+            }
+        }
     },
     computed: {
         repoValue() {

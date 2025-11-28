@@ -17,10 +17,8 @@ const NotificationPreview = {
         }
     },
     setup(props) {
-        const transitionName = ref('slide-up');
-
-        watch(() => props.direction, (dir) => {
-            transitionName.value = dir === 'backward' ? 'slide-down' : 'slide-up';
+        const transitionName = computed(() => {
+            return props.direction === 'backward' ? 'slide-down' : 'slide-up';
         });
 
         // Use entry.id as key to trigger transition on change
