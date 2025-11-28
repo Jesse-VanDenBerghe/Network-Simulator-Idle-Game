@@ -3,25 +3,18 @@ const Sidebar = {
     name: 'Sidebar',
     components: {
         ActionButton,
-        AutomationItem,
         AscensionButton,
-        ParticleBurst
+        CrankButton,
+        ParticleBurst,
+        TerminalProgressButton
     },
     props: {
         resourceStats: { type: Object, required: true }, // { energyPerClick, dataPerClick, stats }
-        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankDisabled }
+        generationState: { type: Object, required: true }, // { dataGeneration, energyGeneration, isCrankBroken, isCrankAutomated }
         gameStats: { type: Object, required: true } // { automations, effectiveRates, coresEarned, highestTierReached, isDataUnlocked, canProcessData }
     },
     emits: ['generate-energy', 'process-data', 'ascend'],
     computed: {
-        hasAutomations() {
-            return Object.values(this.gameStats.automations).some(rate => rate > 0);
-        },
-        automationList() {
-            return Object.entries(this.gameStats.effectiveRates)
-                .filter(([_, rate]) => rate > 0)
-                .map(([resource, rate]) => ({ resource, rate }));
-        },
         dataGenerationProgress() {
             if (this.generationState.dataGeneration && this.generationState.dataGeneration.active) {
                 return this.generationState.dataGeneration.progress;
@@ -42,7 +35,7 @@ const Sidebar = {
             return null;
         },
         energyButtonText() {
-            if (this.generationState.isCrankDisabled) {
+            if (this.generationState.isCrankBroken) {
                 return 'Broken Crank';
             }
             return 'Turn Crank';
@@ -57,36 +50,20 @@ const Sidebar = {
     template: `
         <aside id="sidebar">
             <div id="manual-actions">
-                <h2>Manual Actions</h2>
                 <div class="action-wrapper" @click="handleEnergyClick">
-                    <ActionButton
-                        icon="⚡"
-                        :text="energyButtonText"
+                    <CrankButton
                         :value="energyButtonValue"
-                        :locked="generationState.isCrankDisabled"
+                        :broken="generationState.isCrankBroken"
+                        :automated="generationState.isCrankAutomated"
                         :progress="energyGenerationProgress"
                     />
                     <ParticleBurst ref="energyParticles" />
                 </div>
-                <div class="action-wrapper">
-                    <ActionButton
-                        icon="📊"
-                        text="Generating Data"
+                <div class="action-wrapper" v-if="gameStats.isDataUnlocked">
+                    <TerminalProgressButton
+                        label="data"
                         :value="dataButtonValue"
-                        :locked="!gameStats.isDataUnlocked"
                         :progress="dataGenerationProgress"
-                    />
-                </div>
-            </div>
-
-            <div id="automations" v-if="hasAutomations">
-                <h2>Automations</h2>
-                <div id="automation-list">
-                    <AutomationItem
-                        v-for="auto in automationList"
-                        :key="auto.resource"
-                        :resource="auto.resource"
-                        :rate="auto.rate"
                     />
                 </div>
             </div>
@@ -119,7 +96,7 @@ const Sidebar = {
             return GameData.formatNumber(Math.floor(num));
         },
         handleEnergyClick(event) {
-            if (this.generationState.isCrankDisabled) return;
+            if (this.generationState.isCrankBroken || this.generationState.isCrankAutomated) return;
             this.$emit('generate-energy');
             // Trigger particle burst at click position
             const rect = event.currentTarget.getBoundingClientRect();

@@ -15,10 +15,6 @@ export const energyBranch = {
         cost: { energy: 0 },
         effects: {
             energyPerClick: 1,
-            narrate: {
-                text: 'When you turn the crank, you hear a faint humming sound...',
-                duration: 8000
-            },
             description: '+1 Energy per crank'
         }
     },
@@ -49,11 +45,7 @@ export const energyBranch = {
         requires: ['lubricant', 'hamster_wheel'],
         cost: { energy: 50 },
         effects: {
-            description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.',
-            narrate: {
-                text: 'When you turn on the light, the room is illuminated. The shed is empty, but there\'s an attic hatch above you that wasn\'t visible before.',
-                duration: 10000
-            }
+            description: 'Can\'t see in the dark? No problem, this lightbulb will help you out.'
         }
     },
 
@@ -63,7 +55,7 @@ export const energyBranch = {
         icon: '🐹',
         tier: 2,
         branch: 'energy',
-        description: ' My hamster loves running in this thing, and it generates energy too!',
+        description: ' My hamster Lucy loves running in this thing, and it generates energy too!',
         requires: ['hand_crank'],
         cost: { energy: 25},
         effects: {
@@ -82,11 +74,7 @@ export const energyBranch = {
         requires: ['lightbulb'],
         cost: { energy: 100 },
         effects: {
-            unlockBranch: 'computer',
-            narrate: {
-                text: 'You found an old computer up in the attic! Lets see if it still works...',
-                duration: 10000
-            }
+            unlockBranch: 'computer'
         }
     },
 
@@ -105,23 +93,9 @@ export const energyBranch = {
         effects: {
             energyPerClick: 2,
             description: '+2 Energy per crank',
-            narrate: {
-                text: 'You put your back into it and crank even harder. You feel the burn in your arms, but the energy output increases noticeably.',
-                duration: 8000
-            },
             levelEffects: {
-                5: {
-                    narrate: {
-                        text: 'Sweat drips down your forehead as you crank with all your might. The shed seems to vibrate slightly from the effort, and the energy generation is impressive now.',
-                        duration: 8000
-                    }
-                },
                 10: {
-                    disableCrank: true,
-                    narrate: {
-                        text: 'With a final, Herculean effort, you crank the handle as hard as you can. CRA-A-A-A-A-A-CK! With a loud snap, the crank handle breaks off in your hands. Well, at least you gave it your all!',
-                        duration: 8000
-                    }
+                    breakCrank: true
                 }
             }
         }
@@ -140,11 +114,7 @@ export const energyBranch = {
         costScaling: 1.5,
         effects: {
             automation: { resource: 'energy', rate: 1 },
-            description: '+1 Energy/second per level (passive)',
-            narrate: {
-                text: 'You caught the rat! It seems eager to run in the wheel.',
-                duration: 8000
-            }
+            description: '+1 Energy/second per level (passive)'
         }
     },
 
@@ -180,4 +150,18 @@ export const energyBranch = {
 
     // == Tier 4 Nodes ==
     
+    autocrank: {
+        id: 'autocrank',
+        name: 'AutoCrank',
+        icon: '⚙️',
+        tier: 4,
+        branch: 'energy',
+        description: 'TODO',
+        requires: [{ id: 'crank_harder', level: 10 }],
+        cost: { energy: 10 , data: 100},
+        effects: {
+            automateCrank: true,
+            description: 'Automatically crank the handle every second.'
+        }
+    },
 };

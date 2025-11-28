@@ -23,6 +23,7 @@ const NotificationToast = {
                     class="notification"
                     :class="notification.type"
                     :style="getStyle(notification)"
+                    style="white-space: pre-line"
                 >
                     {{ notification.message }}
                 </div>

@@ -54,7 +54,8 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
         const bonuses = prestigeState.prestigeBonuses.value;
         return {
             energy: gameState.automations.energy * computedValues.value.allRatesMultiplier * bonuses.automationMultiplier,
-            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier
+            data: gameState.automations.data * computedValues.value.allRatesMultiplier * computedValues.value.dataMultiplier * bonuses.automationMultiplier,
+            energyPerClick: computedValues.value.energyPerClick
         };
     });
 
@@ -177,10 +178,16 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
      */
     function processData() {
         if (!gameState.canProcessData.value) return;
+        // Don't process if at capacity
+        if (gameState.resources.data >= gameState.maxDataCapacity.value) return;
         gameState.resources.energy -= 5;
         const dataGain = Math.floor(computedValues.value.dataPerClick * computedValues.value.dataMultiplier);
         gameState.resources.data += dataGain;
         gameState.totalResources.data += dataGain;
+        // Cap at max capacity
+        if (gameState.resources.data > gameState.maxDataCapacity.value) {
+            gameState.resources.data = gameState.maxDataCapacity.value;
+        }
     }
 
     /**
@@ -258,12 +265,14 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
         unlockBranch: (effects) => {
             if (effects.unlockBranch) {
                 gameState.unlockBranch(effects.unlockBranch);
+                eventBus.emit('branchUnlocked', { branch: effects.unlockBranch });
             }
         },
 
         unlockDataProcessing: (effects) => {
             if (effects.unlockDataProcessing) {
                 gameState.unlockFeature('dataProcessing');
+                eventBus.emit('featureUnlocked', { feature: 'dataProcessing' });
             }
         },
 
@@ -285,6 +294,18 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
+        maxDataCapacityBonus: (effects) => {
+            if (effects.maxDataCapacityBonus) {
+                gameState.dataGeneration.capacityBonus += effects.maxDataCapacityBonus;
+            }
+        },
+
+        maxDataCapacityMultiplier: (effects) => {
+            if (effects.maxDataCapacityMultiplier) {
+                gameState.dataGeneration.capacityBonus *= effects.maxDataCapacityMultiplier;
+            }
+        },
+
         instantUnlock: (effects) => {
             if (effects.instantUnlock) {
                 const lockedAvailableNodes = Object.values(nodes).filter(n =>
@@ -301,9 +322,16 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             }
         },
 
-        disableCrank: (effects) => {
-            if (effects.disableCrank) {
-                gameState.isCrankDisabled.value = true;
+        breakCrank: (effects) => {
+            if (effects.breakCrank) {
+                gameState.isCrankBroken.value = true;
+            }
+        },
+
+        automateCrank: (effects) => {
+            if (effects.automateCrank) {
+                gameState.isCrankBroken.value = false; // Repairs the crank
+                gameState.isCrankAutomated.value = true;
             }
         },
 
@@ -338,12 +366,16 @@ export function useNodeManagement(gameState, prestigeState, eventBus, nodes) {
             EffectRegistry.unlockDataGeneration(effects);
             EffectRegistry.dataGenSpeedMultiplier(effects);
             EffectRegistry.dataGenAmountBonus(effects);
+            EffectRegistry.maxDataCapacityBonus(effects);
             EffectRegistry.instantUnlock(effects);
-            EffectRegistry.disableCrank(effects);
+            EffectRegistry.breakCrank(effects);
+            EffectRegistry.automateCrank(effects);
             EffectRegistry.unlockEnergyGeneration(effects);
         } else {
             // On upgrade, still apply bonus effects
+            EffectRegistry.dataGenSpeedMultiplier(effects);
             EffectRegistry.dataGenAmountBonus(effects);
+            EffectRegistry.maxDataCapacityBonus(effects);
         }
 
         // Apply level-specific effects (only triggers at that exact level)

@@ -9,8 +9,20 @@ const NotificationHistoryPanel = {
     emits: ['close', 'update:narrateOnlyFilter'],
     computed: {
         filteredHistory() {
-            if (!this.narrateOnlyFilter) return this.history;
-            return this.history.filter(n => n.type === 'narration');
+            const filtered = !this.narrateOnlyFilter ? this.history : this.history.filter(n => n.type === 'narration');
+            return [...filtered].reverse();
+        }
+    },
+    watch: {
+        show(newVal) {
+            if (newVal) {
+                this.$nextTick(() => {
+                    const panelBody = document.querySelector('#notification-history-panel .panel-body');
+                    if (panelBody) {
+                        panelBody.scrollTop = panelBody.scrollHeight;
+                    }
+                });
+            }
         }
     },
     methods: {
@@ -57,7 +69,7 @@ const NotificationHistoryPanel = {
                     >
                         <span class="history-icon">{{ getTypeIcon(notification.type) }}</span>
                         <div class="history-content">
-                            <span class="history-message">{{ notification.message }}</span>
+                            <span class="history-message" style="white-space: pre-line">{{ notification.message }}</span>
                             <span class="history-time">{{ formatTime(notification.timestamp) }}</span>
                         </div>
                     </div>

@@ -4,7 +4,8 @@
 // Uses event bus for decoupled communication with other composables
 
 const { ref, onMounted, onUnmounted } = Vue;
-import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS, NotificationType } from '../data/constants.js';
+import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS } from '../data/constants.js';
+import { NotificationType, DisabledNotificationTypes } from '../data/notifications/constants.js';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -24,11 +25,23 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     
     // Cached resource rates (updated via events)
     let cachedResourceRates = { energy: 0, data: 0, bandwidth: 0 };
+    let cachedEnergyPerClick = 0;
+    let autoCrankAccumulator = 0; // Tracks time for auto-crank;
 
     // ==========================================
     // METHODS
     // ==========================================
     
+    /**
+     * Cap data at max capacity
+     */
+    function capDataAtCapacity() {
+        const maxCap = gameState.maxDataCapacity.value;
+        if (gameState.resources.data > maxCap) {
+            gameState.resources.data = maxCap;
+        }
+    }
+
     /**
      * Main game loop - applies automation rates
      */
@@ -47,11 +60,23 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         gameState.totalResources.data += rates.data * delta;
         gameState.totalResources.bandwidth += (rates.bandwidth || 0) * delta;
 
+        // Cap data at max capacity
+        capDataAtCapacity();
+
         // Process auto data generation
         processDataGeneration(delta);
         
         // Process auto energy generation
         processEnergyGeneration(delta);
+        
+        // Process auto crank
+        processAutoCrank(delta);
+        
+        // Emit tick for notification engine (throttled checks happen there)
+        eventBus.emit('gameTick', { 
+            resources: gameState.resources,
+            now 
+        });
     }
 
     /**
@@ -62,6 +87,10 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         if (!dg.active) return;
         if (gameState.resources.energy < dg.energyCost) return;
 
+        // Don't generate if at capacity
+        const maxCap = gameState.maxDataCapacity.value;
+        if (gameState.resources.data >= maxCap) return;
+
         // Progress = % of interval completed per second
         const progressPerSecond = 100 / (dg.interval / 1000);
         dg.progress += progressPerSecond * delta;
@@ -71,6 +100,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
             gameState.resources.energy -= dg.energyCost;
             gameState.resources.data += dg.bitsPerTick;
             gameState.totalResources.data += dg.bitsPerTick;
+            capDataAtCapacity();
         }
     }
 
@@ -93,9 +123,26 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     }
 
     /**
+     * Auto crank - adds energyPerClick every second when automated
+     */
+    function processAutoCrank(delta) {
+        if (!gameState.isCrankAutomated.value) return;
+        if (cachedEnergyPerClick <= 0) return;
+
+        autoCrankAccumulator += delta;
+        while (autoCrankAccumulator >= 1) {
+            autoCrankAccumulator -= 1;
+            gameState.resources.energy += cachedEnergyPerClick;
+            gameState.totalResources.energy += cachedEnergyPerClick;
+        }
+    }
+
+    /**
      * Show a notification toast
      */
     function showNotification(message, type = 'info', duration = 10_000) {
+        if (DisabledNotificationTypes.has(type)) return;
+
         const id = ++notificationId;
         const timestamp = Date.now();
         notifications.value.push({ id, message, type, duration });
@@ -110,19 +157,6 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
                 notifications.value.splice(index, 1);
             }
         }, duration);
-    }
-
-    /**
-     * Show narration(s) from a narrate effect
-     * Supports string, object with text/duration, or array of either
-     */
-    function showNarration(narrate) {
-        const narrations = Array.isArray(narrate) ? narrate : [narrate];
-        narrations.forEach(n => {
-            const text = typeof n === 'string' ? n : n.text;
-            const duration = typeof n === 'string' ? 5_000 : (n.duration || 10_000);
-            setTimeout(() => showNotification(text, NotificationType.NARRATION, duration), 500);
-        });
     }
 
     /**
@@ -205,6 +239,9 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         // Request prestige save via event
         eventBus.emit('requestSavePrestige');
         
+        // Emit ascension complete for notification engine
+        eventBus.emit('ascensionComplete', { count: prestigeState.prestigeState.ascensionCount });
+        
         showNotification(`🌌 Ascended! +${cores} Quantum Core${cores !== 1 ? 's' : ''}`, NotificationType.SUCCESS);
     }
 
@@ -253,22 +290,15 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
     function onNodeUnlocked({ node, newLevel, isUpgrade, rates }) {
         // Update cached rates
         cachedResourceRates = rates;
+        cachedEnergyPerClick = rates.energyPerClick || 0;
         
         if (isUpgrade) {
-            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.SUCCESS);
+            showNotification(`${node.icon} ${node.name} upgraded to level ${newLevel}!`, NotificationType.NODE_UNLOCK);
         } else {
-            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.SUCCESS);
+            showNotification(`${node.icon} ${node.name} unlocked!`, NotificationType.NODE_UNLOCK);
         }
         
-        // Show narration from base effects (on initial unlock only)
-        if (!isUpgrade && node.effects.narrate) {
-            showNarration(node.effects.narrate);
-        }
-        
-        // Show narration from levelEffects
-        if (node.effects.levelEffects?.[newLevel]?.narrate) {
-            showNarration(node.effects.levelEffects[newLevel].narrate);
-        }
+        // Note: Narrations are now handled by useNotificationEngine via event subscription
         
         // Trigger unlock animation
         gameState.setLastUnlockedNode(node.id);
@@ -305,6 +335,7 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         eventBus.on('nodeUnlocked', onNodeUnlocked);
         eventBus.on('resourceRatesChanged', (rates) => {
             cachedResourceRates = rates;
+            cachedEnergyPerClick = rates.energyPerClick || 0;
         });
         eventBus.on('offlineProgressCalculated', (message) => {
             if (message) {
@@ -314,6 +345,11 @@ export function useGameLoop(gameState, prestigeState, eventBus) {
         eventBus.on('gameLoaded', () => {
             // Game state has been restored, request current rates
             eventBus.emit('requestResourceRates');
+        });
+        
+        // Listen for showNotification events from notification engine
+        eventBus.on('showNotification', ({ message, type, duration }) => {
+            showNotification(message, type, duration);
         });
         
         // Request initial load

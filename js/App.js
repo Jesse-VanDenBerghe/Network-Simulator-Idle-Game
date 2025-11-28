@@ -11,6 +11,7 @@ import { useNodeManagement } from './composables/useNodeManagement.js';
 import { useSaveLoad } from './composables/useSaveLoad.js';
 import { useGameLoop } from './composables/useGameLoop.js';
 import { useEventBus } from './composables/useEventBus.js';
+import { useNotificationEngine } from './composables/useNotificationEngine.js';
 
 const App = {
     name: 'App',
@@ -40,6 +41,10 @@ const App = {
         const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus, GameData.nodes);
         const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
         const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
+        
+        // Notification engine - subscribes to events, triggers narrations
+        const notificationEngine = useNotificationEngine(eventBus);
+        notificationEngine.initialize();
 
         // ==========================================
         // COMPUTED (for ascension)
@@ -105,7 +110,8 @@ const App = {
             lastUnlockedNodeId: gameState.lastUnlockedNodeId,
             dataGeneration: gameState.dataGeneration,
             energyGeneration: gameState.energyGeneration,
-            isCrankDisabled: gameState.isCrankDisabled,
+            isCrankBroken: gameState.isCrankBroken,
+            isCrankAutomated: gameState.isCrankAutomated,
             notifications: gameLoop.notifications,
             notificationHistory: gameLoop.notificationHistory,
             showNotificationHistory: gameLoop.showNotificationHistory,
@@ -192,7 +198,7 @@ const App = {
             <main id="main-content">
                 <Sidebar
                     :resource-stats="{ energyPerClick: computedValues.energyPerClick, dataPerClick: dataPerClickDisplay, stats: stats }"
-                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, isCrankDisabled: isCrankDisabled }"
+                    :generation-state="{ dataGeneration: dataGeneration, energyGeneration: energyGeneration, isCrankBroken: isCrankBroken, isCrankAutomated: isCrankAutomated }"
                     :game-stats="{ automations: automations, effectiveRates: resourceRates, coresEarned: coresEarned, highestTierReached: highestTierReached, isDataUnlocked: isDataUnlocked, canProcessData: canProcessData }"
                     @generate-energy="generateEnergy"
                     @process-data="processData"

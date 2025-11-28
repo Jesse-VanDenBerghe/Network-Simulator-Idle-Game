@@ -3,7 +3,8 @@
 // Handles saving and loading game and prestige data
 // Uses event bus for decoupled communication
 
-import { MAX_OFFLINE_TIME_S, NotificationType } from '../data/constants.js';
+import { MAX_OFFLINE_TIME_S } from '../data/constants.js';
+import { NotificationType } from '../data/notifications/constants.js';
 
 export function useSaveLoad(gameState, prestigeState, eventBus) {
     /**
@@ -74,6 +75,8 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             unlockedBranches: Array.from(gameState.unlockedBranches.value),
             unlockedFeatures: Array.from(gameState.unlockedFeatures.value),
             dataGeneration: { ...gameState.dataGeneration },
+            isCrankBroken: gameState.isCrankBroken.value,
+            isCrankAutomated: gameState.isCrankAutomated.value,
             lastUpdate: Date.now()
         };
         try {
@@ -97,7 +100,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
         if (!saveData) {
             // No game save, request starting bonuses via event
             eventBus.emit('requestStartingBonuses');
-            eventBus.emit('gameLoaded');
+            eventBus.emit('gameLoaded', { isFirstLaunch: true });
             return;
         }
 
@@ -129,9 +132,15 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
             if (data.dataGeneration) {
                 Object.assign(gameState.dataGeneration, data.dataGeneration);
             }
+            if (data.isCrankBroken !== undefined) {
+                gameState.isCrankBroken.value = data.isCrankBroken;
+            }
+            if (data.isCrankAutomated !== undefined) {
+                gameState.isCrankAutomated.value = data.isCrankAutomated;
+            }
 
             // Notify that game is loaded (so rates can be calculated)
-            eventBus.emit('gameLoaded');
+            eventBus.emit('gameLoaded', { isFirstLaunch: false });
 
             // Calculate offline progress using explicit rate calculation from saved state
             const offlineTime = (Date.now() - (data.lastUpdate || Date.now())) / 1000;
@@ -143,6 +152,7 @@ export function useSaveLoad(gameState, prestigeState, eventBus) {
 
                 if (offlineTime > 60) {
                     eventBus.emit('offlineProgressCalculated', 'Welcome back! Earned resources while away.');
+                    eventBus.emit('offlineReturn', { offlineSeconds: offlineTime });
                 }
             }
         } catch (e) {
