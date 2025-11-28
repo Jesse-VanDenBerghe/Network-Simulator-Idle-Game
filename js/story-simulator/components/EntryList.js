@@ -2,6 +2,8 @@
 // =====================
 // Scrollable list of narration entries with click-to-select
 
+const { watch, ref, nextTick } = Vue;
+
 const EntryList = {
     name: 'EntryList',
     props: {
@@ -15,6 +17,22 @@ const EntryList = {
         }
     },
     emits: ['select'],
+    setup(props) {
+        const listRef = ref(null);
+
+        // Auto-scroll to current entry when index changes
+        watch(() => props.currentIndex, async (newIndex) => {
+            await nextTick();
+            if (listRef.value) {
+                const items = listRef.value.querySelectorAll('.entry-item');
+                if (items[newIndex]) {
+                    items[newIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+
+        return { listRef };
+    },
     methods: {
         getTypeIcon(type) {
             const icons = {
@@ -29,7 +47,7 @@ const EntryList = {
     },
     template: `
         <div class="entry-list-container">
-            <div class="entry-list">
+            <div class="entry-list" ref="listRef">
                 <div v-for="(entry, i) in entries" :key="entry.id"
                      class="entry-item"
                      :class="{ current: i === currentIndex, played: i < currentIndex }"

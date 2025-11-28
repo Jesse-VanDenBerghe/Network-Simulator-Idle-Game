@@ -63,7 +63,8 @@ function useStoryPlayback() {
         currentIndex: 0,
         isPlaying: false,
         speed: 1,
-        currentFile: null
+        currentFile: null,
+        direction: 'forward' // 'forward' or 'backward'
     });
 
     let playbackTimer = null;
@@ -96,6 +97,7 @@ function useStoryPlayback() {
 
         playbackTimer = setTimeout(() => {
             if (hasNext.value) {
+                state.direction = 'forward';
                 state.currentIndex++;
                 scheduleNext();
             } else {
@@ -108,6 +110,7 @@ function useStoryPlayback() {
     function play() {
         if (state.entries.length === 0) return;
         state.isPlaying = true;
+        state.direction = 'forward';
         scheduleNext();
     }
 
@@ -118,6 +121,7 @@ function useStoryPlayback() {
 
     function skip() {
         if (hasNext.value) {
+            state.direction = 'forward';
             state.currentIndex++;
             if (state.isPlaying) {
                 scheduleNext();
@@ -127,11 +131,13 @@ function useStoryPlayback() {
 
     function reset() {
         pause();
+        state.direction = 'backward';
         state.currentIndex = 0;
     }
 
     function goTo(index) {
         if (index >= 0 && index < state.entries.length) {
+            state.direction = index > state.currentIndex ? 'forward' : 'backward';
             state.currentIndex = index;
             if (state.isPlaying) {
                 scheduleNext();
