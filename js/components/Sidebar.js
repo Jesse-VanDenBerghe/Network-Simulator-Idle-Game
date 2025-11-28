@@ -50,7 +50,6 @@ const Sidebar = {
     template: `
         <aside id="sidebar">
             <div id="manual-actions">
-                <h2>Manual Actions</h2>
                 <div class="action-wrapper" @click="handleEnergyClick">
                     <CrankButton
                         :value="energyButtonValue"
