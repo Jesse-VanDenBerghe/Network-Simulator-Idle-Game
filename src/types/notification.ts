@@ -5,7 +5,11 @@
  * Notification display types
  */
 export enum NotificationType {
+    INFO = 'info',
+    ERROR = 'error',
+    SUCCESS = 'success',
     NARRATION = 'narration',
+    NODE_UNLOCK = 'node_unlock',
     HINT = 'hint',
     ACHIEVEMENT = 'achievement',
     TERMINAL = 'terminal'
@@ -78,9 +82,9 @@ export interface NodeLevelTrigger extends BaseTrigger {
  */
 export interface ResourceTrigger extends BaseTrigger {
     type: TriggerType.ON_RESOURCE_AMOUNT_REACHED;
-    resource: 'energy' | 'data';
+    resource: 'energy' | 'data' | 'neurons' | 'memory_shards' | 'memory_frames';
     threshold: number;
-    comparison: ComparisonOperator;
+    comparison?: ComparisonOperator; // Optional, defaults to GREATER_EQUAL
 }
 
 /**
@@ -120,7 +124,8 @@ export interface AscensionTrigger extends BaseTrigger {
  */
 export interface OfflineReturnTrigger extends BaseTrigger {
     type: TriggerType.ON_OFFLINE_RETURN;
-    minOfflineSeconds: number;
+    minOfflineSeconds?: number; // Alias: offlineSeconds
+    offlineSeconds?: number; // Alias for minOfflineSeconds
 }
 
 /**

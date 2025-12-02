@@ -54,10 +54,17 @@ export interface NodeEffects {
     automation?: AutomationEffect;
     energyPerClick?: number;
     dataCapacityBonus?: number;
+    maxDataCapacityBonus?: number;
     dataGenerationRate?: number;
     energyGenerationRate?: number;
+    dataGenSpeedMultiplier?: number;
+    dataGenAmountBonus?: number;
     unlockBranch?: BranchId;
     unlockFeature?: string;
+    unlockDataGeneration?: boolean;
+    unlockDataProcessing?: boolean;
+    breakCrank?: boolean;
+    automateCrank?: boolean;
     description?: string;
     narrate?: NarrationEffect; // Deprecated
     levelEffects?: Record<number, LevelEffect>;
@@ -76,7 +83,7 @@ export interface Node {
     name: string;
     icon: string;
     tier: NodeTier;
-    branch: BranchId;
+    branch: BranchId | null; // null for core starting node
     description?: string;
     requires: NodeRequirement[];
     cost: NodeCost;
