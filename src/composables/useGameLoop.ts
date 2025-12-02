@@ -380,12 +380,11 @@ export function useGameLoop(
     }
 
     /**
-     * Start game intervals
+     * Start game intervals (game loop only, autosave starts after load)
      */
     function startIntervals(): void {
         gameLoopInterval = setInterval(gameLoop, GAME_LOOP_INTERVAL_MS);
-        saveInterval = setInterval(() => eventBus.emit('requestSaveGame', undefined), AUTOSAVE_INTERVAL_MS);
-        prestigeSaveInterval = setInterval(() => eventBus.emit('requestSavePrestige', undefined), AUTOSAVE_INTERVAL_MS);
+        // Note: Autosave intervals are started in gameLoaded event handler to prevent overwriting fresh loads
     }
 
     /**
@@ -412,6 +411,10 @@ export function useGameLoop(
         eventBus.on('gameLoaded', () => {
             // Game state has been restored, request current rates
             eventBus.emit('requestResourceRates', undefined);
+            
+            // Start autosave intervals only after game is loaded
+            saveInterval = setInterval(() => eventBus.emit('requestSaveGame', undefined), AUTOSAVE_INTERVAL_MS);
+            prestigeSaveInterval = setInterval(() => eventBus.emit('requestSavePrestige', undefined), AUTOSAVE_INTERVAL_MS);
         });
         
         // Listen for showNotification events from notification engine
