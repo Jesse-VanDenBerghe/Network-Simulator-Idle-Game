@@ -9,9 +9,7 @@ import { NotificationType } from '@/data/notifications/constants';
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
 import type { EventMap, NodeUnlockedEvent } from '@/types/event';
-
-// TODO: Import from @/data/prestigeData once migrated in Phase 3
-declare const PrestigeData: any;
+import { prestigeUpgrades } from '@/data/prestigeData';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -334,7 +332,7 @@ export function useGameLoop(
     function handlePurchaseUpgrade(upgradeId: string): boolean {
         const success = prestigeState.purchaseUpgrade(upgradeId);
         if (success) {
-            const upgrade = PrestigeData.upgrades[upgradeId];
+            const upgrade = prestigeUpgrades[upgradeId];
             showNotification(`✨ ${upgrade.name} purchased!`, NotificationType.SUCCESS);
             eventBus.emit('requestSavePrestige', undefined);
             return true;

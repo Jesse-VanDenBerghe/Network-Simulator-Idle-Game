@@ -5,10 +5,8 @@
 import { ref, reactive, computed, type Ref, type ComputedRef } from 'vue';
 import type { PrestigeState, PrestigeBonuses, ResourceAmounts } from '@/types/game';
 import type { Node } from '@/types/node';
-// TODO: Import from @/data/prestigeData once migrated in Phase 3
-declare const PrestigeData: any;
-// TODO: Import from @/core/gameData once migrated in Phase 7
-declare const GameData: any;
+import { prestigeUpgrades } from '@/data/prestigeData';
+import GameData from '@/core/gameData';
 
 /**
  * Random starting nodes configuration
@@ -126,7 +124,7 @@ export function usePrestigeState(): UsePrestigeStateReturn {
         };
         
         for (const upgradeId of prestigeState.upgrades) {
-            const upgrade = PrestigeData.upgrades[upgradeId];
+            const upgrade = prestigeUpgrades[upgradeId];
             if (!upgrade) continue;
             
             const e = upgrade.effect;
@@ -174,7 +172,7 @@ export function usePrestigeState(): UsePrestigeStateReturn {
      * Purchase an upgrade with quantum cores
      */
     function purchaseUpgrade(upgradeId: string): boolean {
-        const upgrade = PrestigeData.upgrades[upgradeId];
+        const upgrade = prestigeUpgrades[upgradeId];
         if (!upgrade) return false;
         
         // Check if already purchased

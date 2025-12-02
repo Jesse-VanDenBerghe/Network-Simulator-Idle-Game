@@ -130,9 +130,9 @@ onUnmounted(() => {
         <main id="main-content">
             <Sidebar
                 :resource-stats="{ 
-                    energyPerClick: nodeManagement.computedValues.energyPerClick, 
-                    dataPerClick: nodeManagement.dataPerClickDisplay, 
-                    stats: gameState.stats 
+                    energyPerClick: nodeManagement.computedValues.value.energyPerClick, 
+                    dataPerClick: nodeManagement.dataPerClickDisplay.value, 
+                    stats: gameState.stats.value 
                 }"
                 :generation-state="{ 
                     dataGeneration: gameState.dataGeneration, 
@@ -142,8 +142,8 @@ onUnmounted(() => {
                 }"
                 :game-stats="{ 
                     automations: gameState.automations, 
-                    effectiveRates: nodeManagement.resourceRates, 
-                    coresEarned: coresEarned, 
+                    effectiveRates: nodeManagement.resourceRates.value, 
+                    coresEarned: coresEarned.value, 
                     highestTierReached: gameState.highestTierReached.value, 
                     isDataUnlocked: gameState.isDataUnlocked.value, 
                     canProcessData: gameState.canProcessData.value 
@@ -160,7 +160,7 @@ onUnmounted(() => {
                 :selected-node-id="gameState.selectedNodeId.value"
                 :resources="gameState.resources"
                 :ascension-count="prestigeState.prestigeState.ascensionCount"
-                :prestige-bonuses="prestigeState.prestigeBonuses"
+                :prestige-bonuses="prestigeState.prestigeBonuses.value"
                 :last-unlocked-node-id="gameState.lastUnlockedNodeId.value"
                 :node-levels="gameState.nodeLevels"
                 @select-node="gameState.selectNode"
@@ -176,7 +176,7 @@ onUnmounted(() => {
                 :resources="gameState.resources"
                 :unlocked-nodes="gameState.unlockedNodes.value"
                 :ascension-count="prestigeState.prestigeState.ascensionCount"
-                :prestige-bonuses="prestigeState.prestigeBonuses"
+                :prestige-bonuses="prestigeState.prestigeBonuses.value"
                 :node-level="nodeManagement.selectedNode.value ? nodeManagement.getNodeLevel(nodeManagement.selectedNode.value.id) : 0"
                 :can-upgrade="nodeManagement.selectedNode.value ? nodeManagement.canUpgradeNode(nodeManagement.selectedNode.value) : false"
                 :node-levels="gameState.nodeLevels"

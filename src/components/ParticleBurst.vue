@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 
 interface Particle {
   id: string;
@@ -16,6 +16,8 @@ interface Particle {
   currentOpacity?: number;
   currentScale?: number;
   currentRotation?: number;
+  startTime: number;
+  duration: number;
 }
 
 interface BurstOptions {
@@ -28,6 +30,42 @@ interface BurstOptions {
 }
 
 const particles = ref<Particle[]>([]);
+let animationFrameId: number | null = null;
+
+const animate = (currentTime: number) => {
+  if (particles.value.length === 0) {
+    animationFrameId = null;
+    return;
+  }
+
+  // Update all particles in one loop
+  particles.value.forEach((p) => {
+    const elapsed = currentTime - p.startTime;
+    const progress = elapsed / p.duration;
+
+    if (progress < 1) {
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      p.currentX = p.x + p.vx * easeOut;
+      p.currentY = p.y + p.vy * easeOut - progress * 30;
+      p.currentOpacity = 1 - progress;
+      p.currentScale = 1 - progress * 0.5;
+      p.currentRotation = p.rotation + progress * 180;
+    }
+  });
+
+  // Remove expired particles
+  const now = currentTime;
+  particles.value = particles.value.filter((p) => {
+    return (now - p.startTime) < p.duration;
+  });
+
+  // Continue animation if particles remain
+  if (particles.value.length > 0) {
+    animationFrameId = requestAnimationFrame(animate);
+  } else {
+    animationFrameId = null;
+  }
+};
 
 const burst = (x: number, y: number, options: BurstOptions = {}) => {
   const {
@@ -39,6 +77,7 @@ const burst = (x: number, y: number, options: BurstOptions = {}) => {
     duration = 600,
   } = options;
 
+  const startTime = performance.now();
   const newParticles: Particle[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -56,39 +95,29 @@ const burst = (x: number, y: number, options: BurstOptions = {}) => {
       color: Math.random() > 0.5 ? color : secondaryColor,
       opacity: 1,
       rotation: Math.random() * 360,
+      startTime,
+      duration,
+      currentX: x,
+      currentY: y,
+      currentOpacity: 1,
+      currentScale: 1,
+      currentRotation: 0,
     });
   }
 
   particles.value.push(...newParticles);
 
-  // Animate particles
-  const startTime = performance.now();
-  const animate = (currentTime: number) => {
-    const elapsed = currentTime - startTime;
-    const progress = elapsed / duration;
-
-    if (progress >= 1) {
-      // Remove these particles
-      const ids = new Set(newParticles.map((p) => p.id));
-      particles.value = particles.value.filter((p) => !ids.has(p.id));
-      return;
-    }
-
-    // Update particle positions with easing
-    const easeOut = 1 - Math.pow(1 - progress, 3);
-    newParticles.forEach((p) => {
-      p.currentX = p.x + p.vx * easeOut;
-      p.currentY = p.y + p.vy * easeOut - progress * 30; // slight upward drift
-      p.currentOpacity = 1 - progress;
-      p.currentScale = 1 - progress * 0.5;
-      p.currentRotation = p.rotation + progress * 180;
-    });
-
-    requestAnimationFrame(animate);
-  };
-
-  requestAnimationFrame(animate);
+  // Start animation loop if not already running
+  if (animationFrameId === null) {
+    animationFrameId = requestAnimationFrame(animate);
+  }
 };
+
+onUnmounted(() => {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+  }
+});
 
 defineExpose({ burst });
 </script>

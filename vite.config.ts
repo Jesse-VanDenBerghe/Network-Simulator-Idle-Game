@@ -17,16 +17,26 @@ export default defineConfig({
     assetsDir: 'assets',
     minify: 'terser',
     sourcemap: true,
+    terserOptions: {
+      compress: {
+        drop_console: false,
+        drop_debugger: true
+      }
+    },
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index-vite.html')
+        main: path.resolve(__dirname, 'index.html')
       },
       output: {
         manualChunks: {
           'vue-vendor': ['vue']
-        }
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000
   },
   server: {
     port: 3000,

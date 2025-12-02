@@ -9,8 +9,7 @@ import type {
     DataGeneration, 
     EnergyGeneration 
 } from '@/types/game';
-// TODO: Import from @/core/gameData once migrated in Phase 7
-declare const GameData: any;
+import GameData from '@/core/gameData';
 
 /**
  * Game statistics computed values

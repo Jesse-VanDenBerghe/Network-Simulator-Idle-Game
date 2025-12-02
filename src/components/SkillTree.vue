@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import SkillNode from './SkillNode.vue';
 import type { Node } from '@/types/node';
 import { checkNodeAvailable, checkCanAffordNode, checkTierLocked, checkNodeVisible } from '@/composables/useNodeValidation';
+import GameData from '@/core/gameData';
 
 interface Props {
   nodes: Record<string, Node>;
@@ -62,8 +63,6 @@ watch(
 );
 
 const connections = computed(() => {
-  // Import GameData at runtime
-  const GameData = (window as any).GameData;
   return GameData.getConnections().filter(
     (conn: any) =>
       isNodeVisible(props.nodes[conn.from]) && isNodeVisible(props.nodes[conn.to])
@@ -185,7 +184,6 @@ const startDotAnimation = () => {
         const toNode = props.nodes[dot.toNode];
 
         if (toNode && isAvailable(toNode)) {
-          const GameData = (window as any).GameData;
           const currentProgress = nodeProgress.value.get(dot.toNode) || 0;
           const scaledCost = GameData.getScaledNodeCost(toNode, {
             ascensionCount: props.ascensionCount,
@@ -214,7 +212,6 @@ const startDotAnimation = () => {
 };
 
 const spawnDotsFromCore = () => {
-  const GameData = (window as any).GameData;
   const coreConnections = connections.value.filter((conn: any) => {
     if (conn.from !== 'old_shed') return false;
     if (isUnlocked(conn.to)) return true;
@@ -234,7 +231,6 @@ const spawnDotsFromCore = () => {
 };
 
 const spawnDotsFromNode = (nodeId: string) => {
-  const GameData = (window as any).GameData;
   const outgoingConnections = connections.value.filter((conn: any) => {
     if (conn.from !== nodeId) return false;
     if (!isUnlocked(conn.from)) return false;
@@ -269,7 +265,6 @@ const getNodeProgressPercent = (nodeId: string): number => {
   const node = props.nodes[nodeId];
   if (!node || !isAvailable(node)) return 0;
 
-  const GameData = (window as any).GameData;
   const currentProgress = nodeProgress.value.get(nodeId) || 0;
   const scaledCost = GameData.getScaledNodeCost(node, {
     ascensionCount: props.ascensionCount,

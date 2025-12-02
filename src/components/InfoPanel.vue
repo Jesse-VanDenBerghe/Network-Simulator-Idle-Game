@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { formatNumber } from '@/utils/formatUtils';
 import type { Node } from '@/types/node';
+import GameData from '@/core/gameData';
 
 interface TierGate {
   requiredTier: number;
@@ -62,7 +63,6 @@ const isMaxLevel = computed(() => props.nodeLevel >= maxLevel.value);
 
 const costEntries = computed((): CostEntry[] => {
   if (!props.node?.cost) return [];
-  const GameData = (window as any).GameData;
   const scaledCost = GameData.getScaledNodeCost(props.node, {
     ascensionCount: props.ascensionCount,
     prestigeBonuses: props.prestigeBonuses,
@@ -79,7 +79,6 @@ const costEntries = computed((): CostEntry[] => {
 
 const requirementEntries = computed((): Requirement[] => {
   if (!props.node?.requires) return [];
-  const GameData = (window as any).GameData;
   return props.node.requires.map((req) => {
     const reqId = typeof req === 'string' ? req : req.id;
     const reqLevel = typeof req === 'string' ? undefined : req.level;

@@ -86,15 +86,15 @@ Migrate JavaScript codebase to TypeScript with Vite build system and Vue 3 SFCs.
 7.4 Remove test files: delete [tests/](../../tests/) directory entirely ✅  
 7.5 Update [.gitignore](../../.gitignore) with `node_modules/`, `dist/`, `.env.local` ✅
 
-### Phase 8: Build & Deployment
+### Phase 8: Build & Deployment - COMPLETED
 **Goal**: Production builds working for itch.io
 
-8.1 Configure [vite.config.ts](../../vite.config.ts) build options: output to `dist/`, minify, sourcemaps  
-8.2 Update [build-itch.sh](../../build-itch.sh) to run `npm run build` then zip `dist/` folder  
-8.3 Test production build locally with `npm run preview`  
-8.4 Verify game functionality: save/load, node unlocks, notifications, ascension  
-8.5 Create itch.io test build and upload to verify deployment works  
-8.6 Update [README.md](../../README.md) with new dev/build commands
+8.1 Configure [vite.config.ts](../../vite.config.ts) build options: output to `dist/`, minify, sourcemaps ✅  
+8.2 Update [build-itch.sh](../../build-itch.sh) to run `npm run build` then zip `dist/` folder ✅  
+8.3 Test production build locally with `npm run preview` ✅  
+8.4 Verify game functionality: save/load, node unlocks, notifications, ascension ✅  
+8.5 Create itch.io test build and upload to verify deployment works (manual step)  
+8.6 Update [README.md](../../README.md) with new dev/build commands ✅
 
 ### Phase 9: Documentation & Cleanup
 **Goal**: Update docs, remove old JS files

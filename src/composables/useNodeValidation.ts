@@ -6,9 +6,7 @@ import type { Node } from '@/types/node';
 import type { ResourceAmounts } from '@/types/game';
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
-
-// TODO: Import from @/core/gameData once migrated in Phase 7
-declare const GameData: any;
+import GameData from '@/core/gameData';
 
 /**
  * Options for cost calculation

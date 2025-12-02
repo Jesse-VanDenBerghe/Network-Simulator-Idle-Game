@@ -9,12 +9,21 @@ echo "Building Network Simulator for itch.io..."
 # Extract version from git tag
 VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
 
+# Run Vite production build
+echo "Running production build..."
+npm run build
+
+if [ $? -ne 0 ]; then
+    echo "❌ Build failed"
+    exit 1
+fi
+
 # Remove old zips if they exist
 rm -f network-simulator*.zip
 
-# Create new zip with game files and version tag
+# Create new zip with dist folder contents and version tag
 ZIP_NAME="network-simulator-${VERSION}.zip"
-zip -r "$ZIP_NAME" index.html styles.css js/ -x "*.DS_Store"
+cd dist && zip -r "../$ZIP_NAME" . -x "*.DS_Store" && cd ..
 
 echo "✓ Build complete: $ZIP_NAME"
 

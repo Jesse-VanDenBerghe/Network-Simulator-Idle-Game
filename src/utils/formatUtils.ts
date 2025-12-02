@@ -2,20 +2,27 @@
  * Format a number with appropriate suffixes (K, M, B, T, etc.)
  */
 export function formatNumber(num: number): string {
-  if (num < 1000) {
-    if (num < 10) return parseFloat(num.toFixed(2)).toString();
-    if (num < 100) return parseFloat(num.toFixed(1)).toString();
-    return Math.floor(num).toString();
+  // Handle invalid inputs
+  if (num === undefined || num === null || isNaN(num)) return '0';
+  
+  // Convert to number if string
+  const n = Number(num);
+  if (isNaN(n)) return '0';
+  
+  if (n < 1000) {
+    if (n < 10) return parseFloat(n.toFixed(2)).toString();
+    if (n < 100) return parseFloat(n.toFixed(1)).toString();
+    return Math.floor(n).toString();
   }
 
   const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
-  const tier = Math.floor(Math.log10(Math.abs(num)) / 3);
+  const tier = Math.floor(Math.log10(Math.abs(n)) / 3);
 
   if (tier >= suffixes.length) {
-    return num.toExponential(2);
+    return n.toExponential(2);
   }
 
-  const scaled = num / Math.pow(1000, tier);
+  const scaled = n / Math.pow(1000, tier);
   const decimals = scaled >= 100 ? 0 : scaled >= 10 ? 1 : 2;
   return scaled.toFixed(decimals) + suffixes[tier];
 }

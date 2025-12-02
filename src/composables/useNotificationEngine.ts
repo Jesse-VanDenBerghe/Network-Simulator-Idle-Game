@@ -7,9 +7,7 @@ import { TriggerType, ComparisonOperator } from '@/types/notification';
 import type { Notification } from '@/types/notification';
 import { NotificationType } from '@/data/notifications/constants';
 import type { EventMap } from '@/types/event';
-
-// TODO: Import getAllNotifications from @/data/notifications once migrated
-declare const getAllNotifications: () => Notification[];
+import { getAllNotifications } from '@/data/notifications';
 
 const SHOWN_NOTIFICATIONS_KEY = 'networkSimShownNotifications';
 const NOTIFICATION_QUEUE_DELAY_MS = 500;
