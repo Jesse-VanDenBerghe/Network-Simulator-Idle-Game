@@ -114,6 +114,20 @@ export interface EventMap {
     // System events
     gameTick: { deltaTime: number };
     saveGame: { manual: boolean };
+    
+    // Request events (internal communication)
+    requestUnlockNode: { nodeId: string };
+    requestResourceRates: undefined;
+    requestStartingBonuses: undefined;
+    requestSaveGame: undefined;
+    requestLoadGame: undefined;
+    requestSavePrestige: undefined;
+    requestLoadPrestige: undefined;
+    
+    // Response events
+    resourceRatesChanged: { energy: number; data: number; energyPerClick?: number };
+    offlineReturn: { offlineSeconds: number };
+    showNotification: { message: string; type: string; duration: number };
 }
 
 /**

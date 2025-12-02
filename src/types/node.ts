@@ -53,6 +53,9 @@ export interface LevelEffect {
 export interface NodeEffects {
     automation?: AutomationEffect;
     energyPerClick?: number;
+    dataPerClick?: number;
+    dataMultiplier?: number;
+    allRatesMultiplier?: number;
     dataCapacityBonus?: number;
     maxDataCapacityBonus?: number;
     dataGenerationRate?: number;
@@ -90,6 +93,7 @@ export interface Node {
     effects: NodeEffects;
     maxLevel?: number; // If >1, node can be upgraded
     costScaling?: number; // Multiplier for each level (default 1.5)
+    isTierGate?: boolean; // Tier gate nodes visible even if branch not unlocked
     x?: number; // Layout position (computed)
     y?: number; // Layout position (computed)
 }
