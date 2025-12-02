@@ -37,3 +37,15 @@ export const COST_SHIFT_FOR_RESOURCE: Record<ResourceId, number> = {
 export const GAME_LOOP_INTERVAL_MS = 100;       // 10 ticks per second
 export const AUTOSAVE_INTERVAL_MS = 30_000;     // Save every 30 seconds
 export const MAX_OFFLINE_TIME_S = 86_400;       // 24 hours max offline progress
+
+/**
+ * Layout configuration for skill tree positioning
+ */
+export const LAYOUT_CONFIG = Object.freeze({
+    CENTER_X: 1400,
+    CENTER_Y: 1400,
+    TIER_SPACING: 180,
+    SAME_TIER_OFFSET: 60,
+    NODE_SPACING: 100,
+    NODE_SIZE: 80
+});

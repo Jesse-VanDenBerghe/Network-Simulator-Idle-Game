@@ -68,14 +68,14 @@ Migrate JavaScript codebase to TypeScript with Vite build system and Vue 3 SFCs.
 5.5 Migrate [js/components/NotificationToast.js](../../js/components/NotificationToast.js) → [src/components/NotificationToast.vue](../../src/components/NotificationToast.vue)  
 5.6 Migrate remaining 10 components in [js/components/](../../js/components/) to [src/components/](../../src/components/)
 
-### Phase 6: Utilities & Layout Engine
+### Phase 6: Utilities & Layout Engine - COMPLETED
 **Goal**: Migrate utilities and layout system to TypeScript
 
-6.1 Migrate [js/utils/branchUtils.js](../../js/utils/branchUtils.js) → [src/utils/branchUtils.ts](../../src/utils/branchUtils.ts) with typed functions  
-6.2 Migrate [js/utils/formatUtils.js](../../js/utils/formatUtils.js) → [src/utils/formatUtils.ts](../../src/utils/formatUtils.ts)  
-6.3 Migrate [js/utils/nodeUtils.js](../../js/utils/nodeUtils.js) → [src/utils/nodeUtils.ts](../../src/utils/nodeUtils.ts)  
-6.4 Migrate [js/LayoutEngine.js](../../js/LayoutEngine.js) → [src/layout/LayoutEngine.ts](../../src/layout/LayoutEngine.ts) with class types  
-6.5 Split into [src/layout/TreeBuilder.ts](../../src/layout/TreeBuilder.ts), [src/layout/PositionCalculator.ts](../../src/layout/PositionCalculator.ts), [src/layout/CollisionResolver.ts](../../src/layout/CollisionResolver.ts)
+6.1 Migrate [js/utils/branchUtils.js](../../js/utils/branchUtils.js) → [src/utils/branchUtils.ts](../../src/utils/branchUtils.ts) with typed functions ✅  
+6.2 Migrate [js/utils/formatUtils.js](../../js/utils/formatUtils.js) → [src/utils/formatUtils.ts](../../src/utils/formatUtils.ts) ✅  
+6.3 Migrate [js/utils/nodeUtils.js](../../js/utils/nodeUtils.js) → [src/utils/nodeUtils.ts](../../src/utils/nodeUtils.ts) ✅  
+6.4 Migrate [js/LayoutEngine.js](../../js/LayoutEngine.js) → [src/layout/LayoutEngine.ts](../../src/layout/LayoutEngine.ts) with class types ✅  
+6.5 Split into [src/layout/TreeBuilder.ts](../../src/layout/TreeBuilder.ts), [src/layout/PositionCalculator.ts](../../src/layout/PositionCalculator.ts), [src/layout/CollisionResolver.ts](../../src/layout/CollisionResolver.ts) ✅
 
 ### Phase 7: Main App & GameData
 **Goal**: Complete migration with app entry point
