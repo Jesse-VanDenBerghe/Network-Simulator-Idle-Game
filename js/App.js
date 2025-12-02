@@ -167,7 +167,6 @@ const App = {
             <header id="header">
                 <div class="header-left">
                     <h1>Network Simulator</h1>
-                    <button class="icon-button" @click="toggleNotificationHistory" title="Notification History">🔔</button>
                     <button class="icon-button" @click="toggleChangelogModal" title="View Changelog">📜</button>
                 </div>
                 <div class="prestige-header" v-if="prestigeState.ascensionCount > 0 || prestigeState.quantumCores > 0">
@@ -237,6 +236,8 @@ const App = {
             </main>
 
             <NotificationToast :notifications="notifications" />
+            
+            <button id="notification-history-button" @click="toggleNotificationHistory" title="Notification History">🔔</button>
             
             <NotificationHistoryPanel
                 :show="showNotificationHistory"

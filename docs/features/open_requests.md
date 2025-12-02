@@ -1,4 +1,3 @@
-- move the notification history button to the bottom right corner
 - Make sure having more data generation, also uses the equal amount of energy per byte generated
 - Split up monster css files into smaller files for better maintainability
 - Change up the theme to better match the overall aesthetic of the game.
