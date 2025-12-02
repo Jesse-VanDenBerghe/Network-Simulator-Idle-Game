@@ -52,7 +52,7 @@ interface Props {
   gameStats: GameStats;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
   'generate-energy': [];
@@ -62,8 +62,6 @@ const emit = defineEmits<{
 
 const energyParticles = ref<InstanceType<typeof ParticleBurst> | null>(null);
 const dataParticles = ref<InstanceType<typeof ParticleBurst> | null>(null);
-
-const props = defineProps<Props>();
 
 const dataGenerationProgress = computed(() => {
   return props.generationState.dataGeneration?.progress ?? null;

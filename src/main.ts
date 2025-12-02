@@ -1,16 +1,11 @@
 import { createApp } from 'vue'
+import App from './App.vue'
+import GameData from '@/core/gameData'
+import { LayoutEngine } from '@/layout/LayoutEngine'
 
-// Create a temporary minimal app to test the build system
-const App = {
-  name: 'App',
-  template: `
-    <div id="app">
-      <h1>Network Simulator - TypeScript Migration</h1>
-      <p>Phase 1: Build System Foundation - Dev server running</p>
-    </div>
-  `
-}
+// Initialize layout engine before mounting the app
+LayoutEngine.initializeLayout(GameData)
 
-// Mount the app
+// Create and mount the app
 const app = createApp(App)
 app.mount('#app')
