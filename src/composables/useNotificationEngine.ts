@@ -5,7 +5,7 @@
 
 import { TriggerType, ComparisonOperator } from '@/types/notification';
 import type { Notification } from '@/types/notification';
-import { NotificationType } from '@/data/notifications/constants';
+import { NotificationType, DisabledNotificationTypes } from '@/data/notifications/constants';
 import type { EventMap } from '@/types/event';
 import { getAllNotifications } from '@/data/notifications';
 
@@ -272,6 +272,9 @@ export function useNotificationEngine(eventBus: EventBus): UseNotificationEngine
     
     function queueNotification(notification: Notification): void {
         if (wasShown(notification.id)) return;
+        
+        // Skip disabled notification types
+        if (DisabledNotificationTypes.has(notification.type || NotificationType.NARRATION)) return;
         
         notificationQueue.push(notification);
         notificationQueue.sort((a, b) => 

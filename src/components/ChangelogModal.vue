@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-
-interface ChangelogRelease {
-  version: string;
-  date: string;
-  sections: Record<string, string[]>;
-}
+import { ChangelogData } from '@/data/changelogData';
+import type { ChangelogEntry } from '@/data/changelogData';
 
 interface Props {
   visible: boolean;
@@ -18,14 +14,14 @@ const emit = defineEmits<{
 }>();
 
 const changelogData = computed(() => {
-  return ((window as any).ChangelogData || []) as ChangelogRelease[];
+  return ChangelogData;
 });
 
 const filteredChangelog = computed(() => {
-  return changelogData.value.map((release) => ({
+  return changelogData.value.map((release: ChangelogEntry) => ({
     ...release,
     sections: Object.fromEntries(
-      Object.entries(release.sections).filter(([, items]) => items.length > 0)
+      Object.entries(release.sections).filter(([, items]) => items && items.length > 0)
     ),
   }));
 });

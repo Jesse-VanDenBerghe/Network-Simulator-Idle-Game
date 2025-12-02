@@ -1,15 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { formatNumber } from '@/utils/formatUtils';
-
-interface Upgrade {
-  id: string;
-  name: string;
-  description: string;
-  cost: number;
-  requires: string[];
-  tier: number;
-}
+import { prestigeUpgrades, getUpgradesByTier } from '@/data/prestigeData';
+import type { PrestigeUpgrade } from '@/data/prestigeData';
 
 interface Statistics {
   totalNodesEverUnlocked?: number;
@@ -39,15 +32,14 @@ const emit = defineEmits<{
 const selectedTier = ref(1);
 
 const upgradesByTier = computed(() => {
-  const PrestigeData = (window as any).PrestigeData;
-  return PrestigeData.getUpgradesByTier();
+  return getUpgradesByTier();
 });
 
 const displayUpgrades = computed(() => {
   return upgradesByTier.value[selectedTier.value] || [];
 });
 
-const canAfford = (upgrade: Upgrade): boolean => {
+const canAfford = (upgrade: PrestigeUpgrade): boolean => {
   return props.quantumCores >= upgrade.cost;
 };
 
@@ -55,14 +47,14 @@ const isPurchased = (upgradeId: string): boolean => {
   return props.purchasedUpgrades.has(upgradeId);
 };
 
-const canPurchase = (upgrade: Upgrade): boolean => {
+const canPurchase = (upgrade: PrestigeUpgrade): boolean => {
   if (isPurchased(upgrade.id)) return false;
   if (!canAfford(upgrade)) return false;
 
   return upgrade.requires.every((reqId) => props.purchasedUpgrades.has(reqId));
 };
 
-const handlePurchase = (upgrade: Upgrade) => {
+const handlePurchase = (upgrade: PrestigeUpgrade) => {
   if (!canPurchase(upgrade)) return;
   emit('purchase-upgrade', upgrade.id);
 };
@@ -82,17 +74,16 @@ const formatTime = (ms: number | undefined): string => {
   return `${seconds}s`;
 };
 
-const getUpgradeStatusClass = (upgrade: Upgrade): string => {
+const getUpgradeStatusClass = (upgrade: PrestigeUpgrade): string => {
   if (isPurchased(upgrade.id)) return 'purchased';
   if (canPurchase(upgrade)) return 'available';
   return 'locked';
 };
 
 const getRequirementNames = (requireIds: string[]): string => {
-  const PrestigeData = (window as any).PrestigeData;
   return requireIds
     .map((id) => {
-      const upgrade = PrestigeData.upgrades[id];
+      const upgrade = prestigeUpgrades[id];
       return upgrade ? upgrade.name : id;
     })
     .join(', ');

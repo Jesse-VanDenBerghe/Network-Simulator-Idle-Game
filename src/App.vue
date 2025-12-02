@@ -46,12 +46,13 @@ notificationEngine.initialize();
 // ==========================================
 // COMPUTED (for ascension)
 // ==========================================
-const coresEarned = computed(() => 
-    prestigeState.calculateQuantumCores(
+const coresEarned = computed(() => {
+    const cores = prestigeState.calculateQuantumCores(
         gameState.totalResources,
         gameState.unlockedNodes.value
-    )
-);
+    );
+    return isNaN(cores) ? 0 : cores;
+});
 
 // ==========================================
 // CHANGELOG MODAL

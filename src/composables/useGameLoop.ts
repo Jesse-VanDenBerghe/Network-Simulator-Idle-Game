@@ -5,7 +5,7 @@
 
 import { ref, onMounted, onUnmounted, type Ref } from 'vue';
 import { GAME_LOOP_INTERVAL_MS, AUTOSAVE_INTERVAL_MS } from '@/data/constants';
-import { NotificationType } from '@/data/notifications/constants';
+import { NotificationType, DisabledNotificationTypes } from '@/data/notifications/constants';
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
 import type { EventMap, NodeUnlockedEvent } from '@/types/event';
@@ -203,6 +203,9 @@ export function useGameLoop(
      * Show a notification toast
      */
     function showNotification(message: string, type: string = 'info', duration: number = 10_000): void {
+        // Skip disabled notification types
+        if (DisabledNotificationTypes.has(type as NotificationType)) return;
+        
         const id = ++notificationId;
         const timestamp = Date.now();
         notifications.value.push({ id, message, type, duration });
