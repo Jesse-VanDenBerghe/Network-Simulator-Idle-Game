@@ -23,16 +23,6 @@ interface EventBus {
 }
 
 /**
- * Notification history entry
- */
-interface NotificationHistoryEntry {
-    id: number;
-    message: string;
-    type: string;
-    timestamp: number;
-}
-
-/**
  * Resource rates from node management
  */
 interface ResourceRates {

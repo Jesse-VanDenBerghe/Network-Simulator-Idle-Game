@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, watch, nextTick } from 'vue';
-import type { Notification } from '@/types/notification';
+import type { NotificationHistoryEntry } from '@/types/notification';
 
 interface Props {
   show: boolean;
-  history: Notification[];
+  history: NotificationHistoryEntry[];
   narrateOnlyFilter: boolean;
 }
 

@@ -3,18 +3,13 @@ import { ref, computed } from 'vue';
 import { formatNumber } from '@/utils/formatUtils';
 import { prestigeUpgrades, getUpgradesByTier } from '@/data/prestigeData';
 import type { PrestigeUpgrade } from '@/data/prestigeData';
-
-interface Statistics {
-  totalNodesEverUnlocked?: number;
-  totalEnergyEverEarned?: number;
-  fastestClear?: number;
-}
+import { PrestigeStatistics } from '@/types';
 
 interface Props {
   quantumCores: number;
   ascensionCount: number;
   purchasedUpgrades: Set<string>;
-  statistics: Statistics;
+  statistics: PrestigeStatistics;
   totalCoresEarned?: number;
   visible?: boolean;
 }
