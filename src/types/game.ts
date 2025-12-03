@@ -22,6 +22,7 @@ export interface Resource {
 export interface ResourceAmounts {
     energy: number;
     data: number;
+    [key: string]: number;
 }
 
 /**
@@ -30,6 +31,7 @@ export interface ResourceAmounts {
 export interface AutomationRates {
     energy: number;
     data: number;
+    [key: string]: number;
 }
 
 /**

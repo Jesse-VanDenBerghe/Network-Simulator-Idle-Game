@@ -28,7 +28,8 @@ interface ExtendedPrestigeBonuses extends PrestigeBonuses {
     bonusEnergyPerClick: number;
     coreMultiplier: number;
     tierCostMultipliers: Record<number, number>;
-    randomStartingNodes?: RandomStartingNodes;
+    randomStartingNodes?: RandomStartingNodes,
+    [key: string]: unknown;
 }
 
 /**

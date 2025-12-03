@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Notification } from '@/types/notification';
+import type { NotificationDisplay } from '@/types/notification';
 
 interface Props {
-  notifications: Notification[];
+  notifications: NotificationDisplay[];
 }
 
 defineProps<Props>();
 
-const getStyle = (notification: Notification) => {
+const getStyle = (notification: NotificationDisplay) => {
   const duration = notification.duration || 10000;
   const fadeStart = (duration - 300) / 1000;
   return {

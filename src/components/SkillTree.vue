@@ -4,13 +4,14 @@ import SkillNode from './SkillNode.vue';
 import type { Node } from '@/types/node';
 import { checkNodeAvailable, checkCanAffordNode, checkTierLocked, checkNodeVisible } from '@/composables/useNodeValidation';
 import GameData from '@/core/gameData';
+import { ResourceAmounts } from '@/types';
 
 interface Props {
   nodes: Record<string, Node>;
   unlockedNodes: Set<string>;
   unlockedBranches: Set<string>;
   selectedNodeId: string | null;
-  resources: Record<string, number>;
+  resources: ResourceAmounts;
   ascensionCount?: number;
   prestigeBonuses: Record<string, unknown> | null;
   lastUnlockedNodeId: string | null;

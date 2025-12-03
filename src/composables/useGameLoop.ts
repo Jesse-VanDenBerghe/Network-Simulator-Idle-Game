@@ -10,6 +10,7 @@ import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
 import type { EventMap, NodeUnlockedEvent } from '@/types/event';
 import { prestigeUpgrades } from '@/data/prestigeData';
+import { NotificationDisplay } from '@/types/notification';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -19,16 +20,6 @@ const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 interface EventBus {
     on<K extends keyof EventMap>(eventName: K, callback: (data: EventMap[K]) => void): () => void;
     emit<K extends keyof EventMap>(eventName: K, data: EventMap[K]): void;
-}
-
-/**
- * Notification display object
- */
-interface NotificationDisplay {
-    id: number;
-    message: string;
-    type: string;
-    duration: number;
 }
 
 /**

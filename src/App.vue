@@ -116,13 +116,13 @@ onUnmounted(() => {
                     icon="⚡"
                     name="W"
                     :amount="gameState.resources.energy"
-                    :rate="nodeManagement.resourceRates.energy"
+                    :rate="nodeManagement.resourceRates.value.energy"
                 />
                 <ResourceBar
                     icon="📊"
                     name="B"
                     :amount="gameState.resources.data"
-                    :rate="nodeManagement.resourceRates.data"
+                    :rate="nodeManagement.resourceRates.value.data"
                     :visible="gameState.isDataUnlocked.value"
                 />
             </div>
@@ -143,8 +143,11 @@ onUnmounted(() => {
                 }"
                 :game-stats="{ 
                     automations: gameState.automations, 
-                    effectiveRates: nodeManagement.resourceRates.value, 
-                    coresEarned: coresEarned.value, 
+                    effectiveRates: {
+                        energy: nodeManagement.resourceRates.value.energy,
+                        data: nodeManagement.resourceRates.value.data
+                    },
+                    coresEarned: coresEarned, 
                     highestTierReached: gameState.highestTierReached.value, 
                     isDataUnlocked: gameState.isDataUnlocked.value, 
                     canProcessData: gameState.canProcessData.value 
