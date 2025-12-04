@@ -1,0 +1,36 @@
+#resources {
+    display: flex;
+    gap: 2rem;
+}
+
+.resource {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-light);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--text-muted);
+}
+
+.resource-icon {
+    font-size: 1.2rem;
+}
+
+.resource-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+    min-width: 60px;
+    text-align: right;
+}
+
+.resource-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.rate {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}

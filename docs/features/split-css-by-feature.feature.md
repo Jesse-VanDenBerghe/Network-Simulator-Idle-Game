@@ -25,13 +25,13 @@ Refactor 2200-line `styles.css` into modular, feature-area CSS files for maintai
 1.5 Update [src/main.ts](../../src/main.ts) to import `@/styles/index.css` instead of `styles.css`  - ok
 1.6 Verify dev server works with new structure - ok
 
-### Phase 2: Layout & Navigation (Structure)
+### Phase 2: Layout & Navigation (Structure) - OK
 **Goal**: Extract layout and top-level navigation styles
 
-2.1 Extract `#game-container`, `#main-content` → [src/styles/layout.css](../../src/styles/layout.css)  
-2.2 Extract `#header`, `.header-left`, `.icon-button` → [src/styles/header.css](../../src/styles/header.css)  
-2.3 Extract `#resources`, `.resource-*` classes → [src/styles/resources.css](../../src/styles/resources.css)  
-2.4 Add imports to [src/styles/index.css](../../src/styles/index.css)
+2.1 Extract `#game-container`, `#main-content` → [src/styles/layout.css](../../src/styles/layout.css) - ok 
+2.2 Extract `#header`, `.header-left`, `.icon-button` → [src/styles/header.css](../../src/styles/header.css) - ok 
+2.3 Extract `#resources`, `.resource-*` classes → [src/styles/resources.css](../../src/styles/resources.css) - ok
+2.4 Add imports to [src/styles/index.css](../../src/styles/index.css) - ok
 
 ### Phase 3: Sidebar Components (Actions)
 **Goal**: Modularize sidebar action elements
