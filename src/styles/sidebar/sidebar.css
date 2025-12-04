@@ -17,3 +17,20 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+/* Stats */
+.stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--bg-light);
+    font-size: 0.9rem;
+}
+
+.stat span:first-child {
+    color: var(--text-secondary);
+}
+
+.stat span:last-child {
+    color: var(--accent-primary);
+}
