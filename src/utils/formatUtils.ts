@@ -3,9 +3,9 @@
  * @param num Number to format
  * @return Formatted string
  */
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | null | undefined): string {
   // Handle invalid inputs
-  if (num === undefined || num === null || isNaN(num)) return '0';
+  if (!num || isNaN(num)) return '0';
 
   // Convert to number if string
   const n = Number(num);
@@ -34,7 +34,9 @@ export function formatNumber(num: number): string {
  * @param bytes Number of bytes
  * @return Formatted string
  */
-export function formatDataValue(bytes: number): string {
+export function formatDataValue(bytes: number | null | undefined): string {
+  if(!bytes) return '0 B';
+
   let tier = 0;
   let value = bytes;
   const prefixes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
@@ -56,7 +58,7 @@ export function formatDataValue(bytes: number): string {
  * @param ms Time in milliseconds
  * @return Formatted string
  */
-export function formatTime(ms: number): string {
+export function formatTime(ms: number | null | undefined): string {
   if (!ms) return 'N/A';
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);

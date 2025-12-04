@@ -15,7 +15,6 @@ import ChangelogModal from '@/components/ChangelogModal.vue';
 import { useGameState } from '@/composables/useGameState';
 import { usePrestigeState } from '@/composables/usePrestigeState';
 import { useNodeManagement } from '@/composables/useNodeManagement';
-import { useSaveLoad } from '@/composables/useSaveLoad';
 import { useGameLoop } from '@/composables/useGameLoop';
 import { useEventBus } from '@/composables/useEventBus';
 import { useNotificationEngine } from '@/composables/useNotificationEngine';
@@ -36,7 +35,6 @@ const prestigeState = usePrestigeState();
 
 // These composables communicate via eventBus instead of direct dependencies
 const nodeManagement = useNodeManagement(gameState, prestigeState, eventBus, GameData.nodes);
-const saveLoad = useSaveLoad(gameState, prestigeState, eventBus);
 const gameLoop = useGameLoop(gameState, prestigeState, eventBus);
 
 // Notification engine - subscribes to events, triggers narrations

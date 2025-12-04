@@ -12,6 +12,11 @@ function getReqId(req: NodeRequirement): string {
     return typeof req === 'string' ? req : req.id;
 }
 
+/**
+ * Check if a node is fully defined (has position and ID)
+ * @param node Node to check
+ * @return true if node is defined
+ */
 export function isNodeDefined(node: Node | undefined): boolean {
     return node !== undefined && node.id !== '' && node.x !== undefined && node.y !== undefined;
 }
@@ -136,10 +141,8 @@ export function getConnections(nodesData: Record<string, Node>): NodeConnection[
             const reqId = getReqId(req);
             const reqNode = nodesData[reqId];
             if (reqNode) {
-                // Skip connections from tier gates to nodes in a different branch
-                // This prevents visual connections between unlocking gates and newly unlocked branches
-                if (reqNode.isTierGate && node.branch !== reqNode.branch) {
-                    return; // Skip this connection
+                if (reqNode.isTierGate || node.branch !== reqNode.branch) {
+                    return;
                 }
                 
                 connections.push({

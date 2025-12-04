@@ -10,7 +10,7 @@ import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
 import type { EventMap, NodeUnlockedEvent } from '@/types/event';
 import { prestigeUpgrades } from '@/data/prestigeData';
-import { NotificationDisplay } from '@/types/notification';
+import { NotificationDisplay, NotificationHistoryEntry } from '@/types/notification';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';
 
@@ -43,7 +43,7 @@ export interface UseGameLoopReturn {
     
     // Methods
     gameLoop: () => void;
-    showNotification: (message: string, type?: string, duration?: number) => void;
+    showNotification: (message: string, type?: NotificationType, duration?: number) => void;
     toggleNotificationHistory: () => void;
     clearNotificationHistory: () => void;
     ascend: () => void;
@@ -183,16 +183,16 @@ export function useGameLoop(
     /**
      * Show a notification toast
      */
-    function showNotification(message: string, type: string = 'info', duration: number = 10_000): void {
+    function showNotification(message: string, type: NotificationType = NotificationType.INFO, duration: number = 10_000): void {
         // Skip disabled notification types
         if (DisabledNotificationTypes.has(type as NotificationType)) return;
         
-        const id = ++notificationId;
+        const id = String(++notificationId);
         const timestamp = Date.now();
-        notifications.value.push({ id, message, type, duration });
+        notifications.value.push({ id, message, type, duration , timestamp});
         
         // Add to history
-        notificationHistory.value.unshift({ id, message, type, timestamp });
+        notificationHistory.value.unshift({ id, message, type, timestamp, read: false });
         saveNotificationHistory();
         
         setTimeout(() => {

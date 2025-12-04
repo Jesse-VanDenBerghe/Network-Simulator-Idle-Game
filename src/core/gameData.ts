@@ -34,28 +34,6 @@ class GameDataClass {
     readonly nodes = allNodes;
     
     /**
-     * Format a number with appropriate suffixes (K, M, B, T, etc.)
-     */
-    formatNumber(num: number): string {
-        if (num < 1000) {
-            if (num < 10) return parseFloat(Number(num).toFixed(2)).toString();
-            if (num < 100) return parseFloat(Number(num).toFixed(1)).toString();
-            return Math.floor(Number(num)).toString();
-        }
-        
-        const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
-        const tier = Math.floor(Math.log10(Math.abs(Number(num))) / 3);
-        
-        if (tier >= suffixes.length) {
-            return Number(num).toExponential(2);
-        }
-        
-        const scaled = Number(num) / Math.pow(1000, tier);
-        const decimals = scaled >= 100 ? 0 : scaled >= 10 ? 1 : 2;
-        return scaled.toFixed(decimals) + suffixes[tier];
-    }
-    
-    /**
      * Get the cost of a node scaled by tier, ascension, prestige bonuses, and level
      */
     getScaledNodeCost(node: Node, options: ScaledCostOptions = {}): NodeCost {
@@ -92,14 +70,6 @@ class GameDataClass {
         nodeLevels: Record<string, number>
     ): boolean {
         return checkRequirementMetUtil(req, unlockedNodes, nodeLevels);
-    }
-    
-    /**
-     * Initialize the layout engine with this game data
-     */
-    initializeLayout(): void {
-        // Layout engine initialization handled externally
-        // This method exists for compatibility
     }
 }
 

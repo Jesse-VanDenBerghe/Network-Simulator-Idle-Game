@@ -29,6 +29,6 @@
     /* Vue */
     "types": ["vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "tests/utils/nodeutils.getConnections.test.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

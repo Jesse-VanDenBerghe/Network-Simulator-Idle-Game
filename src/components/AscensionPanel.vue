@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { formatNumber } from '@/utils/formatUtils';
+import { formatNumber, formatTime } from '@/utils/formatUtils';
 import { prestigeUpgrades, getUpgradesByTier } from '@/data/prestigeData';
 import type { PrestigeUpgrade } from '@/data/prestigeData';
 import { PrestigeStatistics } from '@/types';
@@ -56,17 +56,6 @@ const handlePurchase = (upgrade: PrestigeUpgrade) => {
 
 const selectTier = (tier: number) => {
   selectedTier.value = tier;
-};
-
-const formatTime = (ms: number | undefined): string => {
-  if (!ms) return 'N/A';
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) return `${hours}h ${minutes % 60}m`;
-  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-  return `${seconds}s`;
 };
 
 const getUpgradeStatusClass = (upgrade: PrestigeUpgrade): string => {
