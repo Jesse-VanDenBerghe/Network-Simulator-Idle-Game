@@ -4,3 +4,9 @@
 @import "./layout.css";
 @import "./header.css";
 @import "./resources.css";
+
+@import "./sidebar.css";
+@import "./buttons/action-buttons.css";
+@import "./buttons/crank-button.css";
+@import "./buttons/terminal-button.css";
+@import "./automations.css";

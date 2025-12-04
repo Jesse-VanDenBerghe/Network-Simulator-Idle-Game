@@ -33,15 +33,15 @@ Refactor 2200-line `styles.css` into modular, feature-area CSS files for maintai
 2.3 Extract `#resources`, `.resource-*` classes → [src/styles/resources.css](../../src/styles/resources.css) - ok
 2.4 Add imports to [src/styles/index.css](../../src/styles/index.css) - ok
 
-### Phase 3: Sidebar Components (Actions)
+### Phase 3: Sidebar Components (Actions) - OK
 **Goal**: Modularize sidebar action elements
 
-3.1 Extract `#sidebar`, sidebar h2 → [src/styles/sidebar.css](../../src/styles/sidebar.css)  
-3.2 Extract `.action-btn`, `.btn-*` classes → [src/styles/action-buttons.css](../../src/styles/action-buttons.css)  
-3.3 Extract `.crank-*` classes (all crank animations) → [src/styles/crank.css](../../src/styles/crank.css)  
-3.4 Extract `.terminal-*` classes → [src/styles/terminal.css](../../src/styles/terminal.css)  
-3.5 Extract `.automation-*` classes → [src/styles/automations.css](../../src/styles/automations.css)  
-3.6 Add imports to [src/styles/index.css](../../src/styles/index.css)
+3.1 Extract `#sidebar`, sidebar h2 → [src/styles/sidebar.css](../../src/styles/sidebar.css) - ok
+3.2 Extract `.action-btn`, `.btn-*` classes → [src/styles/action-buttons.css](../../src/styles/action-buttons.css) - ok
+3.3 Extract `.crank-*` classes (all crank animations) → [src/styles/crank.css](../../src/styles/crank.css) - ok
+3.4 Extract `.terminal-*` classes → [src/styles/terminal.css](../../src/styles/terminal.css) - ok
+3.5 Extract `.automation-*` classes → [src/styles/automations.css](../../src/styles/automations.css) - ok
+3.6 Add imports to [src/styles/index.css](../../src/styles/index.css) - ok 
 
 ### Phase 4: Skill Tree System (Core Gameplay)
 **Goal**: Isolate skill tree visualization styles

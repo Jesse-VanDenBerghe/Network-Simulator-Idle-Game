@@ -1,0 +1,33 @@
+/* Automations */
+.automation-item {
+    background: var(--bg-light);
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--text-muted);
+}
+
+.automation-item.active {
+    border-color: var(--accent-secondary);
+}
+
+.automation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.automation-name {
+    font-weight: bold;
+}
+
+.automation-level {
+    color: var(--accent-secondary);
+    font-size: 0.9rem;
+}
+
+.automation-output {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
