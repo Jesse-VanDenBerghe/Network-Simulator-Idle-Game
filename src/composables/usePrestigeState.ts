@@ -4,8 +4,8 @@
 
 import { ref, reactive, computed, type Ref, type ComputedRef } from 'vue';
 import type { PrestigeState, PrestigeBonuses, ResourceAmounts } from '@/types/game';
-import type { Node } from '@/types/node';
-import { prestigeUpgrades } from '@/data/prestigeData';
+import type { Node } from 'packages/shared/src/types/node';
+import { prestigeUpgrades } from 'packages/shared/src/data/prestigeData';
 import GameData from '@/core/gameData';
 
 /**

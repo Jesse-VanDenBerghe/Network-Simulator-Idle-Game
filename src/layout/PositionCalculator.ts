@@ -2,7 +2,7 @@
 // Single Responsibility: Physics-based positioning and depth calculations
 // ==========================================================
 
-import type { NodeRequirement } from '@/types/node';
+import type { NodeRequirement } from 'packages/shared/src/types/node';
 import type { LayoutNode } from './TreeBuilder';
 
 /**

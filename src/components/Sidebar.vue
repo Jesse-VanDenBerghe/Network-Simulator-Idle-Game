@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatDataValue, formatNumber } from '@/utils/formatUtils';
+import { formatDataValue, formatNumber } from 'packages/shared/src/utils/formatUtils';
 import CrankButton from './buttons/CrankButton.vue';
 import TerminalProgressButton from './buttons/TerminalProgressButton.vue';
-import { AutomationRates } from '@/types';
+import { AutomationRates } from 'packages/shared/src/types';
 
 interface DataGeneration {
   active: boolean;

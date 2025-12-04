@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 import { getConnections } from '@/utils/nodeUtils';
 
 //Helper function to create a node

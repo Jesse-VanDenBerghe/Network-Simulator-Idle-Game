@@ -2,7 +2,7 @@
 // =================
 // Functions for managing branch-based progression
 
-import { BRANCH_UNLOCK_ORDER } from '@/data/constants';
+import { BRANCH_UNLOCK_ORDER } from '../data/constants';
 
 /**
  * Check if a specific branch is unlocked

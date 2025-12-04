@@ -1,9 +1,9 @@
 // Node Utilities
 // ===============
 
-import type { Node, NodeRequirement, NodeCost } from '@/types/node';
-import { TIER_COST_MULTIPLIERS, COST_SHIFT_FOR_RESOURCE } from '@/data/constants';
-import { ASCENSION_COST_MULTIPLIER } from '@/data/config';
+import type { Node, NodeRequirement, NodeCost } from '../types/node';
+import { TIER_COST_MULTIPLIERS, COST_SHIFT_FOR_RESOURCE } from '../data/constants';
+import { ASCENSION_COST_MULTIPLIER } from '../data/config';
 
 /**
  * Extract node ID from requirement (handles both string and object forms)

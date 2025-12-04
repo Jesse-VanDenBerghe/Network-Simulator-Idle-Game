@@ -5,7 +5,7 @@
 import { TreeBuilder } from './TreeBuilder';
 import { PositionCalculator, type LayoutConfig } from './PositionCalculator';
 import { CollisionResolver } from './CollisionResolver';
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 import type { LayoutNode } from './TreeBuilder';
 import { LAYOUT_CONFIG } from '@/data/constants';
 

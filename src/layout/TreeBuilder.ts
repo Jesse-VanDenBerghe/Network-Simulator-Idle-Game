@@ -2,7 +2,7 @@
 // Single Responsibility: Build tree structure and assign branches
 // ==========================================================
 
-import type { Node, NodeRequirement } from '@/types/node';
+import type { Node, NodeRequirement } from 'packages/shared/src/types/node';
 
 /**
  * Extract node ID from a requirement (supports both 'node_id' and { id: 'node_id', level: n })

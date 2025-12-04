@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { formatNumber, formatTime } from '@/utils/formatUtils';
-import { prestigeUpgrades, getUpgradesByTier } from '@/data/prestigeData';
-import type { PrestigeUpgrade } from '@/data/prestigeData';
+import { prestigeUpgrades, getUpgradesByTier } from 'packages/shared/src/data/prestigeData';
+import type { PrestigeUpgrade } from 'packages/shared/src/data/prestigeData';
 import { PrestigeStatistics } from '@/types';
 
 interface Props {

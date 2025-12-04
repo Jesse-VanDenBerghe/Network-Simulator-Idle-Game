@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 
 interface Props {
   node: Node;

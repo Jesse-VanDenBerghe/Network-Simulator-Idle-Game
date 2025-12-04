@@ -9,7 +9,7 @@ import { NotificationType, DisabledNotificationTypes } from '@/data/notification
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';
 import type { EventMap, NodeUnlockedEvent } from '@/types/event';
-import { prestigeUpgrades } from '@/data/prestigeData';
+import { prestigeUpgrades } from 'packages/shared/src/data/prestigeData';
 import { NotificationDisplay, NotificationHistoryEntry } from '@/types/notification';
 
 const NOTIFICATION_HISTORY_KEY = 'networkSimNotificationHistory';

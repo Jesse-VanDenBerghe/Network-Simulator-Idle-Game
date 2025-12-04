@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import SkillNode from './SkillNode.vue';
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 import { checkNodeAvailable, checkCanAffordNode, checkTierLocked, checkNodeVisible } from '@/composables/useNodeValidation';
 import GameData from '@/core/gameData';
-import { ResourceAmounts } from '@/types';
-import { isNodeDefined } from '@/utils/nodeUtils';
+import { ResourceAmounts } from 'packages/shared/src/types';
+import { isNodeDefined } from 'packages/shared/src/utils/nodeUtils';
 
 interface Props {
   nodes: Record<string, Node>;

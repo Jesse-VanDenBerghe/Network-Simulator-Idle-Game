@@ -3,7 +3,7 @@
 // Manages node operations: unlocking, affordability checks, applying effects
 
 import { computed, type ComputedRef } from 'vue';
-import type { Node, NodeEffects } from '@/types/node';
+import type { Node, NodeEffects } from 'packages/shared/src/types/node';
 import type { ResourceAmounts } from '@/types/game';
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';

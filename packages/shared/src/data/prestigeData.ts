@@ -1,7 +1,7 @@
 // Prestige Data Module - Upgrade definitions and prestige logic
 // ==============================================================
 
-import type { AutomationRates } from '../../packages/shared/src/types/game';
+import type { AutomationRates } from '../types/game';
 
 /**
  * Prestige upgrade effect type

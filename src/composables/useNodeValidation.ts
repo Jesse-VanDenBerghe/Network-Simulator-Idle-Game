@@ -2,7 +2,7 @@
 // =============================
 // Extracted validation logic from SkillTree for reusability and testability
 
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 import type { ResourceAmounts } from '@/types/game';
 import type { UseGameStateReturn } from './useGameState';
 import type { UsePrestigeStateReturn } from './usePrestigeState';

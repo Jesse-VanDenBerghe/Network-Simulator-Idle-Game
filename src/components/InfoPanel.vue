@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { formatNumber } from '@/utils/formatUtils';
-import type { Node } from '@/types/node';
+import type { Node } from 'packages/shared/src/types/node';
 import GameData from '@/core/gameData';
 
 interface TierGate {
