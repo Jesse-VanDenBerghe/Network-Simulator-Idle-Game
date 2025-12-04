@@ -7,6 +7,7 @@
     "dev:editor": "pnpm --filter @network-simulator/editor dev",
     "build:game": "pnpm --filter @network-simulator/game build",
     "build:editor": "pnpm --filter @network-simulator/editor build",
+    "build:all": "pnpm run build:game && pnpm run build:editor",
     "lint": "pnpm -r lint",
     "test:shared": "pnpm --filter @network-simulator/shared test",
     "test": "pnpm -r test"

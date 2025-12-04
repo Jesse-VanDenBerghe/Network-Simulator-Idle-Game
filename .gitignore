@@ -8,6 +8,8 @@ coverage/
 
 # Build outputs
 dist/
+dist-editor/
+dist-game/  
 packages/*/dist/
 build/
 packages/*/build/

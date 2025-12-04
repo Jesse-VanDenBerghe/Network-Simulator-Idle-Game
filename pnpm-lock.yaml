@@ -8,6 +8,31 @@ importers:
 
   .: {}
 
+  packages/editor:
+    dependencies:
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.25(typescript@5.9.3)
+    devDependencies:
+      '@network-simulator/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@6.4.1(@types/node@20.19.25))(vue@3.5.25(typescript@5.9.3))
+      '@vue/tsconfig':
+        specifier: ^0.7.0
+        version: 0.7.0(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.5
+        version: 6.4.1(@types/node@20.19.25)
+      vue-tsc:
+        specifier: ^2.2.0
+        version: 2.2.12(typescript@5.9.3)
+
   packages/game:
     dependencies:
       vue:
