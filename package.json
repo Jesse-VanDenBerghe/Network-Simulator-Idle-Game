@@ -1,31 +1,15 @@
 {
   "name": "network-simulator",
   "version": "1.0.0",
-  "description": "",
-  "main": "game.js",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.2",
-    "@vitest/coverage-v8": "^4.0.13",
-    "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^20.0.10",
-    "jsdom": "^27.2.0",
-    "terser": "^5.44.1",
-    "typescript": "^5.9.3",
-    "vite": "^7.2.6",
-    "vitest": "^4.0.13",
-    "vue": "^3.5.25"
+    "dev:game": "pnpm --filter @network-simulator/game dev",
+    "dev:editor": "pnpm --filter @network-simulator/editor dev",
+    "build:game": "pnpm --filter @network-simulator/game build",
+    "build:editor": "pnpm --filter @network-simulator/editor build",
+    "build:all": "pnpm run build:game && pnpm run build:editor",
+    "lint": "pnpm -r lint",
+    "test:shared": "pnpm --filter @network-simulator/shared test",
+    "test": "pnpm -r test"
   }
 }

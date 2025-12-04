@@ -4,17 +4,45 @@
 You inherit an old shed from your grandfather. Inside, you discover a hand crank that hums when turned. This sparks a journey from manual power generation to building a vast computational network. The game tells this story through node unlocks—each revealing more of what grandpa left behind.
 
 ## Project Overview
-An incremental idle game built with Vue 3 + TypeScript + Vite. Players crank for energy, unlock skill tree nodes, and discover new branches (energy → computer → future expansions).
+An incremental idle game built with Vue 3 + TypeScript + Vite + pnpm workspace monorepo. Players crank for energy, unlock skill tree nodes, and discover new branches (energy → computer → future expansions).
 
 ## Tech Stack
 - **Vue 3** - Composition API with Single File Components (SFCs)
 - **TypeScript** - Strict mode, no `any` allowed
 - **Vite** - Dev server with HMR, production bundler
+- **pnpm** - Workspace monorepo with three packages
 - **Event Bus** - Decoupled composable communication pattern
+
+## Monorepo Architecture
+
+This project uses **pnpm workspaces** with three packages:
+
+### `packages/shared/`
+Shared TypeScript code used by both game and editor:
+- `types/` - Node, GameState, Notification interfaces
+- `data/` - Node definitions, notification configs, constants
+- `utils/` - Pure functions (formatting, calculations)
+
+Imported as `@network-sim/shared` by both apps with full type safety. No runtime build—source compiled directly by consuming apps.
+
+### `packages/game/`
+Main game Vue app:
+- `composables/` - useGameState, useNodeManagement, useGameLoop, etc.
+- `components/` - Vue SFCs (SkillTree, ResourceBar, NotificationToast, etc.)
+- `layout/` - LayoutEngine for radial skill tree positioning
+- `core/` - GameData singleton for cost scaling and validation
+
+Builds to `dist-game/`, runs on port 3000.
+
+### `packages/editor/`
+Story editor Vue app (minimal scaffold):
+- Future: Node editor, narration authoring, skill tree visualizer
+
+Builds to `dist-editor/`, runs on port 3001.
 
 ## Architecture
 
-### Composables (`src/composables/`)
+### Composables (`packages/game/src/composables/`)
 TypeScript composables communicate via **event bus**, not direct imports:
 - `useGameState` - Resources, unlocked nodes, automations
 - `useNodeManagement` - Node unlocking, affordability, effects
@@ -25,7 +53,7 @@ TypeScript composables communicate via **event bus**, not direct imports:
 
 When adding interactions between composables, emit/subscribe to events rather than importing one into another.
 
-### Notification Engine (`src/composables/useNotificationEngine.ts`)
+### Notification Engine (`packages/game/src/composables/useNotificationEngine.ts`)
 Centralized system for triggering narrations, hints, and achievements based on game events.
 
 **Key features:**
@@ -34,7 +62,7 @@ Centralized system for triggering narrations, hints, and achievements based on g
 - Persists "shown" state to localStorage with debounced saves
 - Configurable `persistAcrossAscension` per notification
 
-**Data files:** `src/data/notifications/`
+**Data files:** `packages/shared/src/data/notifications/`
 ```typescript
 {
     id: 'unique_id',
@@ -52,9 +80,9 @@ Centralized system for triggering narrations, hints, and achievements based on g
 
 **Trigger types:** `onFirstLaunch`, `onNodeUnlocked`, `onNodeLevelReached`, `onResourceAmountReached`, `onBranchUnlocked`, `onTierReached`, `onIdleTime`, `onAscension`
 
-**Adding narrations:** Add to appropriate file in `src/data/notifications/narration/` — do NOT add inline `narrate` effects to nodes.
+**Adding narrations:** Add to appropriate file in `packages/shared/src/data/notifications/narration/` — do NOT add inline `narrate` effects to nodes.
 
-### Node System (`src/data/nodes/`)
+### Node System (`packages/shared/src/data/nodes/`)
 Nodes are the progression mechanic. Each unlock reveals story and gameplay:
 ```typescript
 {
@@ -76,7 +104,7 @@ Nodes are the progression mechanic. Each unlock reveals story and gameplay:
 ```
 
 ### Narration Guidelines
-Narration drives the story. Narrations are defined in `src/data/notifications/narration/`:
+Narration drives the story. Narrations are defined in `packages/shared/src/data/notifications/narration/`:
 - Write in second person, present tense ("You discover...", "The room illuminates...")
 - Keep it atmospheric—describe what the player sees/hears/feels
 - Use narration for discoveries and milestones, not routine upgrades
@@ -86,11 +114,11 @@ Narration drives the story. Narrations are defined in `src/data/notifications/na
 ### Branch Progression
 Players start with energy (hand crank → hamster wheel → generators). Unlocking `attic` reveals grandpa's old computer, opening the computer branch. Future branches extend this pattern.
 
-### Components (`src/components/`)
+### Components (`packages/game/src/components/`)
 Vue 3 Single File Components with TypeScript:
 ```vue
 <script setup lang="ts">
-import type { Node } from '@/types'
+import type { Node } from '@network-sim/shared'
 
 interface Props {
     node: Node
@@ -110,13 +138,13 @@ const emit = defineEmits<{
 </template>
 ```
 
-### Layout Engine (`src/layout/`)
+### Layout Engine (`packages/game/src/layout/`)
 Auto-positions nodes radially by tier. Three TypeScript classes:
 - `TreeBuilder` - Builds dependency graph
 - `PositionCalculator` - Calculates radial positions by tier
 - `CollisionResolver` - Prevents node overlap
 
-Exported via `src/layout/LayoutEngine.ts` as unified interface.
+Exported via `packages/game/src/layout/LayoutEngine.ts` as unified interface.
 
 ## TypeScript Coding Guidelines
 
@@ -133,12 +161,14 @@ Exported via `src/layout/LayoutEngine.ts` as unified interface.
 - **Files**: camelCase for .ts files, PascalCase for .vue components
 
 ### Import Aliases
-Use `@/` alias for src/ imports:
+Game package uses `@/` alias for local imports:
 ```typescript
-import type { Node, GameState } from '@/types'
+import type { Node, GameState } from '@network-sim/shared'
 import { useEventBus } from '@/composables/useEventBus'
 import GameData from '@/core/gameData'
 ```
+
+Shared package uses relative imports internally, but exports everything through `@network-sim/shared` barrel.
 
 ## Key Patterns
 
@@ -146,8 +176,8 @@ import GameData from '@/core/gameData'
 Use `GameData.getScaledNodeCost(node, options)` for proper tier/ascension scaling—never raw `node.cost`.
 
 ### Adding New Nodes
-1. Add to `src/data/nodes/{branch}Branch.ts` with proper `Node` type
-2. Export from `src/data/nodes/index.ts`
+1. Add to `packages/shared/src/data/nodes/{branch}Branch.ts` with proper `Node` type
+2. Export from `packages/shared/src/data/nodes/index.ts`
 3. Set `requires` to connect to tree
 4. Positions auto-calculate
 
@@ -156,24 +186,41 @@ When adding state: add to composable, include in `toSaveState()`, handle in `loa
 
 ## Commands
 ```bash
-npm run dev           # Start Vite dev server (http://localhost:3000)
-npm run build         # Production build to dist/
-npm run preview       # Preview production build locally
-./build-itch.sh       # Package zip for itch.io (manual upload)
+pnpm run dev:game     # Start game dev server (http://localhost:3000)
+pnpm run dev:editor   # Start editor dev server (http://localhost:3001)
+pnpm run build:game   # Production build game to dist-game/
+pnpm run build:editor # Production build editor to dist-editor/
+pnpm run build:all    # Build both apps
+./build-itch.sh       # Package game zip for itch.io (manual upload)
 ```
 
 ## File Organization
 ```
-src/
-├── App.vue              # Root SFC component
-├── main.ts              # Vite entry point
-├── composables/         # TypeScript composables
-├── components/          # Vue SFCs
-├── core/                # GameData class
-├── data/                # Nodes, notifications, constants
-├── layout/              # Skill tree positioning
-├── types/               # TypeScript interfaces/types
-└── utils/               # Pure TypeScript functions
+packages/
+├── game/
+│   ├── src/
+│   │   ├── App.vue              # Root component
+│   │   ├── main.ts              # Entry point
+│   │   ├── composables/         # TypeScript composables
+│   │   ├── components/          # Vue SFCs
+│   │   ├── core/                # GameData class
+│   │   └── layout/              # Skill tree positioning
+│   ├── index.html
+│   ├── vite.config.ts
+│   └── package.json
+├── editor/
+│   ├── src/
+│   │   ├── App.vue
+│   │   └── main.ts
+│   ├── index.html
+│   ├── vite.config.ts
+│   └── package.json
+└── shared/
+    ├── src/
+    │   ├── types/               # TypeScript interfaces
+    │   ├── data/                # Nodes, notifications, constants
+    │   └── utils/               # Pure TypeScript functions
+    └── package.json
 ```
 
-**Build output:** Vite bundles to `dist/` with code splitting, minification, source maps.
+**Build output:** Game builds to `dist-game/`, editor builds to `dist-editor/` with code splitting, minification, source maps.

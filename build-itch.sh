@@ -11,7 +11,7 @@ VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
 
 # Run Vite production build
 echo "Running production build..."
-npm run build
+pnpm run build:game
 
 if [ $? -ne 0 ]; then
     echo "❌ Build failed"
@@ -21,9 +21,9 @@ fi
 # Remove old zips if they exist
 rm -f network-simulator*.zip
 
-# Create new zip with dist folder contents and version tag
+# Create new zip with dist-game folder contents and version tag
 ZIP_NAME="network-simulator-${VERSION}.zip"
-cd dist && zip -r "../$ZIP_NAME" . -x "*.DS_Store" && cd ..
+cd dist-game && zip -r "../$ZIP_NAME" . -x "*.DS_Store" && cd ..
 
 echo "✓ Build complete: $ZIP_NAME"
 
