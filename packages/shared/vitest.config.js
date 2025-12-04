@@ -7,16 +7,16 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    setupFiles: ['./tests/setup.js'],
+    setupFiles: ['./tests/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'tests/', '*.config.js', 'game.js']
+      exclude: ['node_modules/', 'tests/', '*.config.js']
     }
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@network-sim/shared': path.resolve(__dirname, './src'),
       'vue': 'vue/dist/vue.esm-bundler.js'
     }
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Node } from 'packages/shared/src/types/node';
-import { getConnections } from '@/utils/nodeUtils';
+import type { Node } from '../../src/types/node';
+import { getConnections } from '../../src/utils/nodeUtils';
 
 //Helper function to create a node
 function createNode(overrides: Partial<Node>): Node {
