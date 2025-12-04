@@ -1,0 +1,24 @@
+/* Global CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* CSS Variables for Theming */
+:root {
+    --bg-dark: #0a0a1a;
+    --bg-medium: #12122a;
+    --bg-light: #1a1a3a;
+    --accent-primary: #00ffaa;
+    --accent-secondary: #00aaff;
+    --accent-tertiary: #ff00aa;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaacc;
+    --text-muted: #666688;
+    --node-locked: #333355;
+    --node-available: #445566;
+    --node-unlocked: #00ffaa;
+    --connection-locked: #222244;
+    --connection-unlocked: #00ffaa55;
+}

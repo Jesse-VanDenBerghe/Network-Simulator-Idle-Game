@@ -41,22 +41,22 @@ Current single-app architecture limits editor development. Game codebase lives i
 
 **2.7** Update imports in copied files to use relative paths within shared package -V
 
-### Phase 3: Game Package Migration
+### Phase 3: Game Package Migration - IMPLEMENTED
 **Goal**: Move existing game into `packages/game/` with shared package imports
 
-**3.1** Create [`packages/game/package.json`](../../packages/game/package.json) with Vue + Vite dependencies and `@network-sim/shared` workspace reference
+**3.1** Create [`packages/game/package.json`](../../packages/game/package.json) with Vue + Vite dependencies and `@network-sim/shared` workspace reference -V
 
-**3.2** Copy [`vite.config.ts`](../../vite.config.ts) to [`packages/game/vite.config.ts`](../../packages/game/vite.config.ts), update paths
+**3.2** Copy [`vite.config.ts`](../../vite.config.ts) to [`packages/game/vite.config.ts`](../../packages/game/vite.config.ts), update paths -V
 
-**3.3** Copy [`tsconfig.json`](../../tsconfig.json) to [`packages/game/tsconfig.json`](../../packages/game/tsconfig.json), add shared package reference
+**3.3** Copy [`tsconfig.json`](../../tsconfig.json) to [`packages/game/tsconfig.json`](../../packages/game/tsconfig.json), add shared package reference -V
 
-**3.4** Copy [`index.html`](../../index.html) to [`packages/game/index.html`](../../packages/game/index.html)
+**3.4** Copy [`index.html`](../../index.html) to [`packages/game/index.html`](../../packages/game/index.html) -V
 
-**3.5** Move remaining [`src/`](../../src/) contents to [`packages/game/src/`](../../packages/game/src/)
+**3.5** Move remaining [`src/`](../../src/) contents to [`packages/game/src/`](../../packages/game/src/) -V
 
-**3.6** Update all game imports from `@/types`, `@/data`, `@/utils` to `@network-sim/shared`
+**3.6** Update all game imports from `@/types`, `@/data`, `@/utils` to `@network-sim/shared` -V
 
-**3.7** Update Vite alias in [`packages/game/vite.config.ts`](../../packages/game/vite.config.ts) to resolve `@/` to game src only
+**3.7** Update Vite alias in [`packages/game/vite.config.ts`](../../packages/game/vite.config.ts) to resolve `@/` to game src only -V
 
 ### Phase 4: Editor Package Scaffold
 **Goal**: Create minimal editor app structure for future development
