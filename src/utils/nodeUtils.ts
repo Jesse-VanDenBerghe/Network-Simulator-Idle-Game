@@ -12,6 +12,10 @@ function getReqId(req: NodeRequirement): string {
     return typeof req === 'string' ? req : req.id;
 }
 
+export function isNodeDefined(node: Node | undefined): boolean {
+    return node !== undefined && node.id !== '' && node.x !== undefined && node.y !== undefined;
+}
+
 /**
  * Check if a single requirement is met
  */

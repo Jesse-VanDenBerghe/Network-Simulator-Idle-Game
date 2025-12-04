@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatNumber } from '@/utils/formatUtils';
-import CrankButton from './CrankButton.vue';
-import TerminalProgressButton from './TerminalProgressButton.vue';
+import { formatDataValue, formatNumber } from '@/utils/formatUtils';
+import CrankButton from './buttons/CrankButton.vue';
+import TerminalProgressButton from './buttons/TerminalProgressButton.vue';
 import { AutomationRates } from '@/types';
 
 interface DataGeneration {
@@ -65,7 +65,7 @@ const dataGenerationProgress = computed(() => {
 const dataButtonValue = computed(() => {
   if (props.generationState.dataGeneration?.active) {
     const dg = props.generationState.dataGeneration;
-    return `+${formatNumber(dg.bitsPerTick)} (${dg.energyCost}⚡)`;
+    return `+${formatDataValue(dg.bitsPerTick)}B (${dg.energyCost}⚡)`;
   }
   return 'IDLE';
 });
@@ -92,12 +92,8 @@ const handleEnergyClick = () => {
   <aside id="sidebar">
     <div id="manual-actions">
       <div class="action-wrapper" @click="handleEnergyClick">
-        <CrankButton
-          :value="energyButtonValue"
-          :broken="generationState.isCrankBroken"
-          :automated="generationState.isCrankAutomated"
-          :progress="energyGenerationProgress"
-        />
+        <CrankButton :value="energyButtonValue" :broken="generationState.isCrankBroken"
+          :automated="generationState.isCrankAutomated" :progress="energyGenerationProgress" />
       </div>
       <div v-if="gameStats.isDataUnlocked" class="action-wrapper">
         <TerminalProgressButton label="data" :value="dataButtonValue" :progress="dataGenerationProgress" />
@@ -116,7 +112,7 @@ const handleEnergyClick = () => {
       </div>
       <div class="stat">
         <span>Total Data:</span>
-        <span>{{ formatNumber(resourceStats.stats.totalData) }}</span>
+        <span>{{ formatDataValue(resourceStats.stats.totalData) }}</span>
       </div>
     </div>
   </aside>

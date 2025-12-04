@@ -5,6 +5,7 @@ import type { Node } from '@/types/node';
 import { checkNodeAvailable, checkCanAffordNode, checkTierLocked, checkNodeVisible } from '@/composables/useNodeValidation';
 import GameData from '@/core/gameData';
 import { ResourceAmounts } from '@/types';
+import { isNodeDefined } from '@/utils/nodeUtils';
 
 interface Props {
   nodes: Record<string, Node>;
@@ -255,10 +256,11 @@ const spawnDotsFromNode = (nodeId: string) => {
 const getDotPosition = (dot: TravelingDot) => {
   const fromNode = props.nodes[dot.fromNode];
   const toNode = props.nodes[dot.toNode];
-  if (!fromNode || !toNode) return { x: 0, y: 0 };
 
-  const x = fromNode.x + (toNode.x - fromNode.x) * dot.progress + 40;
-  const y = fromNode.y + (toNode.y - fromNode.y) * dot.progress + 40;
+  if (!isNodeDefined(fromNode) || !isNodeDefined(toNode)) return { x: 0, y: 0 };
+
+  const x = fromNode.x! + (toNode.x! - fromNode.x!) * dot.progress + 40;
+  const y = fromNode.y! + (toNode.y! - fromNode.y!) * dot.progress + 40;
   return { x, y };
 };
 
@@ -314,9 +316,9 @@ const resetZoom = () => {
   zoomLevel.value = 1;
   nextTick(() => {
     const coreNode = props.nodes.old_shed;
-    if (container.value && coreNode) {
-      container.value.scrollLeft = coreNode.x - container.value.clientWidth / 2 + 40;
-      container.value.scrollTop = coreNode.y - container.value.clientHeight / 2 + 40;
+    if (container.value && isNodeDefined(coreNode)) {
+      container.value.scrollLeft = coreNode.x! - container.value.clientWidth / 2 + 40;
+      container.value.scrollTop = coreNode.y! - container.value.clientHeight / 2 + 40;
     }
   });
 };
@@ -327,9 +329,9 @@ onMounted(() => {
 
   nextTick(() => {
     const coreNode = props.nodes.old_shed;
-    if (container.value && coreNode) {
-      container.value.scrollLeft = coreNode.x - container.value.clientWidth / 2 + 40;
-      container.value.scrollTop = coreNode.y - container.value.clientHeight / 2 + 40;
+    if (container.value && isNodeDefined(coreNode)) {
+      container.value.scrollLeft = coreNode.x! - container.value.clientWidth / 2 + 40;
+      container.value.scrollTop = coreNode.y! - container.value.clientHeight / 2 + 40;
     }
   });
 });
@@ -361,15 +363,8 @@ onBeforeUnmount(() => {
           <defs>
             <!-- Glow gradients for flowing effect -->
             <template v-for="conn in connections" :key="'glow-template-' + conn.from + '-' + conn.to">
-              <linearGradient
-                v-if="isConnectionUnlocked(conn)"
-                :id="getGlowGradientId(conn)"
-                gradientUnits="userSpaceOnUse"
-                :x1="conn.x1"
-                :y1="conn.y1"
-                :x2="conn.x2"
-                :y2="conn.y2"
-              >
+              <linearGradient v-if="isConnectionUnlocked(conn)" :id="getGlowGradientId(conn)"
+                gradientUnits="userSpaceOnUse" :x1="conn.x1" :y1="conn.y1" :x2="conn.x2" :y2="conn.y2">
                 <stop :offset="Math.max(0, getGlowOffset(conn) - 0.1)" stop-color="rgba(0, 255, 170, 0)" />
                 <stop :offset="getGlowOffset(conn)" stop-color="rgba(0, 255, 255, 0.8)" />
                 <stop :offset="Math.min(1, getGlowOffset(conn) + 0.1)" stop-color="rgba(0, 255, 170, 0)" />
@@ -377,107 +372,51 @@ onBeforeUnmount(() => {
             </template>
 
             <!-- Pulse gradients for unlock animation -->
-            <linearGradient
-              v-for="conn in connections"
-              :key="'grad-' + conn.from + '-' + conn.to"
-              :id="getConnectionGradientId(conn)"
-              gradientUnits="userSpaceOnUse"
-              :x1="conn.x1"
-              :y1="conn.y1"
-              :x2="conn.x2"
-              :y2="conn.y2"
-            >
+            <linearGradient v-for="conn in connections" :key="'grad-' + conn.from + '-' + conn.to"
+              :id="getConnectionGradientId(conn)" gradientUnits="userSpaceOnUse" :x1="conn.x1" :y1="conn.y1"
+              :x2="conn.x2" :y2="conn.y2">
               <stop offset="0%" stop-color="#00ffaa" stop-opacity="0">
-                <animate
-                  v-if="isConnectionAnimating(conn)"
-                  attributeName="offset"
-                  values="0;1"
-                  dur="0.6s"
-                  fill="freeze"
-                />
+                <animate v-if="isConnectionAnimating(conn)" attributeName="offset" values="0;1" dur="0.6s"
+                  fill="freeze" />
               </stop>
               <stop offset="0%" stop-color="#ffffff" stop-opacity="1">
-                <animate
-                  v-if="isConnectionAnimating(conn)"
-                  attributeName="offset"
-                  values="0;1"
-                  dur="0.6s"
-                  fill="freeze"
-                />
+                <animate v-if="isConnectionAnimating(conn)" attributeName="offset" values="0;1" dur="0.6s"
+                  fill="freeze" />
               </stop>
               <stop offset="10%" stop-color="#00ffaa" stop-opacity="0">
-                <animate
-                  v-if="isConnectionAnimating(conn)"
-                  attributeName="offset"
-                  values="0.1;1.1"
-                  dur="0.6s"
-                  fill="freeze"
-                />
+                <animate v-if="isConnectionAnimating(conn)" attributeName="offset" values="0.1;1.1" dur="0.6s"
+                  fill="freeze" />
               </stop>
             </linearGradient>
           </defs>
 
           <!-- Base connection lines -->
-          <line
-            v-for="(conn, index) in connections"
-            :key="index"
-            :x1="conn.x1"
-            :y1="conn.y1"
-            :x2="conn.x2"
-            :y2="conn.y2"
-            :class="{ unlocked: isConnectionUnlocked(conn), animating: isConnectionAnimating(conn) }"
-          />
+          <line v-for="(conn, index) in connections" :key="index" :x1="conn.x1" :y1="conn.y1" :x2="conn.x2"
+            :y2="conn.y2" :class="{ unlocked: isConnectionUnlocked(conn), animating: isConnectionAnimating(conn) }" />
 
           <!-- Flowing glow overlay for unlocked connections -->
           <template v-for="conn in connections" :key="'glow-line-' + conn.from + '-' + conn.to">
-            <line
-              v-if="isConnectionUnlocked(conn) && !isConnectionAnimating(conn)"
-              :x1="conn.x1"
-              :y1="conn.y1"
-              :x2="conn.x2"
-              :y2="conn.y2"
-              class="connection-glow"
-              :stroke="'url(#' + getGlowGradientId(conn) + ')'"
-            />
+            <line v-if="isConnectionUnlocked(conn) && !isConnectionAnimating(conn)" :x1="conn.x1" :y1="conn.y1"
+              :x2="conn.x2" :y2="conn.y2" class="connection-glow" :stroke="'url(#' + getGlowGradientId(conn) + ')'" />
           </template>
-          <line
-            v-for="conn in getAnimatingConnections()"
-            :key="'pulse-' + conn.from + '-' + conn.to"
-            :x1="conn.x1"
-            :y1="conn.y1"
-            :x2="conn.x2"
-            :y2="conn.y2"
-            class="connection-pulse"
-            :stroke="'url(#' + getConnectionGradientId(conn) + ')'"
-          />
+          <line v-for="conn in getAnimatingConnections()" :key="'pulse-' + conn.from + '-' + conn.to" :x1="conn.x1"
+            :y1="conn.y1" :x2="conn.x2" :y2="conn.y2" class="connection-pulse"
+            :stroke="'url(#' + getConnectionGradientId(conn) + ')'" />
         </svg>
 
         <!-- Traveling dots -->
-        <div
-          v-for="dot in travelingDots"
-          :key="dot.id"
-          :class="['traveling-dot', { 'to-locked': !dot.toUnlocked }]"
+        <div v-for="dot in travelingDots" :key="dot.id" :class="['traveling-dot', { 'to-locked': !dot.toUnlocked }]"
           :style="{
             left: getDotPosition(dot).x + 'px',
             top: getDotPosition(dot).y + 'px',
-          }"
-        ></div>
+          }"></div>
 
         <div id="nodes">
-          <SkillNode
-            v-for="node in nodesList"
-            :key="node.id"
-            :node="node"
-            :is-unlocked="isUnlocked(node.id)"
-            :is-available="isAvailable(node)"
-            :is-tier-locked="isTierLocked(node)"
-            :can-afford="canAfford(node)"
-            :is-selected="selectedNodeId === node.id"
-            :just-unlocked="justUnlockedNodeId === node.id"
-            :progress-percent="getNodeProgressPercent(node.id)"
-            :node-level="nodeLevels[node.id] || 0"
-            @select="selectNode"
-          />
+          <SkillNode v-for="node in nodesList" :key="node.id" :node="node" :is-unlocked="isUnlocked(node.id)"
+            :is-available="isAvailable(node)" :is-tier-locked="isTierLocked(node)" :can-afford="canAfford(node)"
+            :is-selected="selectedNodeId === node.id" :just-unlocked="justUnlockedNodeId === node.id"
+            :progress-percent="getNodeProgressPercent(node.id)" :node-level="nodeLevels[node.id] || 0"
+            @select="selectNode" />
         </div>
       </div>
     </div>
