@@ -19,9 +19,9 @@ Visual node graph editor with drag-and-drop, connection editing, and property ma
 ### Phase 1: Core Canvas & Visualization
 **Goal**: Render existing nodes visually with pan/zoom
 
-1.1. Create [`NodeCanvas.vue`](packages/editor/src/components/NodeCanvas.vue) using SVG for node/connection rendering with pan/zoom controls
+~~1.1. Create [`NodeCanvas.vue`](packages/editor/src/components/NodeCanvas.vue) using SVG for node/connection rendering with pan/zoom controls~~ - IMPLEMENTED
 
-1.2. Create [`useNodeGraphManager`](packages/editor/src/composables/useNodeGraphManager.ts) composable loading `allNodes` from `@network-simulator/shared`, managing editor state
+~~1.2. Create [`useNodeGraphManager`](packages/editor/src/composables/useNodeGraphManager.ts) composable loading `allNodes` from `@network-simulator/shared`, managing editor state~~ - IMPLEMENTED
 
 1.3. Implement [`canvasRenderer.ts`](packages/editor/src/utils/canvasRenderer.ts) utility converting `Node` positions to SVG coordinates, drawing connection paths
 
