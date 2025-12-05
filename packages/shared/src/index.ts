@@ -18,3 +18,11 @@ export * from './data/changelogData'
 export * from './utils/nodeUtils'
 export * from './utils/formatUtils'
 export * from './utils/branchUtils'
+
+// Re-export layout engine and types
+export { LayoutEngine } from './layout/LayoutEngine'
+export type { LayoutNode } from './layout/TreeBuilder'
+export type { LayoutConfig, DepthInfo } from './layout/PositionCalculator'
+export { TreeBuilder } from './layout/TreeBuilder'
+export { PositionCalculator } from './layout/PositionCalculator'
+export { CollisionResolver } from './layout/CollisionResolver'

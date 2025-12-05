@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import NodeCanvas from './components/NodeCanvas.vue';
 
 const message = ref('Network Simulator Editor')
 </script>
@@ -11,15 +12,7 @@ const message = ref('Network Simulator Editor')
       <p class="subtitle">Story & Node Editor - Coming Soon</p>
     </header>
     <main class="editor-main">
-      <div class="placeholder">
-        <p>Editor interface will be implemented here</p>
-        <ul class="feature-list">
-          <li>Visual node editor</li>
-          <li>Story narration composer</li>
-          <li>Branch visualization</li>
-          <li>Export/import tools</li>
-        </ul>
-      </div>
+        <NodeCanvas />
     </main>
   </div>
 </template>

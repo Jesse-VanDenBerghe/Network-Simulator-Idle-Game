@@ -2,7 +2,7 @@
 // Single Responsibility: Physics-based positioning and depth calculations
 // ==========================================================
 
-import type { NodeRequirement } from '@network-simulator/shared/types/node';
+import type { NodeRequirement } from '../types/node';
 import type { LayoutNode } from './TreeBuilder';
 
 /**

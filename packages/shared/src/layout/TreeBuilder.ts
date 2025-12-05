@@ -2,7 +2,7 @@
 // Single Responsibility: Build tree structure and assign branches
 // ==========================================================
 
-import type { Node, NodeRequirement } from '@network-simulator/shared/types/node';
+import type { Node, NodeRequirement } from '../types/node';
 
 /**
  * Extract node ID from a requirement (supports both 'node_id' and { id: 'node_id', level: n })
@@ -26,6 +26,8 @@ export interface DependencyTree {
  * Extended node with layout metadata
  */
 export interface LayoutNode extends Node {
+    x: number;
+    y: number;
     branchAngle?: number;
     depth?: number;
     depthInfo?: { depth: number; sameTierHops: number };

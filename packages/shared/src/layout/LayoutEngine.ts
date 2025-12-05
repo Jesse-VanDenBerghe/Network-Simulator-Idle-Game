@@ -5,9 +5,9 @@
 import { TreeBuilder } from './TreeBuilder';
 import { PositionCalculator, type LayoutConfig } from './PositionCalculator';
 import { CollisionResolver } from './CollisionResolver';
-import type { Node } from '@network-simulator/shared/types/node';
+import type { Node } from '../types/node';
 import type { LayoutNode } from './TreeBuilder';
-import { LAYOUT_CONFIG } from '@network-simulator/shared/data/constants';
+import { LAYOUT_CONFIG } from '../data/constants';
 
 /**
  * GameData interface (minimal for layout purposes)
