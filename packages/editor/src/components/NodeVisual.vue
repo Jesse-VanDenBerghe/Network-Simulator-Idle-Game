@@ -58,6 +58,7 @@ const handleClick = (event: MouseEvent) => {
     <g
         class="node-visual"
         @click="handleClick"
+        :class="{ 'node-selected': isSelected }"
         :style="{
             transformOrigin: `${node.x}px ${node.y}px`,
             opacity: isFiltered ? 1 : 0.2
@@ -77,7 +78,6 @@ const handleClick = (event: MouseEvent) => {
             :cy="node.y"
             :r="NODE_RADIUS"
             class="node-border"
-            :class="{ 'node-selected': isSelected }"
             :stroke="branchColors"
             :stroke-width="isSelected ? 4 : 2"
             fill="none"
@@ -200,8 +200,11 @@ const handleClick = (event: MouseEvent) => {
     user-select: none;
 }
 
-.node-selected .node-name {
-    fill: #2196F3;
-    font-weight: bold;
+.node-selected .node-border, .node-selected .tier-badge {
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.node-selected .node-fill {
+    opacity: 0.5;
 }
 </style>
