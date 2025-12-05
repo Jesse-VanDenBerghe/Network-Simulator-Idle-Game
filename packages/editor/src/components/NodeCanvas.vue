@@ -3,16 +3,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { LayoutEngine, type LayoutNode } from '@network-simulator/shared';
 import { useNodeGraphManager } from '@/composables/useNodeGraphManager';
-
-interface Point {
-    x: number;
-    y: number;
-}
-
-interface Connection {
-    from: Point;
-    to: Point;
-}
+import { buildConnections, generateConnectionPath, type Point, type Connection } from '@/utils/canvasRenderer';
 
 const {
     filteredNodes,
@@ -51,26 +42,7 @@ const visibleNodes = computed(() => {
 });
 
 const connections = computed(() => {
-    const results: Connection[] = [];
-    const visibleNodeIds = new Set(visibleNodes.value.map(n => n.id));
-
-    visibleNodes.value.forEach((node) => {
-        node.requires.forEach((req) => {
-            const parentId = typeof req === 'string' ? req : req.id;
-
-            if (!visibleNodeIds.has(parentId)) return;
-
-            const parent = visibleNodes.value.find(n => n.id === parentId);
-            if (parent) {
-                results.push({
-                    from: { x: node.x, y: node.y },
-                    to: { x: parent.x, y: parent.y }
-                });
-            }
-        });
-    });
-
-    return results;
+    return buildConnections(visibleNodes.value);
 });
 
 function isSelected(nodeId: string): boolean {
@@ -164,8 +136,14 @@ onBeforeUnmount(() => {
 <template>
     <svg ref="svgRef" view-box="0 0 1600 1200" class="node-canvas" @wheel="handleWheel" @mousedown="handleMouseDown">
         <g :transform="transform">
-            <line v-for="(conn, index) in connections" :key="index" :x1="conn.from.x" :y1="conn.from.y" :x2="conn.to.x"
-                :y2="conn.to.y" class="connection-line" />
+            <path 
+                v-for="(conn, index) in connections" 
+                :key="`${conn.fromNodeId}-${conn.toNodeId}-${index}`" 
+                :d="generateConnectionPath(conn.from, conn.to)"
+                class="connection-line"
+                :class="{ 'connection-leveled': conn.requirementLevel !== undefined }"
+                fill="none" />
+
             <g v-for="node in visibleNodes" :key="node.id" class="node-group" @click="handleNodeClick(node.id, $event)">
                 <circle :cx="node.x" :cy="node.y" r="20" :class="getNodeCircleClass(node.id)" />
                 <circle v-if="isModified(node.id)" :cx="node.x + 15" :cy="node.y - 15" r="4"
@@ -194,6 +172,11 @@ onBeforeUnmount(() => {
     stroke: #666;
     stroke-width: 2;
     pointer-events: none;
+}
+
+.connection-leveled {
+    stroke: #888;
+    stroke-dasharray: 4 2;
 }
 
 .node-group {
