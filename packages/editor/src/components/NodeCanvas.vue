@@ -54,15 +54,6 @@ function isModified(nodeId: string): boolean {
     return modifiedNodeIds.value.has(nodeId);
 }
 
-function getNodeCircleClass(nodeId: string): string {
-    let classes = ['node-circle'];
-
-    if (isSelected(nodeId)) classes.push('node-selected');
-    if (isModified(nodeId)) classes.push('node-modified');
-
-    return classes.join(' ');
-}
-
 function handleWheel(event: WheelEvent) {
     event.preventDefault();
 
@@ -185,43 +176,6 @@ onBeforeUnmount(() => {
 .connection-leveled {
     stroke: #888;
     stroke-dasharray: 4 2;
-}
-
-.node-group {
-    cursor: pointer;
-}
-
-.node-circle {
-    fill: #4CAF50;
-    stroke: #2e7d32;
-    stroke-width: 2;
-    transition: fill 0.2s, stroke 0.2s;
-}
-
-.node-circle:hover {
-    fill: #66BB6A;
-    stroke: #43A047;
-}
-
-.node-circle.node-selected {
-    stroke: #2196F3;
-    stroke-width: 4;
-    fill: #4CAF50;
-}
-
-.node-circle.node-modified {
-    fill: #FF9800;
-}
-
-.node-circle.node-selected.node-modified {
-    fill: #FF9800;
-    stroke: #2196F3;
-    stroke-width: 4;
-}
-
-.modified-indicator {
-    fill: #FF5722;
-    pointer-events: none;
 }
 
 .node-icon {
