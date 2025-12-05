@@ -23,9 +23,9 @@ Visual node graph editor with drag-and-drop, connection editing, and property ma
 
 ~~1.2. Create [`useNodeGraphManager`](packages/editor/src/composables/useNodeGraphManager.ts) composable loading `allNodes` from `@network-simulator/shared`, managing editor state~~ - IMPLEMENTED
 
-1.3. Implement [`canvasRenderer.ts`](packages/editor/src/utils/canvasRenderer.ts) utility converting `Node` positions to SVG coordinates, drawing connection paths
+~~1.3. Implement [`canvasRenderer.ts`](packages/editor/src/utils/canvasRenderer.ts) utility converting `Node` positions to SVG coordinates, drawing connection paths~~ - IMPLEMENTED 
 
-1.4. Add [`NodeVisual.vue`](packages/editor/src/components/NodeVisual.vue) displaying individual node with icon, name, tier badge, branch color
+~~1.4. Add [`NodeVisual.vue`](packages/editor/src/components/NodeVisual.vue) displaying individual node with icon, name, tier badge, branch color~~ - IMPLEMENTED
 
 1.5. Integrate existing [`LayoutEngine`](packages/game/src/layout/LayoutEngine.ts) calculating initial node positions
 

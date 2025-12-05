@@ -3,7 +3,8 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { LayoutEngine, type LayoutNode } from '@network-simulator/shared';
 import { useNodeGraphManager } from '@/composables/useNodeGraphManager';
-import { buildConnections, generateConnectionPath, type Point, type Connection } from '@/utils/canvasRenderer';
+import { buildConnections, generateConnectionPath, type Point } from '@/utils/canvasRenderer';
+import NodeVisual from './NodeVisual.vue';
 
 const {
     filteredNodes,
@@ -64,7 +65,7 @@ function getNodeCircleClass(nodeId: string): string {
 
 function handleWheel(event: WheelEvent) {
     event.preventDefault();
-    
+
     if (event.ctrlKey) {
         // Pinch-to-zoom: use smaller delta for smoothness
         const zoomSensitivity = 0.002;
@@ -74,7 +75,7 @@ function handleWheel(event: WheelEvent) {
         // Two-finger pan
         panX.value -= event.deltaX;
         panY.value -= event.deltaY;
-        
+
         const maxPan = 2000;
         panX.value = Math.max(-maxPan, Math.min(maxPan, panX.value));
         panY.value = Math.max(-maxPan, Math.min(maxPan, panY.value));
@@ -134,24 +135,31 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <svg ref="svgRef" view-box="0 0 1600 1200" class="node-canvas" @wheel="handleWheel" @mousedown="handleMouseDown">
+    <svg
+        ref="svgRef"
+        view-box="0 0 1600 1200"
+        class="node-canvas"
+        @wheel="handleWheel"
+        @mousedown="handleMouseDown"
+    >
         <g :transform="transform">
-            <path 
-                v-for="(conn, index) in connections" 
-                :key="`${conn.fromNodeId}-${conn.toNodeId}-${index}`" 
+            <path
+                v-for="(conn, index) in connections"
+                :key="`${conn.fromNodeId}-${conn.toNodeId}-${index}`"
                 :d="generateConnectionPath(conn.from, conn.to)"
                 class="connection-line"
                 :class="{ 'connection-leveled': conn.requirementLevel !== undefined }"
-                fill="none" />
+                fill="none"
+            />
 
-            <g v-for="node in visibleNodes" :key="node.id" class="node-group" @click="handleNodeClick(node.id, $event)">
-                <circle :cx="node.x" :cy="node.y" r="20" :class="getNodeCircleClass(node.id)" />
-                <circle v-if="isModified(node.id)" :cx="node.x + 15" :cy="node.y - 15" r="4"
-                    class="modified-indicator" />
-                <text :x="node.x" :y="node.y" class="node-icon">
-                    {{ node.icon }}
-                </text>
-            </g>
+            <NodeVisual
+                v-for="node in visibleNodes"
+                :key="node.id"
+                :node="node"
+                :is-selected="isSelected(node.id)"
+                :is-modified="isModified(node.id)"
+                @click="handleNodeClick"
+            />
         </g>
     </svg>
 </template>
@@ -224,5 +232,4 @@ onBeforeUnmount(() => {
     pointer-events: none;
     user-select: none;
 }
-
 </style>
