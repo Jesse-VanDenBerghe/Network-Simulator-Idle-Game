@@ -7,6 +7,7 @@ import { buildConnections, generateConnectionPath, type Point } from '@/utils/ca
 import NodeVisual from './NodeVisual.vue';
 
 const {
+    nodes,
     filteredNodes,
     selectedNode,
     modifiedNodeIds,
@@ -101,18 +102,13 @@ function handleNodeClick(nodeId: string, event: MouseEvent) {
 }
 
 onMounted(() => {
-    const allNodesForLayout = Object.fromEntries(
-        Array.from(filteredNodes.value).map(node => [node.id, node])
-    );
+    const allNodesRecord = Object.fromEntries(nodes.value);
 
-    const positions = LayoutEngine.calculateLayout(allNodesForLayout);
+    const layoutResult = LayoutEngine.calculateLayout(allNodesRecord);
 
     layoutedNodes.value = new Map(
-        Object.entries(positions).map(([id, node]) => [
-            id,
-            node as LayoutNode & { x: number; y: number }
-        ])
-    )
+        Object.entries(layoutResult).map(([id, node]) => [id, node])
+    );
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);

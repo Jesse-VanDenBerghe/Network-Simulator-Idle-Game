@@ -27,7 +27,7 @@ Visual node graph editor with drag-and-drop, connection editing, and property ma
 
 ~~1.4. Add [`NodeVisual.vue`](packages/editor/src/components/NodeVisual.vue) displaying individual node with icon, name, tier badge, branch color~~ - IMPLEMENTED
 
-1.5. Integrate existing [`LayoutEngine`](packages/game/src/layout/LayoutEngine.ts) calculating initial node positions
+~~1.5. Integrate existing [`LayoutEngine`](packages/game/src/layout/LayoutEngine.ts) calculating initial node positions~~ - IMPLEMENTED
 
 1.6. Wire up `NodeCanvas` in [`App.vue`](packages/editor/src/App.vue) with sidebar showing node count, branch filters
 
