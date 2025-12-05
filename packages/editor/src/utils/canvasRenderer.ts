@@ -23,6 +23,7 @@ export interface Connection{
     from: Point;
     to: Point;
     requirementLevel?: number;
+    isFiltered?: boolean;
 }
 
 /**
@@ -155,7 +156,8 @@ export function inverseTransformPoint(
  * @returns Array of Connection objects
  */
 export function buildConnections(
-    nodes: Array<Node & {x: number; y: number}>
+    nodes: Array<Node & {x: number; y: number}>,
+    filteredNodeIds: Set<string>
 ): Connection[] {
     const connections: Connection[] = [];
 
@@ -177,6 +179,7 @@ export function buildConnections(
                 from: {x: node.x, y: node.y},
                 to: parentPos,
                 requirementLevel: level,
+                isFiltered: filteredNodeIds.has(node.id) && filteredNodeIds.has(parentId),
             });
         });
     });

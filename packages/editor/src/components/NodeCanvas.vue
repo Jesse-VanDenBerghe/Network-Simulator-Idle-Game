@@ -29,7 +29,11 @@ const transform = computed(() => {
 });
 
 const visibleNodes = computed(() => {
-    return filteredNodes.value
+    const allNodesArray = Array.from(nodes.value.values());
+
+    const filteredNodeIds = new Set(filteredNodes.value.map(node => node.id));
+
+    return allNodesArray
         .map(node => {
             const layoutNode = layoutedNodes.value.get(node.id);
             if (!layoutNode) return null;
@@ -37,14 +41,15 @@ const visibleNodes = computed(() => {
             return {
                 ...node,
                 x: layoutNode.x,
-                y: layoutNode.y
+                y: layoutNode.y,
+                isFiltered: filteredNodeIds.has(node.id)
             };
         })
         .filter((node): node is NonNullable<typeof node> => node !== null);
 });
 
 const connections = computed(() => {
-    return buildConnections(visibleNodes.value);
+    return buildConnections(visibleNodes.value, new Set(filteredNodes.value.map(node => node.id)));
 });
 
 function isSelected(nodeId: string): boolean {
@@ -136,6 +141,7 @@ onBeforeUnmount(() => {
                 :d="generateConnectionPath(conn.from, conn.to)"
                 class="connection-line"
                 :class="{ 'connection-leveled': conn.requirementLevel !== undefined }"
+                :style="{ opacity: conn.isFiltered ? 1 : 0.2 }"
                 fill="none"
             />
 
@@ -145,6 +151,7 @@ onBeforeUnmount(() => {
                 :node="node"
                 :is-selected="isSelected(node.id)"
                 :is-modified="isModified(node.id)"
+                :is-filtered="node.isFiltered"
                 @click="handleNodeClick"
             />
         </g>
@@ -167,6 +174,7 @@ onBeforeUnmount(() => {
     stroke: #666;
     stroke-width: 2;
     pointer-events: none;
+    transition: opacity 0.3s;
 }
 
 .connection-leveled {

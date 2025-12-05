@@ -20,6 +20,7 @@ export type {
 // Node system types
 export type {
     BranchId,
+    BranchMetadata,
     NodeTier,
     NodeCost,
     AutomationEffect,
@@ -33,6 +34,10 @@ export type {
     UnlockResult,
     NodeCollection,
     BranchCollection
+} from './node';
+
+export {
+    BRANCHES
 } from './node';
 
 // Notification system types

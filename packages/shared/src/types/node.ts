@@ -9,6 +9,21 @@ import type { ResourceAmounts } from './game';
 export type BranchId = 'energy' | 'computer';
 
 /**
+ *  Branch metadata display
+ */
+export interface BranchMetadata {
+    id: BranchId;
+    label: string;
+    icon: string;
+    color: string;
+}
+
+export const BRANCHES: readonly BranchMetadata[] = [
+    { id: 'energy', label: 'Energy', icon: '⚡', color: '#f59e0b' },
+    { id: 'computer', label: 'Computer', icon: '💻', color: '#3b82f6' }
+] as const;
+
+/**
  * Node tier (0-8, affects cost scaling)
  */
 export type NodeTier = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;

@@ -1,6 +1,21 @@
 import { allNodes, BranchId, NodeTier, type Node } from "@network-simulator/shared";
 import { computed, ComputedRef, reactive, ref, Ref } from "vue";
 
+const originalNodes = new Map<string, Node>(
+    Object.entries(allNodes).map(([id, node]) => [id, node])
+);
+
+const modifications = reactive<Map<string, Partial<Node>>>(new Map());
+const modifiedNodeIds = ref<Set<string>>(new Set());
+
+const editorState = reactive<EditorState>({
+    selectedNodeId: null,
+    filterBranch: null,
+    filterTier: null,
+    searchQuery: "",
+    isDirty: false,
+});
+
 /**
  * Editor state for node graph management
  */
@@ -39,23 +54,6 @@ export interface UseNodeGraphManagerReturn {
 }
 
 export function useNodeGraphManager(): UseNodeGraphManagerReturn {
-    //=== State ===//
-    const originalNodes = new Map<string, Node>(
-        Object.entries(allNodes).map(([id, node]) => [id, node])
-    );
-
-    const modifications = reactive<Map<string, Partial<Node>>>(new Map());
-
-    const modifiedNodeIds = ref<Set<string>>(new Set());
-
-    const editorState = reactive<EditorState>({
-        selectedNodeId: null,
-        filterBranch: null,
-        filterTier: null,
-        searchQuery: "",
-        isDirty: false,
-    });
-
     //=== Computed ===//
     const nodes = computed<Map<string, Node>>(() => {
         const merged = new Map<string, Node>();

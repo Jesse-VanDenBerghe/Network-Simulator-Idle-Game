@@ -29,7 +29,7 @@ Visual node graph editor with drag-and-drop, connection editing, and property ma
 
 ~~1.5. Integrate existing [`LayoutEngine`](packages/game/src/layout/LayoutEngine.ts) calculating initial node positions~~ - IMPLEMENTED
 
-1.6. Wire up `NodeCanvas` in [`App.vue`](packages/editor/src/App.vue) with sidebar showing node count, branch filters
+~~1.6. Wire up `NodeCanvas` in [`App.vue`](packages/editor/src/App.vue) with sidebar showing node count, branch filters~~ - IMPLEMENTED
 
 ### Phase 2: Node Selection & Property Editor
 **Goal**: Select nodes and edit their properties

@@ -7,11 +7,13 @@ interface Props {
     node: Node & { x: number; y: number };
     isSelected?: boolean;
     isModified?: boolean;
+    isFiltered?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isSelected: false,
-    isModified: false
+    isModified: false,
+    isFiltered: true
 });
 
 const emit = defineEmits<{
@@ -56,7 +58,10 @@ const handleClick = (event: MouseEvent) => {
     <g
         class="node-visual"
         @click="handleClick"
-        :style="{ transformOrigin: `${node.x}px ${node.y}px` }"
+        :style="{
+            transformOrigin: `${node.x}px ${node.y}px`,
+            opacity: isFiltered ? 1 : 0.2
+        }"
     >
 
         <circle
@@ -141,7 +146,7 @@ const handleClick = (event: MouseEvent) => {
 
 .node-visual {
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, opacity 0.3s;
 }
 
 .node-visual:hover {

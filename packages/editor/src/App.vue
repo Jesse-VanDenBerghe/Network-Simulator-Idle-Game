@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import NodeCanvas from './components/NodeCanvas.vue';
+import EditorSidebar from './components/EditorSidebar.vue';
 
 const message = ref('Network Simulator Editor')
 </script>
@@ -9,10 +10,13 @@ const message = ref('Network Simulator Editor')
   <div class="editor-container">
     <header class="editor-header">
       <h1>{{ message }}</h1>
-      <p class="subtitle">Story & Node Editor - Coming Soon</p>
+      <p class="subtitle">Visual Node Graph Editor</p>
     </header>
     <main class="editor-main">
+      <EditorSidebar />
+      <div class="canvas-container">
         <NodeCanvas />
+      </div>
     </main>
   </div>
 </template>
@@ -29,54 +33,32 @@ const message = ref('Network Simulator Editor')
 }
 
 .editor-header {
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   background: #2a2a2a;
   border-bottom: 2px solid #3a3a3a;
 }
 
 .editor-header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.75rem;
   color: #4a9eff;
 }
 
 .subtitle {
   margin: 0.5rem 0 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #888;
 }
 
 .editor-main {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  overflow: hidden;
 }
 
-.placeholder {
-  text-align: center;
-  max-width: 600px;
-}
-
-.placeholder p {
-  font-size: 1.25rem;
-  margin-bottom: 2rem;
-  color: #aaa;
-}
-
-.feature-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.feature-list li {
-  padding: 1rem;
-  background: #2a2a2a;
-  border-radius: 8px;
-  border-left: 4px solid #4a9eff;
+.canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 </style>
